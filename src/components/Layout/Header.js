@@ -152,7 +152,7 @@ class Header extends React.Component {
                   onClick={this.keluarGudang}
                   className="border-light"
                 >
-                  <MdEditLocation /> Pilih Gudang
+                  <MdEditLocation /> Pilih Domisili
                 </ListGroupItem>
                 <ListGroupItem
                   tag="button"

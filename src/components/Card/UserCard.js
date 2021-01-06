@@ -17,7 +17,7 @@ const UserCard = ({
   className,
   ...restProps
 }) => {
-  const classes = classNames('bg-gradient-theme', className);
+  const classes = classNames('bg-gradient-theme-header', className);
 
   return (
     <Card inverse className={classes} {...restProps}>
