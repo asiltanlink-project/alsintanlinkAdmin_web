@@ -1,36 +1,16 @@
-import AuthForm, { STATE_LOGIN } from 'components/AuthForm';
+import AuthForm from 'components/AuthForm';
 import React from 'react';
 import { Card, Col, Row } from 'reactstrap';
 import * as myUrl from '../urlLink';
-
 import NotificationSystem from 'react-notification-system';
 import { NOTIFICATION_SYSTEM_STYLE } from 'utils/constants';
+import Page from 'components/Page';
 
 import { MdLoyalty } from 'react-icons/md';
 
 class AuthPage extends React.Component {
-  handleAuthState = authState => {
-    if (authState === STATE_LOGIN) {
-      this.props.history.push('/login');
-    } else {
-      this.props.history.push('/lupapassword');
-    }
-  };
-
-  gotoChangePwd = () => {
-    this.props.history.push({
-      pathname: '/resetpassword',
-      state: { ok: true },
-    });
-  };
-
-  handleLogoClick = () => {
-    this.props.history.push('/login');
-  };
-
   requestLogin = async (username, password) => {
     const urlA = myUrl.url_login;
-    var status = false;
     //console.log("url", urlA);
 
     var payload = {
@@ -51,7 +31,6 @@ class AuthPage extends React.Component {
     let data = await fetch(urlA, option)
       .then(response => {
         if (response.ok) {
-          //console.log("LOGIN2");
           return response;
         } else {
           if (response.status === 401) {
@@ -65,7 +44,7 @@ class AuthPage extends React.Component {
           return true;
         }
       })
-      .catch(err => {
+      .catch(() => {
         //console.log(err);
         this.showNotification('Koneksi ke server gagal!', 'error');
         return true;
@@ -97,15 +76,10 @@ class AuthPage extends React.Component {
           if (data1.mem_forcechangepasswordyn === 'Y') {
             //console.log("FORE CHANGE YES");
             this.props.history.push({
-              pathname: '/resetpassword',
+              pathname: '/',
               state: { ok: true },
             });
           } else {
-            //console.log("FORE CHANGE NO");
-            // this.props.history.push({
-            //   pathname: '/Dashboard',
-            //   state: { profile: data.result }
-            // })
             window.location.replace('/');
           }
         } else {
@@ -114,7 +88,6 @@ class AuthPage extends React.Component {
         }
       } else {
         this.showNotification(error.msg, 'error');
-        //console.log(error.msg);
       }
     } else {
       //console.log("FETCHING DONE");
@@ -124,6 +97,7 @@ class AuthPage extends React.Component {
     return true;
   };
 
+  // untuk menampilkan notifikasi
   showNotification = (currMessage, levelType) => {
     setTimeout(() => {
       if (!this.notificationSystem) {
@@ -139,34 +113,34 @@ class AuthPage extends React.Component {
 
   render() {
     return (
-      <Row
-        style={{
-          height: '100vh',
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}
-      >
-        <Col md={6} lg={4}>
-          <Card body>
-            <NotificationSystem
-              dismissible={false}
-              ref={notificationSystem =>
-                (this.notificationSystem = notificationSystem)
-              }
-              style={NOTIFICATION_SYSTEM_STYLE}
-            />
-            {/* {//console.log(this.props)} */}
-            <AuthForm
-              authState={this.props.authState}
-              onChangeAuthState={this.handleAuthState}
-              onLogoClick={this.handleLogoClick}
-              onButtonClick={this.requestLogin}
-              gotoChangePwd={this.gotoChangePwd}
-              showNotification={this.showNotification}
-            />
-          </Card>
-        </Col>
-      </Row>
+      <Page>
+        <Row
+          style={{
+            height: '100vh',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        >
+          <Col md={6} lg={4}>
+            <Card body>
+              {/* untuk notifikasi */}
+              <NotificationSystem
+                dismissible={false}
+                ref={notificationSystem =>
+                  (this.notificationSystem = notificationSystem)
+                }
+                style={NOTIFICATION_SYSTEM_STYLE}
+              />
+
+              {/* untuk get props dari authform  */}
+              <AuthForm
+                onButtonClick={this.requestLogin}
+                showNotification={this.showNotification}
+              />
+            </Card>
+          </Col>
+        </Row>
+      </Page>
     );
   }
 }

@@ -20,7 +20,7 @@ import {
   ModalHeader,
   CardHeader,
 } from 'reactstrap';
-import { IconWidget } from 'components/Widget';
+// import { IconWidget } from 'components/Widget';FG
 import {
   MdLoyalty,
   MdHighlightOff,

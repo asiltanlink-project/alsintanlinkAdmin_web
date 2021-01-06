@@ -7,7 +7,6 @@ import {
   MdExitToApp,
   MdEditLocation,
   MdNotificationsActive,
-  MdPublic,
 } from 'react-icons/md';
 import {
   Button,
@@ -25,19 +24,6 @@ import { Redirect } from 'react-router-dom';
 
 const bem = bn.create('header');
 
-const MdNotificationsActiveWithBadge = withBadge({
-  size: 'md',
-  color: 'primary',
-  style: {
-    top: -10,
-    right: -10,
-    display: 'inline-flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  children: <small>2</small>,
-})(MdNotificationsActive);
-
 class Header extends React.Component {
   state = {
     isOpenNotificationPopover: false,
@@ -45,7 +31,6 @@ class Header extends React.Component {
     isOpenUserCardPopover: false,
     redirect: false,
     redirectGudang: false,
-    redirectDashboard: false,
   };
 
   toggleNotificationPopover = () => {
@@ -86,13 +71,6 @@ class Header extends React.Component {
     });
   };
 
-  keDashboard = () => {
-    this.setState({
-      redirectDashboard: true,
-      isOpenUserCardPopover: false,
-    });
-  };
-
   renderRedirect = () => {
     if (this.state.redirect) {
       return <Redirect to="/login" />;
@@ -100,9 +78,6 @@ class Header extends React.Component {
       const { title } = this.props;
       this.setState({ title: '' });
       return <Redirect to="/" />;
-    } else if (this.state.redirectDashboard) {
-      this.setState({ redirectDashboard: false });
-      return <Redirect to="/Dashboard" />;
     }
   };
 
@@ -121,7 +96,6 @@ class Header extends React.Component {
     this.setDataProfile();
   }
 
-  // <SearchInput />
   render() {
     var gudangName = window.localStorage.getItem('gName');
     return (
@@ -172,14 +146,6 @@ class Header extends React.Component {
               className="border-light"
             >
               <ListGroup flush>
-                <ListGroupItem
-                  tag="button"
-                  action
-                  onClick={this.keDashboard}
-                  className="border-light"
-                >
-                  <MdPublic /> Dashboard
-                </ListGroupItem>
                 <ListGroupItem
                   tag="button"
                   action

@@ -31,8 +31,7 @@ function getPermission(page, Component, rest) {
   if (result === true) {
     if (
       page.location.pathname === '/login' ||
-      page.location.pathname === '/lupapassword' ||
-      page.location.pathname === '/resetpassword'
+      page.location.pathname === '/lupapassword' 
     ) {
       return (
         <Redirect
@@ -48,8 +47,7 @@ function getPermission(page, Component, rest) {
   } else {
     if (
       page.location.pathname !== '/login' &&
-      page.location.pathname !== '/lupapassword' &&
-      page.location.pathname !== '/resetpassword'
+      page.location.pathname !== '/lupapassword' 
     ) {
       return (
         <Redirect

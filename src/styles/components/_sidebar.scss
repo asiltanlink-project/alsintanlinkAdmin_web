@@ -39,9 +39,9 @@
   &::after {
     z-index: 3;
     // sublime light
-    background: #fc5c7d; /* fallback for old browsers */
-    //background: #1db8b2;//linear-gradient(to bottom, #6a82fb, #fc5c7d);
-    background: linear-gradient(to bottom, #1db8b2, #047873);
+    // background: #fc5c7d; /* fallback for old browsers */
+    // background: #1db8b2;//linear-gradient(to bottom, #6a82fb, #fc5c7d);
+    // background: linear-gradient(to bottom, #1db8b2, #047873);
     opacity: 1;
   }
 
@@ -113,9 +113,9 @@
     }
 
     .nav-link {
-      // @include media-breakpoint-down(md) {
-      //   padding: .5rem;
-      // }
+      @include media-breakpoint-down(md) {
+        padding: .5rem;
+      }
       color: theme-color(light);
 
       &:hover {
