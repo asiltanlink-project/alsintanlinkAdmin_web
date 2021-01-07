@@ -73,7 +73,10 @@ class showTransaction extends React.Component {
       newProductDesc: '',
       newProcode: '',
       enterButton: false,
-      pilihPeriode: '',
+      pilihType: '',
+      pilihProvinsi: '',
+      pilihKotaKab: '',
+      pilihKecamatan: '',
       pilihPelapak: '',
       pilihPelapak2: '',
       pilihEcommerce: '',
@@ -82,8 +85,8 @@ class showTransaction extends React.Component {
       namaPeriode: '',
       ecommerceID: '',
       action: '',
-      pelapakDisabled: false,
-      ecommerceDisabled: true,
+      typeDisabled: false,
+      domisiliDisabled: true,
       periodeDisabled: true,
       dataAvailable: false,
       startDate: '',
@@ -91,22 +94,18 @@ class showTransaction extends React.Component {
       resetInfo: false,
       currentDimenBatasStandar: [],
       currentDimenBatasStandarLama: [],
-      resultPeriode: [
+      resultType: [
         {
-          periode_id: 'upcoming',
-          periode_name: 'Akan Datang',
+          type_id: 'farmer',
+          type_name: 'Farmer',
         },
         {
-          periode_id: 'ongoing',
-          periode_name: 'Sedang Berjalan',
-        },
-        {
-          periode_id: 'expired',
-          periode_name: 'Sudah Selesai',
+          type_id: 'upja',
+          type_name: 'UPJA',
         },
       ],
 
-      namaPelapak2: [],
+      namaProvinsi2: [],
       idPelapak: [],
       pelapakDetail: [],
       ecommerceDetail: [],
@@ -339,11 +338,31 @@ class showTransaction extends React.Component {
     }
   }
 
+  saveDomisili() {
+    this.setState(
+      {
+        pilihProvinsi: this.state.pilihProvinsi,
+        pilihKotaKab: this.state.pilihKotaKab,
+        pilihKecamatan: this.state.pilihKecamatan,
+        namaProvinsiSave: this.state.namaProvinsi,
+        namaKotaKabSave: this.state.namaKotaKab,
+        namaKecamatanSave: this.state.namaKecamatan,
+        domisiliDisabled: true,
+        typeDisabled: false,
+        modal_nested_parent_list_domisili: false,
+        namaType: '',
+        namaTypeSave: this.state.namaTypeTemp,
+      },
+      () =>
+        this.setState({ namaKecamatan: '', namaProvinsi: '', namaKotaKab: '' }),
+    );
+  }
+
   getListbyPaging(currPage, currLimit) {
     // const trace = perf.trace('getBundling');
     var pelapakID = this.state.pilihPelapak;
     var ecommerceID = this.state.resultPelapakID;
-    var periodeID = this.state.pilihPeriode;
+    var periodeID = this.state.pilihType;
     // var pelapakID = '';
     // var ecommerceID = '';
     // var periodeID = '';
@@ -888,7 +907,7 @@ class showTransaction extends React.Component {
           this.showNotification(data.error.msg, 'error');
         } else {
           this.setState({
-            resultPelapak: data.data,
+            resultProvinsi: data.data,
             maxPages: data.metadata.pages ? data.metadata.pages : 1,
             loading: false,
           });
@@ -1009,22 +1028,22 @@ class showTransaction extends React.Component {
 
     // console.log('NAMA', nama);
 
-    var listPelapak = this.state.idPelapak;
+    var listProvinsi = this.state.idPelapak;
     var listDetail = this.state.pelapakDetail;
     // console.log('ISI LIST', listDetail);
 
     this.setState(
       {
         pilihPelapak2: event.target.value,
-        namaPelapak2: nama.outletname,
+        namaProvinsi2: nama.outletname,
         modal_nested_parent_list_editMasal: false,
         keywordList: '',
-        ecommerceDisabled: false,
+        domisiliDisabled: false,
         outletData: nama,
 
         pelapak2: nama.outletname,
         pelapakDetail: listDetail,
-        idPelapak: listPelapak,
+        idPelapak: listProvinsi,
       },
       () => {
         var newpelapakDetail = {
@@ -1056,35 +1075,62 @@ class showTransaction extends React.Component {
     );
   };
 
-  // untuk pilih Pelapak
-  setPelapak = event => {
-    var nama = this.state.resultPelapak.find(function (element) {
+  // untuk pilih Provinsi
+  setProvinsi = event => {
+    var nama = this.state.resultProvinsi.find(function (element) {
       return element.out_code === event.target.value;
     });
 
-    var list = this.state.namaPelapak2;
-    var listPelapak = this.state.idPelapak;
-
     this.setState(
       {
-        pilihPelapak: event.target.value,
-        namaPelapak: nama.out_name,
-        modal_nested_parent_list: false,
+        pilihProvinsi: event.target.value,
+        namaProvinsi: nama.out_name,
+        modal_nested_parent_list_provinsi: false,
         keywordList: '',
-        ecommerceDisabled: false,
-        // periodeDisabled:false,
-
-        pelapak: nama.outletname,
-        pelapakid: nama.outletid,
-        outletid: nama.outletid,
-        namaPelapak2: list,
-        idPelapak: listPelapak,
+        domisiliDisabled: false,
       },
-      // () => this.getPelapakID(),
       () => this.getPelapak(this.state.currentPages, this.state.todosPerPages),
     );
   };
-  // untuk pilih Outlet
+  // untuk pilih Provinsi
+
+  // untuk pilih Kota/Kabupaten
+  setKotakab = event => {
+    var nama = this.state.resultProvinsi.find(function (element) {
+      return element.out_code === event.target.value;
+    });
+
+    this.setState(
+      {
+        pilihKotaKab: event.target.value,
+        namaKotaKab: nama.out_name,
+        modal_nested_parent_list_kotakab: false,
+        keywordList: '',
+        domisiliDisabled: false,
+      },
+      () => this.getPelapak(this.state.currentPages, this.state.todosPerPages),
+    );
+  };
+  // untuk pilih Kota/Kabupaten
+
+  // untuk pilih Kecamatan
+  setKecamatan = event => {
+    var nama = this.state.resultProvinsi.find(function (element) {
+      return element.out_code === event.target.value;
+    });
+
+    this.setState(
+      {
+        pilihKecamatan: event.target.value,
+        namaKecamatan: nama.out_name,
+        modal_nested_parent_list_kecamatan: false,
+        keywordList: '',
+        domisiliDisabled: false,
+      },
+      () => this.getPelapak(this.state.currentPages, this.state.todosPerPages),
+    );
+  };
+  // untuk pilih Kecamatan
 
   // untuk pilih Ecommerce
   setEcommerce = event => {
@@ -1097,7 +1143,7 @@ class showTransaction extends React.Component {
       {
         pilihEcommerce: event.target.value,
         namaEcommerce: nama.ecommerce_name,
-        modal_nested_parent_list_ecommerceList: false,
+        modal_nested_parent_list_domisili: false,
       },
       () => this.getPelapakID(),
 
@@ -1106,18 +1152,20 @@ class showTransaction extends React.Component {
     );
   };
 
-  // untuk pilih Ecommerce
-  setPeriode = event => {
-    var nama = this.state.resultPeriode.find(function (element) {
-      return element.periode_id === event.target.value;
+  // untuk pilih Type
+  setType = event => {
+    var nama = this.state.resultType.find(function (element) {
+      return element.type_id === event.target.value;
     });
     this.setState(
       {
-        pilihPeriode: event.target.value,
-        namaPeriode: nama.periode_name,
-        modal_nested_parent_list_periodeList: false,
+        pilihType: event.target.value,
+        namaType: nama.type_name,
+        namaTypeTemp: nama.type_name,
+        modal_nested_parent_list: false,
+        domisiliDisabled: false,
       },
-      // () => console.log('CEK CEK CEK', this.state.pilihPeriode),
+      () => console.log('CEK CEK CEK', this.state.pilihType),
       // () =>
       // this.getListbyPaging(),
     );
@@ -1532,7 +1580,7 @@ class showTransaction extends React.Component {
     //   'ECOMMERCE',
     //   this.state.pilihEcommerce,
     //   'PERIODE',
-    //   this.state.pilihPeriode,
+    //   this.state.pilihType,
     // );
     const option = {
       method: 'PUT',
@@ -2055,6 +2103,27 @@ class showTransaction extends React.Component {
     this.setState({ loading: true });
   };
 
+  handleCloseDomisili = () => {
+    this.setState(
+      {
+        namaProvinsi: '',
+        namaKotaKab: '',
+        namaKecamatan: '',
+        pilihProvinsi: '',
+        pilihKotaKab: '',
+        pilihKecamatan: '',
+        modal_nested_parent_list_domisili: false,
+      },
+      () =>
+        console.log(
+          'ISI SETELAH CLOSE',
+          this.state.namaProvinsi,
+          this.state.namaKotaKab,
+          this.state.namaKecamatan,
+        ),
+    );
+  };
+
   handleClose = () => {
     // console.log('CURRRRR', this.state.currentDimenBatasStandar);
     this.setState({
@@ -2087,8 +2156,8 @@ class showTransaction extends React.Component {
   }
 
   SearchAllList() {
-    const { pilihEcommerce, pilihPelapak, pilihPeriode } = this.state;
-    return pilihPelapak !== '' && pilihEcommerce !== '' && pilihPeriode !== '';
+    const { pilihEcommerce, pilihPelapak, pilihType } = this.state;
+    return pilihPelapak !== '' && pilihEcommerce !== '' && pilihType !== '';
   }
 
   openModalWithItemID(code, user_id, name) {
@@ -2205,11 +2274,11 @@ class showTransaction extends React.Component {
     buttonSearch.disabled = true;
     this.setState(
       {
-        namaPelapak: '',
+        namaProvinsi: '',
         namaEcommerce: '',
         namaPeriode: '',
-        ecommerceDisabled: true,
-        pelapakDisabled: false,
+        domisiliDisabled: true,
+        typeDisabled: false,
         periodeDisabled: true,
         lastID: 0,
       },
@@ -2222,47 +2291,75 @@ class showTransaction extends React.Component {
     var buttonSearch = document.getElementById('buttonSearch');
     buttonSearch.disabled = true;
     this.setState({
-      namaPelapak: '',
+      namaType: '',
       namaEcommerce: '',
       namaPeriode: '',
-      ecommerceDisabled: true,
-      pelapakDisabled: false,
+      domisiliDisabled: true,
+      typeDisabled: false,
       periodeDisabled: true,
     });
   }
 
-  setModalPelapak() {
+  setModalType() {
     this.setState(
       {
-        ecommerceDisabled: true,
+        domisiliDisabled: true,
         // namaEcommerce: '',
       },
       this.toggle('nested_parent_list'),
     );
   }
 
-  setModalEcommerce() {
+  setModalDomisili() {
     this.setState(
       {
         periodeDisabled: false,
-        pelapakDisabled: true,
+        typeDisabled: true,
         // namaEcommerce: '',
       },
-      this.toggle('nested_parent_list_ecommerceList'),
+      this.toggle('nested_parent_list_domisili'),
     );
   }
 
-  setModalPeriode() {
+  setModalProvinsi() {
     var buttonSearch = document.getElementById('buttonSearch');
     buttonSearch.disabled = false;
     this.setState(
       {
         periodeDisabled: false,
-        pelapakDisabled: true,
-        ecommerceDisabled: true,
+        typeDisabled: true,
+        // domisiliDisabled: true,
         // namaEcommerce: '',
       },
-      this.toggle('nested_parent_list_periodeList'),
+      this.toggle('nested_parent_list_provinsi'),
+    );
+  }
+
+  setModalKotaKab() {
+    var buttonSearch = document.getElementById('buttonSearch');
+    buttonSearch.disabled = false;
+    this.setState(
+      {
+        periodeDisabled: false,
+        typeDisabled: true,
+        domisiliDisabled: true,
+        // namaEcommerce: '',
+      },
+      this.toggle('nested_parent_list_kotakab'),
+    );
+  }
+
+  setModalKecamatan() {
+    var buttonSearch = document.getElementById('buttonSearch');
+    buttonSearch.disabled = false;
+    this.setState(
+      {
+        periodeDisabled: false,
+        typeDisabled: true,
+        domisiliDisabled: true,
+        // namaEcommerce: '',
+      },
+      this.toggle('nested_parent_list_kecamatan'),
     );
   }
 
@@ -2316,9 +2413,12 @@ class showTransaction extends React.Component {
   render() {
     const { loading } = this.state;
     const currentTodos = this.state.result.data;
-    const pelapakTodos = this.state.resultPelapak;
+    const provinsiTodos = this.state.resultProvinsi;
+    const kotakabTodos = this.state.resultProvinsi;
+    const kecamatanTodos = this.state.resultProvinsi;
     const pelapakEcommerceTodos = this.state.resultPelapakEcommerce;
-    const periodeTodos = this.state.resultPeriode;
+    const typeTodos = this.state.resultType;
+    const isEnabledSaveDomisili = this.canBeSubmittedDomisili();
     const isEnabled = this.canBeSubmitted();
     const isEnabledEdit = this.canBeSubmittedEdit();
     const isEnabledAddProduct = this.canBeSubmittedAddProduct();
@@ -2334,13 +2434,96 @@ class showTransaction extends React.Component {
 
     const listEcommerce = this.state.resultEcommerce;
     // console.log("A",listEcommerce )
-    // console.log("B", periodeTodos)
+    // console.log("B", typeTodos)
     // console.log(
     //   'AAA',
     //   this.state.pilihPelapak,
     //   this.state.resultPelapakID,
-    //   this.state.pilihPeriode,
+    //   this.state.pilihType,
     // );
+
+    const renderType =
+      typeTodos &&
+      typeTodos.map((todo, i) => {
+        return (
+          <tr key={i}>
+            <td>{todo.type_name}</td>
+            <td style={{ textAlign: 'right' }}>
+              <Button
+                color="primary"
+                style={{ margin: '0px', fontSize: '15px' }}
+                value={todo.type_id}
+                onClick={this.setType}
+              >
+                Pilih
+              </Button>
+            </td>
+          </tr>
+        );
+      });
+
+    const renderProvinsi =
+      provinsiTodos &&
+      provinsiTodos.map((todo, i) => {
+        return (
+          <tr key={i}>
+            <td>{todo.out_comco}</td>
+            <td>{todo.out_name}</td>
+            <td style={{ textAlign: 'right' }}>
+              <Button
+                color="info"
+                style={{ margin: '0px', fontSize: '15px' }}
+                value={todo.out_code}
+                onClick={this.setProvinsi}
+              >
+                Pilih
+              </Button>
+            </td>
+          </tr>
+        );
+      });
+
+    const renderKotakab =
+      kotakabTodos &&
+      kotakabTodos.map((todo, i) => {
+        return (
+          <tr key={i}>
+            <td>{todo.out_comco}</td>
+            <td>{todo.out_name}</td>
+            <td style={{ textAlign: 'right' }}>
+              <Button
+                color="info"
+                style={{ margin: '0px', fontSize: '15px' }}
+                value={todo.out_code}
+                onClick={this.setKotakab}
+              >
+                Pilih
+              </Button>
+            </td>
+          </tr>
+        );
+      });
+
+    const renderKecamatan =
+      kecamatanTodos &&
+      kecamatanTodos.map((todo, i) => {
+        return (
+          <tr key={i}>
+            <td>{todo.out_comco}</td>
+            <td>{todo.out_name}</td>
+            <td style={{ textAlign: 'right' }}>
+              <Button
+                color="info"
+                style={{ margin: '0px', fontSize: '15px' }}
+                value={todo.out_code}
+                onClick={this.setKecamatan}
+              >
+                Pilih
+              </Button>
+            </td>
+          </tr>
+        );
+      });
 
     const renderEcommerce =
       listEcommerce &&
@@ -2374,47 +2557,6 @@ class showTransaction extends React.Component {
                 style={{ margin: '0px', fontSize: '15px' }}
                 value={todo.ecommerce_id}
                 onClick={this.setEcommerceEditMassal}
-              >
-                Pilih
-              </Button>
-            </td>
-          </tr>
-        );
-      });
-
-    const renderPeriode =
-      periodeTodos &&
-      periodeTodos.map((todo, i) => {
-        return (
-          <tr key={i}>
-            <td>{todo.periode_name}</td>
-            <td style={{ textAlign: 'right' }}>
-              <Button
-                color="info"
-                style={{ margin: '0px', fontSize: '15px' }}
-                value={todo.periode_id}
-                onClick={this.setPeriode}
-              >
-                Pilih
-              </Button>
-            </td>
-          </tr>
-        );
-      });
-
-    const renderPelapak =
-      pelapakTodos &&
-      pelapakTodos.map((todo, i) => {
-        return (
-          <tr key={i}>
-            <td>{todo.out_comco}</td>
-            <td>{todo.out_name}</td>
-            <td style={{ textAlign: 'right' }}>
-              <Button
-                color="info"
-                style={{ margin: '0px', fontSize: '15px' }}
-                value={todo.out_code}
-                onClick={this.setPelapak}
               >
                 Pilih
               </Button>
@@ -2617,18 +2759,18 @@ class showTransaction extends React.Component {
                         marginTop: '8px',
                       }}
                     >
-                      Farmer:&nbsp;
+                      Type:&nbsp;
                     </Label>
                     <Input
                       disabled
-                      placeholder="Pilih Farmer"
+                      placeholder="Pilih Type"
                       style={{ fontWeight: 'bold' }}
-                      value={this.state.namaPelapak}
+                      value={this.state.namaType}
                     />
                     <InputGroupAddon addonType="append">
                       <Button
-                        disabled={this.state.pelapakDisabled}
-                        onClick={() => this.setModalPelapak()}
+                        disabled={this.state.typeDisabled}
+                        onClick={() => this.setModalType()}
                       >
                         <MdList />
                       </Button>
@@ -2643,48 +2785,21 @@ class showTransaction extends React.Component {
                         marginTop: '8px',
                       }}
                     >
-                      UPJA:&nbsp;
+                      Domisili:&nbsp;
                     </Label>
                     <Input
                       type="text"
                       id="ecommerceValue"
                       disabled={true}
-                      placeholder="Pilih UPJA"
+                      placeholder="Pilih Domisili"
                       style={{ fontWeight: 'bold' }}
                       value={this.state.namaEcommerce}
                       // onChange={event => this.setEcommerce(event)}
                     ></Input>
                     <InputGroupAddon addonType="append">
                       <Button
-                        disabled={this.state.ecommerceDisabled}
-                        onClick={() => this.setModalEcommerce()}
-                      >
-                        <MdList />
-                      </Button>
-                    </InputGroupAddon>
-                  </InputGroup>
-                </Col>
-                <Col style={{ paddingRight: 0 }}>
-                  <InputGroup style={{ float: 'right' }}>
-                    <Label
-                      style={{
-                        fontWeight: 'bold',
-                        marginTop: '8px',
-                      }}
-                    >
-                      Alsin:&nbsp;
-                    </Label>
-                    <Input
-                      type="text"
-                      disabled={true}
-                      placeholder="Pilih Alsin"
-                      style={{ fontWeight: 'bold' }}
-                      value={this.state.namaPeriode}
-                    ></Input>
-                    <InputGroupAddon addonType="append">
-                      <Button
-                        disabled={this.state.periodeDisabled}
-                        onClick={() => this.setModalPeriode()}
+                        disabled={this.state.domisiliDisabled}
+                        onClick={() => this.setModalDomisili()}
                       >
                         <MdList />
                       </Button>
@@ -2709,7 +2824,7 @@ class showTransaction extends React.Component {
                         this.setState({ resetInfo: !this.state.resetInfo })
                       }
                     >
-                      Reset Farmer, UPJA dan Alsin yang telah dipilih
+                      Reset Farmer/UPJA dan Domisili yang telah dipilih
                     </Tooltip>
                     <Button
                       style={{ float: 'right' }}
@@ -2753,7 +2868,7 @@ class showTransaction extends React.Component {
                     // disabled={!pelapakID}
                     style={{ marginLeft: '1%' }}
                   >
-                    Batas Standar
+                    Detail Farmer
                   </Button>
                   <Button
                     // size="sm"
@@ -2761,7 +2876,7 @@ class showTransaction extends React.Component {
                     // disabled={!pelapakID}
                     style={{ marginLeft: '1%' }}
                   >
-                    Batas per Pelapak
+                    Detail UPJA
                   </Button>
                   <Button
                     // size="sm"
@@ -2769,62 +2884,128 @@ class showTransaction extends React.Component {
                     // disabled={!pelapakID}
                     style={{ marginLeft: '1%' }}
                   >
-                    Tambah Batas Bawah
+                    Detail Alsin
                   </Button> */}
                 </Col>
               </CardHeader>
-              {/* <CardBody>
-                <Label
-                  style={{
-                    float: 'right',
-                    textAlign: 'right',
-                    marginTop: '8px',
-                  }}
-                >
-                  {'Halaman : ' +
-                    this.state.realCurrentPage +
-                    ' / ' +
-                    this.state.maxPage}
-                </Label>
-              </CardBody> */}
               <CardBody>
+                {/* <Row style={{ paddingBottom: 0, marginBottom: 0 }}></Row> */}
                 <Row style={{ paddingBottom: 0, marginBottom: 0 }}>
-                  {/* {console.log('HIYAHIYA: ', this.state.result)} */}
-                  <Col style={{ paddingBottom: 0, marginBottom: 0 }}>
-                    <Label style={{ fontWeight: 'bold' }}>Farmer:&nbsp;</Label>
-                    {this.state.result.length === 0 ? (
-                      <Label style={{ fontWeight: 'bold' }}>-</Label>
-                    ) : (
-                      <Label style={{ fontWeight: 'bold' }}>
-                        {currentTodos && currentTodos[0].outletname}
-                      </Label>
-                    )}
+                  <Col sm={2} style={{ paddingBottom: 0, marginBottom: 0 }}>
+                    <Label style={{ fontWeight: 'bold' }}>Type</Label>
                   </Col>
-                  <Col style={{ paddingBottom: 0, marginBottom: 0 }}>
-                    <Label style={{ fontWeight: 'bold' }}>
-                      UPJA:&nbsp;
-                    </Label>
-                    {this.state.result.length === 0 ? (
+                  <Col sm={10} style={{ paddingBottom: 0, marginBottom: 0 }}>
+                    :&nbsp;
+                    {this.state.namaTypeSave === undefined ? (
                       <Label style={{ fontWeight: 'bold' }}>-</Label>
                     ) : (
                       <Label style={{ fontWeight: 'bold' }}>
-                        {currentTodos && currentTodos[0].ecommercename}
-                      </Label>
-                    )}
-                  </Col>
-                  <Col style={{ paddingBottom: 0, marginBottom: 0 }}>
-                    <Label style={{ fontWeight: 'bold' }}>
-                      Alsin:&nbsp;
-                    </Label>
-                    {this.state.result.length === 0 ? (
-                      <Label style={{ fontWeight: 'bold' }}>-</Label>
-                    ) : (
-                      <Label style={{ fontWeight: 'bold' }}>
-                        {currentTodos && currentTodos[0].ecommercename}
+                        {this.state.namaTypeSave}
                       </Label>
                     )}
                   </Col>
                 </Row>
+
+                <Row style={{ paddingBottom: 0, marginBottom: 0 }}>
+                  <Col sm={2} style={{ paddingBottom: 0, marginBottom: 0 }}>
+                    <Label style={{ fontWeight: 'bold' }}>Provinsi</Label>
+                  </Col>
+                  <Col sm={10} style={{ paddingBottom: 0, marginBottom: 0 }}>
+                    :&nbsp;
+                    {this.state.namaProvinsiSave === undefined ? (
+                      <Label style={{ fontWeight: 'bold' }}>-</Label>
+                    ) : (
+                      <Label style={{ fontWeight: 'bold' }}>
+                        {this.state.namaProvinsiSave}
+                      </Label>
+                    )}
+                  </Col>
+                </Row>
+
+                <Row style={{ paddingBottom: 0, marginBottom: 0 }}>
+                  <Col sm={2} style={{ paddingBottom: 0, marginBottom: 0 }}>
+                    <Label style={{ fontWeight: 'bold' }}>Kota/Kab</Label>
+                  </Col>
+                  <Col sm={10} style={{ paddingBottom: 0, marginBottom: 0 }}>
+                    :&nbsp;
+                    {this.state.namaKotaKabSave === undefined ? (
+                      <Label style={{ fontWeight: 'bold' }}>-</Label>
+                    ) : (
+                      <Label style={{ fontWeight: 'bold' }}>
+                        {this.state.namaKotaKabSave}
+                      </Label>
+                    )}
+                  </Col>
+                </Row>
+
+                <Row style={{ paddingBottom: 0, marginBottom: 0 }}>
+                  <Col sm={2} style={{ paddingBottom: 0, marginBottom: 0 }}>
+                    <Label style={{ fontWeight: 'bold' }}>Kecamatan</Label>
+                  </Col>
+                  <Col sm={10} style={{ paddingBottom: 0, marginBottom: 0 }}>
+                    :&nbsp;
+                    {this.state.namaKecamatanSave === undefined ? (
+                      <Label style={{ fontWeight: 'bold' }}>-</Label>
+                    ) : (
+                      <Label style={{ fontWeight: 'bold' }}>
+                        {this.state.namaKecamatanSave}
+                      </Label>
+                    )}
+                  </Col>
+                </Row>
+
+                {/* <Row style={{ paddingBottom: 0, marginBottom: 0 }}>
+                  <Col style={{ paddingBottom: 0, marginBottom: 0 }}>
+                    <Label style={{ fontWeight: 'bold' }}>Type:&nbsp;</Label>
+                    <br></br>
+                    {this.state.namaTypeSave === undefined ? (
+                      <Label style={{ fontWeight: 'bold' }}>-</Label>
+                    ) : (
+                      <Label style={{ fontWeight: 'bold' }}>
+                        {this.state.namaTypeSave}
+                      </Label>
+                    )}
+                  </Col>
+                  <Col style={{ paddingBottom: 0, marginBottom: 0 }}>
+                    <Label style={{ fontWeight: 'bold' }}>
+                      Provinsi:&nbsp;
+                    </Label>
+                    <br></br>
+                    {this.state.namaProvinsiSave === undefined ? (
+                      <Label style={{ fontWeight: 'bold' }}>-</Label>
+                    ) : (
+                      <Label style={{ fontWeight: 'bold' }}>
+                        {this.state.namaProvinsiSave}
+                      </Label>
+                    )}
+                  </Col>
+                  <Col style={{ paddingBottom: 0, marginBottom: 0 }}>
+                    <Label style={{ fontWeight: 'bold' }}>
+                      Kota/Kab:&nbsp;
+                    </Label>
+                    <br></br>
+                    {this.state.namaKotaKabSave === undefined ? (
+                      <Label style={{ fontWeight: 'bold' }}>-</Label>
+                    ) : (
+                      <Label style={{ fontWeight: 'bold' }}>
+                        {this.state.namaKotaKabSave}
+                      </Label>
+                    )}
+                  </Col>
+                  <Col style={{ paddingBottom: 0, marginBottom: 0 }}>
+                    <Label style={{ fontWeight: 'bold' }}>
+                      Kecamatan:&nbsp;
+                    </Label>
+                    <br></br>
+                    {this.state.namaKecamatanSave === undefined ? (
+                      <Label style={{ fontWeight: 'bold' }}>-</Label>
+                    ) : (
+                      <Label style={{ fontWeight: 'bold' }}>
+                        {this.state.namaKecamatanSave}
+                      </Label>
+                    )}
+                  </Col>
+                </Row> */}
                 <Table responsive striped id="tableUtama">
                   <thead>
                     <tr>
@@ -3218,7 +3399,7 @@ class showTransaction extends React.Component {
                   </Label>
                   <Input
                     type="select"
-                    // disabled={this.state.ecommerceDisabled}
+                    // disabled={this.state.domisiliDisabled}
                     placeholder="Pilih E-Commerce"
                     style={{ fontWeight: 'bold' }}
                     value={this.state.namaEcommerce}
@@ -4077,7 +4258,7 @@ class showTransaction extends React.Component {
         </Modal>
         {/* Modal Hapus */}
 
-        {/* Modal List Pelapak */}
+        {/* Modal List Type */}
         <Modal
           onExit={this.handleClose}
           isOpen={this.state.modal_nested_parent_list}
@@ -4085,44 +4266,13 @@ class showTransaction extends React.Component {
           className={this.props.className}
         >
           <ModalHeader toggle={this.toggle('nested_parent_list')}>
-            List Pelapak
+            List Type
           </ModalHeader>
           <ModalBody>
-            <Form
-              inline
-              className="cr-search-form"
-              onSubmit={e => e.preventDefault()}
-            >
-              <MdSearch
-                size="20"
-                className="cr-search-form__icon-search text-secondary"
-              />
-              <Input
-                autoComplete="off"
-                type="search"
-                className="cr-search-form__input"
-                placeholder="Pilih Pelapak yang di tuju"
-                id="search"
-                onChange={evt => this.updateSearchValueList(evt)}
-                onKeyPress={event => this.enterPressedSearchList(event, true)}
-              />
-              {/* <Button style={{ float:'right' }} onClick={() => this.getListbyPagingAll(this.state.currentPage, this.state.todosPerPage)}>All Outlet</Button> */}
-            </Form>
-
             <Table responsive striped>
-              <thead>
-                <tr>
-                  <th style={{ border: 'none' }}>
-                    <Label style={{ textAlign: 'left' }}>Comco</Label>
-                  </th>
-                  <th style={{ border: 'none' }}>
-                    <Label style={{ textAlign: 'left' }}>Nama Pelapak</Label>
-                  </th>
-                </tr>
-              </thead>
               <tbody>
-                {renderPelapak}
-                {!pelapakTodos && (
+                {renderType}
+                {!typeTodos && (
                   <tr>
                     <td
                       style={{ backgroundColor: 'white' }}
@@ -4136,125 +4286,115 @@ class showTransaction extends React.Component {
               </tbody>
             </Table>
           </ModalBody>
-          <ModalFooter>
-            <Row>
-              <Col sm="6">
-                <Input
-                  disabled
-                  style={{
-                    textAlign: 'left',
-                    backgroundColor: 'transparent',
-                    border: 0,
-                  }}
-                  value={
-                    'Halaman: ' +
-                    this.state.realCurrentPages +
-                    '/' +
-                    this.state.maxPages
-                  }
-                ></Input>
-              </Col>
-              <Col sm="6">
-                <Card className="mb-3s">
-                  <ButtonGroup>
-                    <Button
-                      name="FirstButton"
-                      value={1}
-                      onClick={e =>
-                        this.paginationButtonList(e, 0, this.state.maxPages)
-                      }
-                    >
-                      &#10092;&#10092;
-                    </Button>
-                    <Button
-                      name="PrevButton"
-                      value={this.state.currentPages}
-                      onClick={e =>
-                        this.paginationButtonList(e, -1, this.state.maxPages)
-                      }
-                    >
-                      &#10092;
-                    </Button>
-                    <input
-                      type="text"
-                      placeholder="Page"
-                      outline="none"
-                      value={this.state.currentPages}
-                      onChange={e =>
-                        this.setState({
-                          currentPages: e.target.value,
-                        })
-                      }
-                      onKeyPress={e => this.enterPressedPageList(e)}
-                      style={{
-                        height: '38px',
-                        width: '75px',
-                        textAlign: 'center',
-                      }}
-                    />
-                    <Button
-                      name="NextButton"
-                      value={this.state.currentPages}
-                      onClick={e =>
-                        this.paginationButtonList(e, 1, this.state.maxPages)
-                      }
-                    >
-                      &#10093;
-                    </Button>
-                    <Button
-                      name="LastButton"
-                      value={this.state.maxPages}
-                      onClick={e =>
-                        this.paginationButtonList(e, 0, this.state.maxPages)
-                      }
-                    >
-                      &#10093;&#10093;
-                    </Button>
-                  </ButtonGroup>
-                </Card>
-              </Col>
-            </Row>
-          </ModalFooter>
         </Modal>
-        {/* Modal List Pelapak */}
+        {/* Modal List Type */}
 
-        {/* Modal List Ecommerce */}
+        {/* Modal List Domisili */}
         <Modal
-          onExit={this.handleClose}
-          isOpen={this.state.modal_nested_parent_list_ecommerceList}
-          toggle={this.toggle('nested_parent_list_ecommerceList')}
+          onExit={this.handleCloseDomisili}
+          isOpen={this.state.modal_nested_parent_list_domisili}
+          toggle={this.toggle('nested_parent_list_domisili')}
           className={this.props.className}
         >
-          <ModalHeader toggle={this.toggle('nested_parent_list_ecommerceList')}>
-            List Ecommerce
-          </ModalHeader>
+          <ModalHeader>List Domisili</ModalHeader>
           <ModalBody>
-            <Table responsive striped>
-              <thead>
-                <tr>
-                  <th style={{ border: 'none' }}>
-                    <Label style={{ textAlign: 'left' }}>Nama Ecommerce</Label>
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {renderEcommerce}
-                {!renderEcommerce && (
-                  <tr>
-                    <td
-                      style={{ backgroundColor: 'white' }}
-                      colSpan="11"
-                      className="text-center"
-                    >
-                      TIDAK ADA DATA
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </Table>
+            <Row>
+              <Col sm={3}>
+                <Label
+                  style={{
+                    fontWeight: 'bold',
+                    marginTop: '8px',
+                  }}
+                >
+                  Provinsi:&nbsp;
+                </Label>
+              </Col>
+              <Col sm={9}>
+                <InputGroup style={{ float: 'right' }}>
+                  <Input
+                    disabled
+                    placeholder="Pilih Provinsi"
+                    style={{ fontWeight: 'bold' }}
+                    value={this.state.namaProvinsi}
+                  />
+                  {console.log('ISINYA:', this.state.namaProvinsi)}
+                  <InputGroupAddon addonType="append">
+                    <Button onClick={() => this.setModalProvinsi()}>
+                      <MdList />
+                    </Button>
+                  </InputGroupAddon>
+                </InputGroup>
+              </Col>
+            </Row>
+            <Row>
+              <Col sm={3}>
+                <Label
+                  style={{
+                    fontWeight: 'bold',
+                    marginTop: '8px',
+                  }}
+                >
+                  Kota/Kab:&nbsp;
+                </Label>
+              </Col>
+              <Col sm={9}>
+                <InputGroup style={{ float: 'right' }}>
+                  <Input
+                    disabled
+                    placeholder="Pilih Kota/Kab"
+                    style={{ fontWeight: 'bold' }}
+                    value={this.state.namaKotaKab}
+                  />
+                  <InputGroupAddon addonType="append">
+                    <Button onClick={() => this.setModalKotaKab()}>
+                      <MdList />
+                    </Button>
+                  </InputGroupAddon>
+                </InputGroup>
+              </Col>
+            </Row>
+            <Row>
+              <Col sm={3}>
+                <Label
+                  style={{
+                    fontWeight: 'bold',
+                    marginTop: '8px',
+                  }}
+                >
+                  Kecamatan:&nbsp;
+                </Label>
+              </Col>
+              <Col sm={9}>
+                <InputGroup style={{ float: 'right' }}>
+                  <Input
+                    disabled
+                    placeholder="Pilih Kecamatan"
+                    style={{ fontWeight: 'bold' }}
+                    value={this.state.namaKecamatan}
+                  />
+                  <InputGroupAddon addonType="append">
+                    <Button onClick={() => this.setModalKecamatan()}>
+                      <MdList />
+                    </Button>
+                  </InputGroupAddon>
+                </InputGroup>
+              </Col>
+            </Row>
           </ModalBody>
+          <ModalFooter>
+            <Button
+              color="primary"
+              onClick={() => this.saveDomisili()}
+              disabled={!isEnabledSaveDomisili}
+            >
+              Simpan
+            </Button>
+            <Button color="danger" onClick={this.handleCloseDomisili}>
+              Batal
+            </Button>
+          </ModalFooter>
         </Modal>
-        {/* Modal List Ecommerce */}
+        {/* Modal List Domisili */}
 
         {/* Modal List Ecommerce Edit Masal */}
         <Modal
@@ -4296,28 +4436,21 @@ class showTransaction extends React.Component {
         </Modal>
         {/* Modal List Ecommerce Edit Masal */}
 
-        {/* Modal List Periode */}
+        {/* Modal List Provinsi */}
         <Modal
-          onExit={this.handleClose}
-          isOpen={this.state.modal_nested_parent_list_periodeList}
-          toggle={this.toggle('nested_parent_list_periodeList')}
+          onExit={this.handleCloseDomisili}
+          isOpen={this.state.modal_nested_parent_list_provinsi}
+          toggle={this.toggle('nested_parent_list_provinsi')}
           className={this.props.className}
         >
-          <ModalHeader toggle={this.toggle('nested_parent_list_periodeList')}>
-            List Periode
+          <ModalHeader toggle={this.toggle('nested_parent_list_provinsi')}>
+            List Provinsi
           </ModalHeader>
           <ModalBody>
             <Table responsive striped>
-              <thead>
-                <tr>
-                  <th style={{ border: 'none' }}>
-                    <Label style={{ textAlign: 'left' }}>Periode</Label>
-                  </th>
-                </tr>
-              </thead>
               <tbody>
-                {renderPeriode}
-                {!periodeTodos && (
+                {renderProvinsi}
+                {!provinsiTodos && (
                   <tr>
                     <td
                       style={{ backgroundColor: 'white' }}
@@ -4332,7 +4465,69 @@ class showTransaction extends React.Component {
             </Table>
           </ModalBody>
         </Modal>
-        {/* Modal List Periode */}
+        {/* Modal List Provinsi */}
+
+        {/* Modal List Kota/kabupaten */}
+        <Modal
+          onExit={this.handleCloseDomisili}
+          isOpen={this.state.modal_nested_parent_list_kotakab}
+          toggle={this.toggle('nested_parent_list_kotakab')}
+          className={this.props.className}
+        >
+          <ModalHeader toggle={this.toggle('nested_parent_list_kotakab')}>
+            List Kota/Kabupaten
+          </ModalHeader>
+          <ModalBody>
+            <Table responsive striped>
+              <tbody>
+                {renderKotakab}
+                {!kotakabTodos && (
+                  <tr>
+                    <td
+                      style={{ backgroundColor: 'white' }}
+                      colSpan="11"
+                      className="text-center"
+                    >
+                      TIDAK ADA DATA
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </Table>
+          </ModalBody>
+        </Modal>
+        {/* Modal List Kota/kabupaten */}
+
+        {/* Modal List Kecamatan */}
+        <Modal
+          onExit={this.handleCloseDomisili}
+          isOpen={this.state.modal_nested_parent_list_kecamatan}
+          toggle={this.toggle('nested_parent_list_kecamatan')}
+          className={this.props.className}
+        >
+          <ModalHeader toggle={this.toggle('nested_parent_list_kecamatan')}>
+            List Kecamatan
+          </ModalHeader>
+          <ModalBody>
+            <Table responsive striped>
+              <tbody>
+                {renderKecamatan}
+                {!kecamatanTodos && (
+                  <tr>
+                    <td
+                      style={{ backgroundColor: 'white' }}
+                      colSpan="11"
+                      className="text-center"
+                    >
+                      TIDAK ADA DATA
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </Table>
+          </ModalBody>
+        </Modal>
+        {/* Modal List Kecamatan */}
 
         {/* Modal List Pelapak Edit Masal */}
         <Modal
@@ -4598,6 +4793,17 @@ class showTransaction extends React.Component {
         {/* KHUSUS MODAL */}
       </Page>
     );
+  }
+
+  canBeSubmittedDomisili() {
+    const { pilihProvinsi, pilihKotaKab, pilihKecamatan } = this.state;
+    console.log(
+      'DISABLE',
+      pilihProvinsi !== '',
+      pilihKotaKab !== '',
+      pilihKecamatan !== '',
+    );
+    return pilihProvinsi !== '' && pilihKotaKab !== '' && pilihKecamatan !== '';
   }
 
   canBeSubmitted() {
