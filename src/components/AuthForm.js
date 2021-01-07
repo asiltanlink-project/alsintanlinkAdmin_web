@@ -111,7 +111,6 @@ class AuthForm extends React.Component {
             <Label>Show Password (F1)</Label>
           </Col>
         </Col>
-        <br />
         <hr />
         {/* button login */}
         <Button

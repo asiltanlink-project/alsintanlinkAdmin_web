@@ -26,6 +26,23 @@ const sidebarBackground = {
   backgroundRepeat: 'no-repeat',
 };
 
+const alsintanlink = [
+  {
+    to: '/Farmer',
+    id: '5',
+    name: 'List Farmer',
+    exact: false,
+    Icon: MdHdrStrong,
+  },
+  {
+    to: '/UPJA',
+    id: '5',
+    name: 'List UPJA',
+    exact: false,
+    Icon: MdHdrStrong,
+  },
+];
+
 const Pelapak = [
   {
     to: '/OrderMalamIni',
@@ -197,7 +214,13 @@ const navTN = [
 ];
 
 const navMasterDataSPAddHO = [
-  { to: '/spaddho', id: '23', name: 'SP Add HO', exact: false, Icon: MdRadioButtonChecked }
+  {
+    to: '/spaddho',
+    id: '23',
+    name: 'SP Add HO',
+    exact: false,
+    Icon: MdRadioButtonChecked,
+  },
 ];
 
 const spdoGroup = [
@@ -205,13 +228,24 @@ const spdoGroup = [
 ];
 
 const laporanSP = [
-  { to: '/laporansphome', id: '23', name: 'Laporan SP Home', exact: false, Icon: MdRadioButtonChecked },
+  {
+    to: '/laporansphome',
+    id: '23',
+    name: 'Laporan SP Home',
+    exact: false,
+    Icon: MdRadioButtonChecked,
+  },
 ];
 
 const EkspedisiExternal = [
-  {to:'/Ekspedisi-Integra', id:'5', name:'Ekspedisi-Integra', exact:false, Icon:MdHdrStrong}
-]
-
+  {
+    to: '/Ekspedisi-Integra',
+    id: '5',
+    name: 'Ekspedisi-Integra',
+    exact: false,
+    Icon: MdHdrStrong,
+  },
+];
 
 const bem = bn.create('sidebar');
 
@@ -226,13 +260,14 @@ class Sidebar extends React.Component {
   }
 
   state = {
+    isOpenAlsintanlinkAdmin: false,
     isOpenPelapak: false,
     isOpenMasterB2B: false,
     isOpenReceiving: false,
     isOpenStock: false,
     isOpenExternal: true,
     isOpenMasterSPAddHO: false,
-    isOpenEkspedisiExternal:false,
+    isOpenEkspedisiExternal: false,
   };
 
   handleClick = name => () => {
@@ -283,7 +318,7 @@ class Sidebar extends React.Component {
 
           {/* PELAPAK */}
           <Nav vertical>
-            {this.allFound(Pelapak) && (
+            {/* {this.allFound(Pelapak) && (
               <NavItem
                 className={bem.e('nav-item')}
                 onClick={this.handleClick('Pelapak')}
@@ -329,10 +364,10 @@ class Sidebar extends React.Component {
                     ),
                 )}
               </Collapse>
-            )}
+            )} */}
 
             {/* B2B */}
-            {this.allFound(navB2B) && (
+            {/* {this.allFound(navB2B) && (
               <NavItem
                 className={bem.e('nav-item')}
                 onClick={this.handleClick('MasterB2B')}
@@ -378,10 +413,10 @@ class Sidebar extends React.Component {
                     ),
                 )}
               </Collapse>
-            )}
+            )} */}
 
             {/* RECEIVING */}
-            {this.allFound(navReceiving) && (
+            {/* {this.allFound(navReceiving) && (
               <NavItem
                 className={bem.e('nav-item')}
                 onClick={this.handleClick('Receiving')}
@@ -427,27 +462,27 @@ class Sidebar extends React.Component {
                     ),
                 )}
               </Collapse>
-            )}
+            )} */}
             {/* Master SP Add HO   */}
-            {this.allFound(navMasterDataSPAddHO) &&
-            navMasterDataSPAddHO.map(({ to, name, exact }, index) => (
-              <NavItem key={index} className={bem.e('nav-item')}>
-                <BSNavLink
-                  id={`navItem-${name}-${index}`}
-                  className="text-uppercase"
-                  tag={NavLink}
-                  to={to}
-                  activeClassName="active"
-                  exact={exact}
-                  onClick={this.handleSidebarControlButton}
-                >
-                  <span className="">{name}</span>
-                </BSNavLink>
-              </NavItem>
-            ))}
+            {/* {this.allFound(navMasterDataSPAddHO) &&
+              navMasterDataSPAddHO.map(({ to, name, exact }, index) => (
+                <NavItem key={index} className={bem.e('nav-item')}>
+                  <BSNavLink
+                    id={`navItem-${name}-${index}`}
+                    className="text-uppercase"
+                    tag={NavLink}
+                    to={to}
+                    activeClassName="active"
+                    exact={exact}
+                    onClick={this.handleSidebarControlButton}
+                  >
+                    <span className="">{name}</span>
+                  </BSNavLink>
+                </NavItem>
+              ))} */}
 
             {/* STOCK */}
-            {this.allFound(navStock) &&
+            {/* {this.allFound(navStock) &&
               navStock.map(({ to, name, exact }, index) => (
                 <NavItem key={index} className={bem.e('nav-item')}>
                   <BSNavLink
@@ -462,10 +497,10 @@ class Sidebar extends React.Component {
                     <span className="">{name}</span>
                   </BSNavLink>
                 </NavItem>
-              ))}
+              ))} */}
 
             {/* TN Gudang */}
-            {this.allFound(navTN) &&
+            {/* {this.allFound(navTN) &&
               navTN.map(({ to, name, exact }, index) => (
                 <NavItem key={index} className={bem.e('nav-item')}>
                   <BSNavLink
@@ -480,10 +515,10 @@ class Sidebar extends React.Component {
                     <span className="">{name}</span>
                   </BSNavLink>
                 </NavItem>
-              ))}
+              ))} */}
 
             {/* SP DO */}
-            {this.allFound(spdoGroup) &&
+            {/* {this.allFound(spdoGroup) &&
               spdoGroup.map(({ to, name, exact }, index) => (
                 <NavItem key={index} className={bem.e('nav-item')}>
                   <BSNavLink
@@ -498,10 +533,10 @@ class Sidebar extends React.Component {
                     <span className="">{name}</span>
                   </BSNavLink>
                 </NavItem>
-              ))}
+              ))} */}
 
             {/* EXTERNAL */}
-            {this.allFound(navItems2) &&
+            {/* {this.allFound(navItems2) &&
               navItems2.map(({ to, name, exact }, index) => (
                 <NavItem key={index} className={bem.e('nav-item')}>
                   <BSNavLink
@@ -516,10 +551,10 @@ class Sidebar extends React.Component {
                     <span className="">{name}</span>
                   </BSNavLink>
                 </NavItem>
-              ))}
+              ))} */}
 
-              {/* Laporan SP */}
-              {this.allFound(laporanSP) &&
+            {/* Laporan SP */}
+            {/* {this.allFound(laporanSP) &&
               laporanSP.map(({ to, name, exact }, index) => (
                 <NavItem key={index} className={bem.e('nav-item')}>
                   <BSNavLink
@@ -534,10 +569,10 @@ class Sidebar extends React.Component {
                     <span className="">{name}</span>
                   </BSNavLink>
                 </NavItem>
-              ))}
+              ))} */}
 
-              {/* EXTERNAL EKSPEDISI */}
-              {this.allFound(EkspedisiExternal) && (
+            {/* EXTERNAL EKSPEDISI */}
+            {/* {this.allFound(EkspedisiExternal) && (
               <NavItem
                 className={bem.e('nav-item')}
                 onClick={this.handleClick('EkspedisiExternal')}
@@ -583,8 +618,24 @@ class Sidebar extends React.Component {
                     ),
                 )}
               </Collapse>
-            )}
-              
+            )} */}
+
+            {this.allFound(alsintanlink) &&
+              alsintanlink.map(({ to, name, exact }, index) => (
+                <NavItem key={index} className={bem.e('nav-item')}>
+                  <BSNavLink
+                    id={`navItem-${name}-${index}`}
+                    className="text-uppercase"
+                    tag={NavLink}
+                    to={to}
+                    activeClassName="active"
+                    exact={exact}
+                    onClick={this.handleSidebarControlButton}
+                  >
+                    <span className="">{name}</span>
+                  </BSNavLink>
+                </NavItem>
+              ))}
           </Nav>
         </div>
       </aside>

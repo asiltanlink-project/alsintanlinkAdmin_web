@@ -274,6 +274,41 @@ if (window.location.hostname.includes('staging-logistic')) {
   // DASHBOARD
   var url_getDashboard =
     'https://staging-api.cfu.pharmalink.id/monitoring-gudang/GetOutstanding?type=all&gudangID=';
+
+  // ShowTransaction
+  var url_getEcommerce =
+    'https://staging-api.cfu.pharmalink.id/support/getEcommerceData';
+  var url_getPelapakID =
+    'https://staging-api.cfu.pharmalink.id/support/getEcommerceData?';
+  var url_getPelapak =
+    'https://api.cfu.pharmalink.id/support/getOutletData?type=getPelapakList';
+  var url_scanProcod =
+    'https://staging-api.cfu.pharmalink.id/product-bundling/getProductByProductId';
+  var url_getAllData =
+    'https://staging-api.cfu.pharmalink.id/master-plafond-ecommerce/integra/getlimitproduct?';
+  var url_getListPerOulet =
+    'https://staging-api.cfu.pharmalink.id/master-plafond-ecommerce/integra/getlimitoutlet?';
+  var url_getLimitDefault =
+    'https://staging-api.cfu.pharmalink.id/master-plafond-ecommerce/integra/getlimitdefault';
+  var url_editLimitDefault =
+    'https://staging-api.cfu.pharmalink.id/master-plafond-ecommerce/integra/setlimitdefault';
+  var url_editLimitPerPelapak =
+    'https://staging-api.cfu.pharmalink.id/master-plafond-ecommerce/integra/setlimitoutlet';
+  var url_deleteBatasPerPelapak =
+    'https://staging-api.cfu.pharmalink.id/master-plafond-ecommerce/integra/resetlimitoutlet';
+  var url_deleteHeaderData =
+    'https://staging-api.cfu.pharmalink.id/master-plafond-ecommerce/integra/forceendlimitproduct';
+  var url_editDataHeader =
+    'https://staging-api.cfu.pharmalink.id/master-plafond-ecommerce/integra/editlimitproduct';
+  var url_getOutletEcommerce =
+    'https://staging-api.cfu.pharmalink.id/support/getOutletData?type=getOutletPelapak';
+  var url_insertDataOutlet =
+    'https://staging-api.cfu.pharmalink.id/master-plafond-ecommerce/integra/setlimitproduct';
+  var url_editDataOutlet;
+  var url_getOutlet;
+  var url_hapusProdukOutlet;
+
+  var url_scanProcodProductOutlet;
 }
 
 export {
@@ -316,4 +351,23 @@ export {
   base_url_ekspedisi_eksternal,
   url_getBatch,
   url_getDashboard,
+  // BATAS BAWAH
+  url_getListPerOulet,
+  url_getLimitDefault,
+  url_editLimitDefault,
+  url_editLimitPerPelapak,
+  url_deleteBatasPerPelapak,
+  url_getOutletEcommerce,
+  url_editDataHeader,
+  url_deleteHeaderData,
+  url_editDataOutlet,
+  url_getAllData,
+  url_getOutlet,
+  url_hapusProdukOutlet,
+  url_insertDataOutlet,
+  url_scanProcodProductOutlet,
+  url_getEcommerce,
+  url_getPelapak,
+  url_getPelapakID,
+  url_scanProcod
 };

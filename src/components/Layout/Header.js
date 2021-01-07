@@ -1,13 +1,7 @@
 import Avatar from 'components/Avatar';
 import { UserCard } from 'components/Card';
-import withBadge from 'hocs/withBadge';
 import React from 'react';
-import {
-  MdClearAll,
-  MdExitToApp,
-  MdEditLocation,
-  MdNotificationsActive,
-} from 'react-icons/md';
+import { MdClearAll, MdExitToApp, MdEditLocation } from 'react-icons/md';
 import {
   Button,
   ListGroup,
@@ -74,10 +68,6 @@ class Header extends React.Component {
   renderRedirect = () => {
     if (this.state.redirect) {
       return <Redirect to="/login" />;
-    } else if (this.state.redirectGudang) {
-      const { title } = this.props;
-      this.setState({ title: '' });
-      return <Redirect to="/" />;
     }
   };
 
@@ -97,15 +87,14 @@ class Header extends React.Component {
   }
 
   render() {
-    var gudangName = window.localStorage.getItem('gName');
     return (
       <Navbar light expand className={bem.b('bg-white')}>
         {this.renderRedirect()}
-        <Nav navbar className="mr-2">
+        {/* <Nav navbar className="mr-2">
           <Button outline onClick={this.handleSidebarControlButton}>
             <MdClearAll size={25} />
           </Button>
-        </Nav>
+        </Nav> */}
         <Label
           style={{
             fontWeight: 'bold',
@@ -140,20 +129,8 @@ class Header extends React.Component {
           style={{ minWidth: 250 }}
         >
           <PopoverBody className="p-0 border-light">
-            <UserCard
-              title={this.state.nama}
-              subtitle={gudangName}
-              className="border-light"
-            >
+            <UserCard title={this.state.nama} className="border-light">
               <ListGroup flush>
-                <ListGroupItem
-                  tag="button"
-                  action
-                  onClick={this.keluarGudang}
-                  className="border-light"
-                >
-                  <MdEditLocation /> Pilih Domisili
-                </ListGroupItem>
                 <ListGroupItem
                   tag="button"
                   action

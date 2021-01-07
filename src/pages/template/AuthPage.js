@@ -1,7 +1,7 @@
 import AuthForm from 'components/AuthForm';
 import React from 'react';
 import { Card, Col, Row } from 'reactstrap';
-import * as myUrl from '../urlLink';
+import * as myUrl from 'pages/urlLink';
 import NotificationSystem from 'react-notification-system';
 import { NOTIFICATION_SYSTEM_STYLE } from 'utils/constants';
 import Page from 'components/Page';
@@ -76,11 +76,11 @@ class AuthPage extends React.Component {
           if (data1.mem_forcechangepasswordyn === 'Y') {
             //console.log("FORE CHANGE YES");
             this.props.history.push({
-              pathname: '/',
+              pathname: '/Dashboard',
               state: { ok: true },
             });
           } else {
-            window.location.replace('/');
+            window.location.replace('/Dashboard');
           }
         } else {
           this.showNotification(metadata.message, 'error');

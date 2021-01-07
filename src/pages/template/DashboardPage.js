@@ -1,7 +1,7 @@
 import Page from 'components/Page';
 import logo200Image from 'assets/img/logo/logo.jpg';
 import React from 'react';
-import { Col, Row, Label } from 'reactstrap';
+import { Col, Row, Label, Button } from 'reactstrap';
 
 class DashboardPage extends React.Component {
   state = {
@@ -55,6 +55,10 @@ class DashboardPage extends React.Component {
             <Label style={{ fontWeight: 'bold' }}>
               Selamat Datang {this.state.nama} di Halaman Alsintanlink Admin
             </Label>
+            <br></br>
+            <Button onClick={() => this.props.history.push('/showTransaction')}>
+              Masuk Ke Detail
+            </Button>
           </Col>
         </Row>
       </Page>

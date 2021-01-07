@@ -8,9 +8,7 @@ const Footer = () => {
   return (
     <Navbar>
       <Nav navbar>
-        <NavItem>
-          2020 Logistic 1.0.2aa
-        </NavItem>
+        <NavItem>© {new Date().getFullYear()}, Alsintanlink Admin</NavItem>
       </Nav>
     </Navbar>
   );
