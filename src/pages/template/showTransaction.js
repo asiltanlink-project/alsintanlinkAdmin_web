@@ -927,10 +927,11 @@ class showTransaction extends React.Component {
   }
 
   componentDidMount() {
-    this.showNotification(
-      'Silahkan Pilih Pelapak, Ecommerce & Periode terlebih dahulu!',
-      'warning',
-    );
+    this.props.setTitle('Alsintanlink Admin', 'black');
+    // this.showNotification(
+    //   'Silahkan Pilih Pelapak, Ecommerce & Periode terlebih dahulu!',
+    //   'warning',
+    // );
     this.setProfileData();
     this.getAllEcommerce();
     // this.getListbyPaging(this.state.currentPage, this.state.todosPerPage);
@@ -2593,11 +2594,7 @@ class showTransaction extends React.Component {
       });
 
     return (
-      <Page
-        title="Batas Bawah Harga Pelapak"
-        breadcrumbs={[{ name: 'Batas Bawah Page', active: true }]}
-        className="batasHargaPage"
-      >
+      <Page>
         <Row>
           <Col>
             <Card className="mb-3">
@@ -2620,11 +2617,11 @@ class showTransaction extends React.Component {
                         marginTop: '8px',
                       }}
                     >
-                      Pelapak:&nbsp;
+                      Farmer:&nbsp;
                     </Label>
                     <Input
                       disabled
-                      placeholder="Pelapak yang dituju"
+                      placeholder="Pilih Farmer"
                       style={{ fontWeight: 'bold' }}
                       value={this.state.namaPelapak}
                     />
@@ -2646,13 +2643,13 @@ class showTransaction extends React.Component {
                         marginTop: '8px',
                       }}
                     >
-                      E-commerce:&nbsp;
+                      UPJA:&nbsp;
                     </Label>
                     <Input
                       type="text"
                       id="ecommerceValue"
                       disabled={true}
-                      placeholder="Pilih E-Commerce"
+                      placeholder="Pilih UPJA"
                       style={{ fontWeight: 'bold' }}
                       value={this.state.namaEcommerce}
                       // onChange={event => this.setEcommerce(event)}
@@ -2675,12 +2672,12 @@ class showTransaction extends React.Component {
                         marginTop: '8px',
                       }}
                     >
-                      Periode:&nbsp;
+                      Alsin:&nbsp;
                     </Label>
                     <Input
                       type="text"
                       disabled={true}
-                      placeholder="Pilih Periode"
+                      placeholder="Pilih Alsin"
                       style={{ fontWeight: 'bold' }}
                       value={this.state.namaPeriode}
                     ></Input>
@@ -2712,7 +2709,7 @@ class showTransaction extends React.Component {
                         this.setState({ resetInfo: !this.state.resetInfo })
                       }
                     >
-                      Reset Pelapak, Ecommerce dan Periode yang telah dipilih
+                      Reset Farmer, UPJA dan Alsin yang telah dipilih
                     </Tooltip>
                     <Button
                       style={{ float: 'right' }}
@@ -2742,7 +2739,7 @@ class showTransaction extends React.Component {
                       autoComplete="off"
                       type="search"
                       className="cr-search-form__input"
-                      placeholder="Search Procod..."
+                      placeholder="Cari..."
                       id="search"
                       onChange={evt => this.updateSearchValue(evt)}
                       onKeyPress={event => this.enterPressedSearch(event, true)}
@@ -2750,7 +2747,7 @@ class showTransaction extends React.Component {
                   </Form>
                 </Col>
                 <Col sm={7} style={{ textAlign: 'right', paddingRight: 0 }}>
-                  <Button
+                  {/* <Button
                     // size="sm"
                     onClick={this.toggle('nested_parent')}
                     // disabled={!pelapakID}
@@ -2773,7 +2770,7 @@ class showTransaction extends React.Component {
                     style={{ marginLeft: '1%' }}
                   >
                     Tambah Batas Bawah
-                  </Button>
+                  </Button> */}
                 </Col>
               </CardHeader>
               {/* <CardBody>
@@ -2794,7 +2791,7 @@ class showTransaction extends React.Component {
                 <Row style={{ paddingBottom: 0, marginBottom: 0 }}>
                   {/* {console.log('HIYAHIYA: ', this.state.result)} */}
                   <Col style={{ paddingBottom: 0, marginBottom: 0 }}>
-                    <Label style={{ fontWeight: 'bold' }}>Pelapak:&nbsp;</Label>
+                    <Label style={{ fontWeight: 'bold' }}>Farmer:&nbsp;</Label>
                     {this.state.result.length === 0 ? (
                       <Label style={{ fontWeight: 'bold' }}>-</Label>
                     ) : (
@@ -2805,7 +2802,19 @@ class showTransaction extends React.Component {
                   </Col>
                   <Col style={{ paddingBottom: 0, marginBottom: 0 }}>
                     <Label style={{ fontWeight: 'bold' }}>
-                      Ecommerce:&nbsp;
+                      UPJA:&nbsp;
+                    </Label>
+                    {this.state.result.length === 0 ? (
+                      <Label style={{ fontWeight: 'bold' }}>-</Label>
+                    ) : (
+                      <Label style={{ fontWeight: 'bold' }}>
+                        {currentTodos && currentTodos[0].ecommercename}
+                      </Label>
+                    )}
+                  </Col>
+                  <Col style={{ paddingBottom: 0, marginBottom: 0 }}>
+                    <Label style={{ fontWeight: 'bold' }}>
+                      Alsin:&nbsp;
                     </Label>
                     {this.state.result.length === 0 ? (
                       <Label style={{ fontWeight: 'bold' }}>-</Label>
