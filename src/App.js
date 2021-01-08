@@ -115,7 +115,7 @@ class App extends React.Component {
                   exact
                   setTitle={this.setTitle}
                   menuID={this.state.menuID}
-                  path="/Dashboard"
+                  path="/"
                   component={Dashboard}
                 />
                 <PrivateRoute

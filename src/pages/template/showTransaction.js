@@ -139,7 +139,8 @@ class showTransaction extends React.Component {
         ecommerceID: event.target.value,
       },
       () => {
-        this.getOutletEcommerce();
+        console.log('YANG KEPILIH:', this.state.ecommerceID);
+        // this.getOutletEcommerce();
       },
     );
   }
@@ -339,23 +340,14 @@ class showTransaction extends React.Component {
   }
 
   saveDomisili() {
-    this.setState(
-      {
-        pilihProvinsi: this.state.pilihProvinsi,
-        pilihKotaKab: this.state.pilihKotaKab,
-        pilihKecamatan: this.state.pilihKecamatan,
-        namaProvinsiSave: this.state.namaProvinsi,
-        namaKotaKabSave: this.state.namaKotaKab,
-        namaKecamatanSave: this.state.namaKecamatan,
-        domisiliDisabled: true,
-        typeDisabled: false,
-        modal_nested_parent_list_domisili: false,
-        namaType: '',
-        namaTypeSave: this.state.namaTypeTemp,
-      },
-      () =>
-        this.setState({ namaKecamatan: '', namaProvinsi: '', namaKotaKab: '' }),
-    );
+    this.setState({
+      pilihProvinsi: this.state.pilihProvinsi,
+      pilihKotaKab: this.state.pilihKotaKab,
+      pilihKecamatan: this.state.pilihKecamatan,
+      domisiliDisabled: true,
+      typeDisabled: true,
+      modal_nested_parent_list_domisili: false,
+    });
   }
 
   getListbyPaging(currPage, currLimit) {
@@ -606,7 +598,7 @@ class showTransaction extends React.Component {
             window.localStorage.removeItem('tokenCookies');
             window.localStorage.removeItem('accessList');
             this.props.history.push({
-              pathname: '/',
+              pathname: '/login',
             });
           }
         } else {
@@ -672,7 +664,7 @@ class showTransaction extends React.Component {
             window.localStorage.removeItem('tokenCookies');
             window.localStorage.removeItem('accessList');
             this.props.history.push({
-              pathname: '/',
+              pathname: '/login',
             });
           }
         } else {
@@ -738,7 +730,7 @@ class showTransaction extends React.Component {
             window.localStorage.removeItem('tokenCookies');
             window.localStorage.removeItem('accessList');
             this.props.history.push({
-              pathname: '/',
+              pathname: '/login',
             });
           }
         } else {
@@ -819,7 +811,7 @@ class showTransaction extends React.Component {
             window.localStorage.removeItem('tokenCookies');
             window.localStorage.removeItem('accessList');
             this.props.history.push({
-              pathname: '/',
+              pathname: '/login',
             });
           }
         } else {
@@ -1164,8 +1156,11 @@ class showTransaction extends React.Component {
         namaTypeTemp: nama.type_name,
         modal_nested_parent_list: false,
         domisiliDisabled: false,
+        pilihProvinsi: '',
+        pilihKotaKab: '',
+        pilihKecamatan: '',
       },
-      () => console.log('CEK CEK CEK', this.state.pilihType),
+      // () => console.log('CEK CEK CEK', this.state.pilihType),
       // () =>
       // this.getListbyPaging(),
     );
@@ -1524,7 +1519,7 @@ class showTransaction extends React.Component {
             window.localStorage.removeItem('tokenCookies');
             window.localStorage.removeItem('accessList');
             this.props.history.push({
-              pathname: '/',
+              pathname: '/login',
             });
           }
         } else {
@@ -1626,7 +1621,7 @@ class showTransaction extends React.Component {
             window.localStorage.removeItem('tokenCookies');
             window.localStorage.removeItem('accessList');
             this.props.history.push({
-              pathname: '/',
+              pathname: '/login',
             });
           }
         } else {
@@ -1698,7 +1693,7 @@ class showTransaction extends React.Component {
             window.localStorage.removeItem('tokenCookies');
             window.localStorage.removeItem('accessList');
             this.props.history.push({
-              pathname: '/',
+              pathname: '/login',
             });
           }
         } else {
@@ -1767,7 +1762,7 @@ class showTransaction extends React.Component {
             window.localStorage.removeItem('tokenCookies');
             window.localStorage.removeItem('accessList');
             this.props.history.push({
-              pathname: '/',
+              pathname: '/login',
             });
           }
         } else {
@@ -1844,7 +1839,7 @@ class showTransaction extends React.Component {
             window.localStorage.removeItem('tokenCookies');
             window.localStorage.removeItem('accessList');
             this.props.history.push({
-              pathname: '/',
+              pathname: '/login',
             });
           }
         } else {
@@ -2156,8 +2151,18 @@ class showTransaction extends React.Component {
   }
 
   SearchAllList() {
-    const { pilihEcommerce, pilihPelapak, pilihType } = this.state;
-    return pilihPelapak !== '' && pilihEcommerce !== '' && pilihType !== '';
+    const {
+      pilihKecamatan,
+      pilihKotaKab,
+      pilihType,
+      pilihProvinsi,
+    } = this.state;
+    return (
+      pilihKecamatan !== '' &&
+      pilihKotaKab !== '' &&
+      pilihType !== '' &&
+      pilihProvinsi !== ''
+    );
   }
 
   openModalWithItemID(code, user_id, name) {
@@ -2270,20 +2275,34 @@ class showTransaction extends React.Component {
   }
 
   findData() {
+    console.log('KLIK FIND DATA');
     var buttonSearch = document.getElementById('buttonSearch');
     buttonSearch.disabled = true;
     this.setState(
       {
-        namaProvinsi: '',
-        namaEcommerce: '',
-        namaPeriode: '',
+        namaProvinsiSave: this.state.namaProvinsi,
+        namaKotaKabSave: this.state.namaKotaKab,
+        namaKecamatanSave: this.state.namaKecamatan,
+        namaTypeSave: this.state.namaTypeTemp,
         domisiliDisabled: true,
         typeDisabled: false,
         periodeDisabled: true,
         lastID: 0,
       },
       () =>
-        this.getListbyPaging(this.state.currentPage, this.state.todosPerPage),
+        this.setState(
+          {
+            namaProvinsi: '',
+            namaKotaKab: '',
+            namaKecamatan: '',
+            namaType: '',
+          },
+          () =>
+            this.getListbyPaging(
+              this.state.currentPage,
+              this.state.todosPerPage,
+            ),
+        ),
     );
   }
 
@@ -2292,11 +2311,11 @@ class showTransaction extends React.Component {
     buttonSearch.disabled = true;
     this.setState({
       namaType: '',
-      namaEcommerce: '',
-      namaPeriode: '',
+      namaKotaKab: '',
+      namaProvinsi: '',
+      namaKecamatan: '',
       domisiliDisabled: true,
       typeDisabled: false,
-      periodeDisabled: true,
     });
   }
 
@@ -2471,7 +2490,7 @@ class showTransaction extends React.Component {
             <td>{todo.out_name}</td>
             <td style={{ textAlign: 'right' }}>
               <Button
-                color="info"
+                color="primary"
                 style={{ margin: '0px', fontSize: '15px' }}
                 value={todo.out_code}
                 onClick={this.setProvinsi}
@@ -2492,7 +2511,7 @@ class showTransaction extends React.Component {
             <td>{todo.out_name}</td>
             <td style={{ textAlign: 'right' }}>
               <Button
-                color="info"
+                color="primary"
                 style={{ margin: '0px', fontSize: '15px' }}
                 value={todo.out_code}
                 onClick={this.setKotakab}
@@ -2513,7 +2532,7 @@ class showTransaction extends React.Component {
             <td>{todo.out_name}</td>
             <td style={{ textAlign: 'right' }}>
               <Button
-                color="info"
+                color="primary"
                 style={{ margin: '0px', fontSize: '15px' }}
                 value={todo.out_code}
                 onClick={this.setKecamatan}
@@ -2606,12 +2625,12 @@ class showTransaction extends React.Component {
             <td>{todo.sellpackname}</td>
             {todo.activeyn === 'Y' && (
               <td>
-                <Badge color="success">Aktif</Badge>
+                <Badge color="success">Sudah Lunas</Badge>
               </td>
             )}
             {todo.activeyn === 'N' && (
               <td>
-                <Badge color="danger">Tidak Aktif</Badge>
+                <Badge color="danger">Menunggu Pembayaran</Badge>
               </td>
             )}
             <td>{new Date(todo.lastupdated).toDateString()}</td>
@@ -2793,7 +2812,11 @@ class showTransaction extends React.Component {
                       disabled={true}
                       placeholder="Pilih Domisili"
                       style={{ fontWeight: 'bold' }}
-                      value={this.state.namaEcommerce}
+                      value={
+                        this.state.namaProvinsi
+                        // this.state.namaKotaKab
+                        // this.state.namaKecamatan
+                      }
                       // onChange={event => this.setEcommerce(event)}
                     ></Input>
                     <InputGroupAddon addonType="append">
@@ -2889,123 +2912,88 @@ class showTransaction extends React.Component {
                 </Col>
               </CardHeader>
               <CardBody>
-                {/* <Row style={{ paddingBottom: 0, marginBottom: 0 }}></Row> */}
                 <Row style={{ paddingBottom: 0, marginBottom: 0 }}>
-                  <Col sm={2} style={{ paddingBottom: 0, marginBottom: 0 }}>
-                    <Label style={{ fontWeight: 'bold' }}>Type</Label>
+                  <Col>
+                    <Row style={{ paddingBottom: 0, marginBottom: 0 }}>
+                      <Col sm={2} style={{ paddingBottom: 0, marginBottom: 0 }}>
+                        <Label style={{ fontWeight: 'bold' }}>Type</Label>
+                      </Col>
+                      <Col
+                        sm={10}
+                        style={{ paddingBottom: 0, marginBottom: 0 }}
+                      >
+                        :&nbsp;
+                        {this.state.namaTypeSave === undefined ? (
+                          <Label style={{ fontWeight: 'bold' }}>-</Label>
+                        ) : (
+                          <Label style={{ fontWeight: 'bold' }}>
+                            {this.state.namaTypeSave}
+                          </Label>
+                        )}
+                      </Col>
+                    </Row>
+
+                    <Row style={{ paddingBottom: 0, marginBottom: 0 }}>
+                      <Col sm={2} style={{ paddingBottom: 0, marginBottom: 0 }}>
+                        <Label style={{ fontWeight: 'bold' }}>Provinsi</Label>
+                      </Col>
+                      <Col
+                        sm={10}
+                        style={{ paddingBottom: 0, marginBottom: 0 }}
+                      >
+                        :&nbsp;
+                        {this.state.namaProvinsiSave === undefined ? (
+                          <Label style={{ fontWeight: 'bold' }}>-</Label>
+                        ) : (
+                          <Label style={{ fontWeight: 'bold' }}>
+                            {this.state.namaProvinsiSave}
+                          </Label>
+                        )}
+                      </Col>
+                    </Row>
                   </Col>
-                  <Col sm={10} style={{ paddingBottom: 0, marginBottom: 0 }}>
-                    :&nbsp;
-                    {this.state.namaTypeSave === undefined ? (
-                      <Label style={{ fontWeight: 'bold' }}>-</Label>
-                    ) : (
-                      <Label style={{ fontWeight: 'bold' }}>
-                        {this.state.namaTypeSave}
-                      </Label>
-                    )}
+
+                  <Col>
+                    <Row style={{ paddingBottom: 0, marginBottom: 0 }}>
+                      <Col sm={2} style={{ paddingBottom: 0, marginBottom: 0 }}>
+                        <Label style={{ fontWeight: 'bold' }}>Kota/Kab</Label>
+                      </Col>
+                      <Col
+                        sm={10}
+                        style={{ paddingBottom: 0, marginBottom: 0 }}
+                      >
+                        :&nbsp;
+                        {this.state.namaKotaKabSave === undefined ? (
+                          <Label style={{ fontWeight: 'bold' }}>-</Label>
+                        ) : (
+                          <Label style={{ fontWeight: 'bold' }}>
+                            {this.state.namaKotaKabSave}
+                          </Label>
+                        )}
+                      </Col>
+                    </Row>
+
+                    <Row style={{ paddingBottom: 0, marginBottom: 0 }}>
+                      <Col sm={2} style={{ paddingBottom: 0, marginBottom: 0 }}>
+                        <Label style={{ fontWeight: 'bold' }}>Kecamatan</Label>
+                      </Col>
+                      <Col
+                        sm={10}
+                        style={{ paddingBottom: 0, marginBottom: 0 }}
+                      >
+                        :&nbsp;
+                        {this.state.namaKecamatanSave === undefined ? (
+                          <Label style={{ fontWeight: 'bold' }}>-</Label>
+                        ) : (
+                          <Label style={{ fontWeight: 'bold' }}>
+                            {this.state.namaKecamatanSave}
+                          </Label>
+                        )}
+                      </Col>
+                    </Row>
                   </Col>
                 </Row>
 
-                <Row style={{ paddingBottom: 0, marginBottom: 0 }}>
-                  <Col sm={2} style={{ paddingBottom: 0, marginBottom: 0 }}>
-                    <Label style={{ fontWeight: 'bold' }}>Provinsi</Label>
-                  </Col>
-                  <Col sm={10} style={{ paddingBottom: 0, marginBottom: 0 }}>
-                    :&nbsp;
-                    {this.state.namaProvinsiSave === undefined ? (
-                      <Label style={{ fontWeight: 'bold' }}>-</Label>
-                    ) : (
-                      <Label style={{ fontWeight: 'bold' }}>
-                        {this.state.namaProvinsiSave}
-                      </Label>
-                    )}
-                  </Col>
-                </Row>
-
-                <Row style={{ paddingBottom: 0, marginBottom: 0 }}>
-                  <Col sm={2} style={{ paddingBottom: 0, marginBottom: 0 }}>
-                    <Label style={{ fontWeight: 'bold' }}>Kota/Kab</Label>
-                  </Col>
-                  <Col sm={10} style={{ paddingBottom: 0, marginBottom: 0 }}>
-                    :&nbsp;
-                    {this.state.namaKotaKabSave === undefined ? (
-                      <Label style={{ fontWeight: 'bold' }}>-</Label>
-                    ) : (
-                      <Label style={{ fontWeight: 'bold' }}>
-                        {this.state.namaKotaKabSave}
-                      </Label>
-                    )}
-                  </Col>
-                </Row>
-
-                <Row style={{ paddingBottom: 0, marginBottom: 0 }}>
-                  <Col sm={2} style={{ paddingBottom: 0, marginBottom: 0 }}>
-                    <Label style={{ fontWeight: 'bold' }}>Kecamatan</Label>
-                  </Col>
-                  <Col sm={10} style={{ paddingBottom: 0, marginBottom: 0 }}>
-                    :&nbsp;
-                    {this.state.namaKecamatanSave === undefined ? (
-                      <Label style={{ fontWeight: 'bold' }}>-</Label>
-                    ) : (
-                      <Label style={{ fontWeight: 'bold' }}>
-                        {this.state.namaKecamatanSave}
-                      </Label>
-                    )}
-                  </Col>
-                </Row>
-
-                {/* <Row style={{ paddingBottom: 0, marginBottom: 0 }}>
-                  <Col style={{ paddingBottom: 0, marginBottom: 0 }}>
-                    <Label style={{ fontWeight: 'bold' }}>Type:&nbsp;</Label>
-                    <br></br>
-                    {this.state.namaTypeSave === undefined ? (
-                      <Label style={{ fontWeight: 'bold' }}>-</Label>
-                    ) : (
-                      <Label style={{ fontWeight: 'bold' }}>
-                        {this.state.namaTypeSave}
-                      </Label>
-                    )}
-                  </Col>
-                  <Col style={{ paddingBottom: 0, marginBottom: 0 }}>
-                    <Label style={{ fontWeight: 'bold' }}>
-                      Provinsi:&nbsp;
-                    </Label>
-                    <br></br>
-                    {this.state.namaProvinsiSave === undefined ? (
-                      <Label style={{ fontWeight: 'bold' }}>-</Label>
-                    ) : (
-                      <Label style={{ fontWeight: 'bold' }}>
-                        {this.state.namaProvinsiSave}
-                      </Label>
-                    )}
-                  </Col>
-                  <Col style={{ paddingBottom: 0, marginBottom: 0 }}>
-                    <Label style={{ fontWeight: 'bold' }}>
-                      Kota/Kab:&nbsp;
-                    </Label>
-                    <br></br>
-                    {this.state.namaKotaKabSave === undefined ? (
-                      <Label style={{ fontWeight: 'bold' }}>-</Label>
-                    ) : (
-                      <Label style={{ fontWeight: 'bold' }}>
-                        {this.state.namaKotaKabSave}
-                      </Label>
-                    )}
-                  </Col>
-                  <Col style={{ paddingBottom: 0, marginBottom: 0 }}>
-                    <Label style={{ fontWeight: 'bold' }}>
-                      Kecamatan:&nbsp;
-                    </Label>
-                    <br></br>
-                    {this.state.namaKecamatanSave === undefined ? (
-                      <Label style={{ fontWeight: 'bold' }}>-</Label>
-                    ) : (
-                      <Label style={{ fontWeight: 'bold' }}>
-                        {this.state.namaKecamatanSave}
-                      </Label>
-                    )}
-                  </Col>
-                </Row> */}
                 <Table responsive striped id="tableUtama">
                   <thead>
                     <tr>
@@ -4317,7 +4305,7 @@ class showTransaction extends React.Component {
                     style={{ fontWeight: 'bold' }}
                     value={this.state.namaProvinsi}
                   />
-                  {console.log('ISINYA:', this.state.namaProvinsi)}
+                  {/* {console.log('ISINYA:', this.state.namaProvinsi)} */}
                   <InputGroupAddon addonType="append">
                     <Button onClick={() => this.setModalProvinsi()}>
                       <MdList />
@@ -4387,7 +4375,7 @@ class showTransaction extends React.Component {
               onClick={() => this.saveDomisili()}
               disabled={!isEnabledSaveDomisili}
             >
-              Simpan
+              Simpan Domisili
             </Button>
             <Button color="danger" onClick={this.handleCloseDomisili}>
               Batal
@@ -4695,7 +4683,7 @@ class showTransaction extends React.Component {
         </Modal>
         {/* Modal List Pelapak Edit Masal */}
 
-        {/* Modal Edit */}
+        {/* Modal Edit Status Pembayaran*/}
         <Modal
           onExit={this.handleClose}
           isOpen={this.state.modal_nested_parent_edit}
@@ -4703,7 +4691,7 @@ class showTransaction extends React.Component {
           className={this.props.className}
         >
           <ModalHeader toggle={this.toggle('nested_parent_edit')}>
-            Edit Pembelian Per-Outlet
+            Edit Status Pembayaran
           </ModalHeader>
           <ModalBody>
             <Form>
@@ -4724,7 +4712,7 @@ class showTransaction extends React.Component {
                     this.state.editDimen && this.state.editDimen.productname
                   }
                 />
-                <Label>Batas Bawah</Label>
+                {/* <Label>Batas Bawah</Label>
                 <Input
                   type="number"
                   name="limitpriceecommerce"
@@ -4742,7 +4730,52 @@ class showTransaction extends React.Component {
                       'editDimen',
                     )
                   }
-                />
+                /> */}
+                <Label>Status Pembayaran</Label>
+                <select
+                  className="form-control"
+                  name="activeyn"
+                  style={{ width: '100%' }}
+                  value={this.state.value}
+                  onChange={evt =>
+                    this.updateInputValue(
+                      evt.target.value,
+                      evt.target.name,
+                      'editDimen',
+                    )
+                  }
+                  // onChange={e => this.handleSelectEditMasal(e)}
+                >
+                  {this.state.editDimen &&
+                    this.state.editDimen.activeyn === 'Y' && (
+                      <option
+                        value={
+                          this.state.editDimen && this.state.editDimen.activeyn
+                        }
+                        disabled
+                        selected
+                        hidden
+                      >
+                        Sudah Lunas
+                      </option>
+                    )}
+                  {this.state.editDimen &&
+                    this.state.editDimen.activeyn === 'N' && (
+                      <option
+                        value={
+                          this.state.editDimen && this.state.editDimen.activeyn
+                        }
+                        disabled
+                        selected
+                        hidden
+                      >
+                        Menunggu Pembayaran
+                      </option>
+                    )}
+
+                  <option value="Y">Sudah Lunas</option>
+                  <option value="N">Menunggu Pembayaran</option>
+                </select>
               </FormGroup>
             </Form>
           </ModalBody>
@@ -4797,12 +4830,12 @@ class showTransaction extends React.Component {
 
   canBeSubmittedDomisili() {
     const { pilihProvinsi, pilihKotaKab, pilihKecamatan } = this.state;
-    console.log(
-      'DISABLE',
-      pilihProvinsi !== '',
-      pilihKotaKab !== '',
-      pilihKecamatan !== '',
-    );
+    // console.log(
+    //   'DISABLE',
+    //   pilihProvinsi !== '',
+    //   pilihKotaKab !== '',
+    //   pilihKecamatan !== '',
+    // );
     return pilihProvinsi !== '' && pilihKotaKab !== '' && pilihKecamatan !== '';
   }
 
@@ -4905,10 +4938,14 @@ class showTransaction extends React.Component {
   updateInputValue(value, field, Dimen) {
     let currentDimen = this.state[Dimen];
     currentDimen[field] = value;
-    this.setState(
-      { currentDimen },
+    this.setState({ currentDimen }, 
       // () =>
-      // console.log('CURRA', this.state.currentDimen),
+      // console.log(
+      //   'CURRA',
+      //   this.state.currentDimen,
+      //   'EDIT',
+      //   this.state.editDimen,
+      // ),
     );
   }
 

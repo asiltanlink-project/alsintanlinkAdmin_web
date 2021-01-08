@@ -76,11 +76,11 @@ class AuthPage extends React.Component {
           if (data1.mem_forcechangepasswordyn === 'Y') {
             //console.log("FORE CHANGE YES");
             this.props.history.push({
-              pathname: '/Dashboard',
+              pathname: '/',
               state: { ok: true },
             });
           } else {
-            window.location.replace('/Dashboard');
+            window.location.replace('/');
           }
         } else {
           this.showNotification(metadata.message, 'error');
