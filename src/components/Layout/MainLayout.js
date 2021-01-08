@@ -1,6 +1,8 @@
 import { Content, Footer, Header, Sidebar } from 'components/Layout';
 import React from 'react';
-import { MdImportantDevices, MdLoyalty } from 'react-icons/md';
+import { MdImportantDevices } from 'react-icons/md';
+import NotificationSystem from 'react-notification-system';
+import { NOTIFICATION_SYSTEM_STYLE } from 'utils/constants';
 
 class MainLayout extends React.Component {
   static isSidebarOpen() {
@@ -19,28 +21,17 @@ class MainLayout extends React.Component {
     this.checkBreakpoint(this.props.breakpoint);
 
     setTimeout(() => {
+      console.log('TERPANGGIL', this.notificationSystem);
       if (!this.notificationSystem) {
         return;
       }
 
       this.notificationSystem.addNotification({
         title: <MdImportantDevices />,
-        message: 'Selamat datang di Logistic Page!',
-        level: 'info',
+        message: 'Selamat datang di Alsintanlink Admin, Selamat Bekerja!',
+        level: 'success',
       });
     }, 1500);
-
-    setTimeout(() => {
-      if (!this.notificationSystem) {
-        return;
-      }
-
-      this.notificationSystem.addNotification({
-        title: <MdLoyalty />,
-        message: 'Selamat bekerja!',
-        level: 'info',
-      });
-    }, 2500);
   }
 
   // close sidebar when
@@ -85,10 +76,18 @@ class MainLayout extends React.Component {
       <main className="cr-app bg-light">
         <Sidebar />
         <Content fluid onClick={this.handleContentClick}>
-          <Header title={this.props.title} color={this.props.color} />
+          <Header />
           {children}
           <Footer />
         </Content>
+
+        <NotificationSystem
+          dismissible={false}
+          ref={notificationSystem =>
+            (this.notificationSystem = notificationSystem)
+          }
+          style={NOTIFICATION_SYSTEM_STYLE}
+        />
       </main>
     );
   }
