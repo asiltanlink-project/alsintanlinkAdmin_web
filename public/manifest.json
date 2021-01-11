@@ -1,6 +1,6 @@
 {
-  "short_name": "Alsintanlink",
-  "name": "Alsintanlink",
+  "short_name": "Alsintanlink Admin",
+  "name": "Alsintanlink Admin",
   "icons": [
     {
       "src": "favicon-16x16.png",
@@ -43,11 +43,16 @@
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
+    },
+    {
+      "src": "/512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ],
-  "start_url": "/",
+  "start_url": "/login",
   "display": "standalone",
   "theme_color": "#26A68E",
-  "background_color": "#26A68E",
-  "orientation": "portrait"
+  "background_color": "#26A68E"
 }

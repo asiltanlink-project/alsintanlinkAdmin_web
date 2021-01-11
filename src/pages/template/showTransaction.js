@@ -38,8 +38,6 @@ import * as firebase from 'firebase/app';
 import { Scrollbar } from 'react-scrollbars-custom';
 import LoadingSpinner from 'pages/LoadingSpinner.js';
 
-const perf = firebase.performance();
-
 const initialCurrentDimen = {
   procod: '',
   nama: '',

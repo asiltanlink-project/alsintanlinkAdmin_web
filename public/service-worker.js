@@ -2,7 +2,7 @@
 var doCache = false;
 
 // Name our cache
-var CACHE_NAME = 'centurynetPWA-v1';
+var CACHE_NAME = 'alsintanlinkAdmin-v1';
 
 // Delete old caches that are not our current one!
 self.addEventListener("activate", event => {
@@ -28,7 +28,7 @@ self.addEventListener('install', function(event) {
         .then(function(cache) {
           // Get the assets manifest so we can see what our js file is named
           // This is because webpack hashes it
-          fetch("asset-manifest.json")
+          fetch("manifest.json")
             .then(response => {
               response.json()
             })
