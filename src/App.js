@@ -11,7 +11,7 @@ import * as firebase from 'firebase/app';
 // import 'firebase/performance';
 // import 'firebase/auth';
 
-var firebaseConfig = {
+const firebaseConfig = {
   apiKey: 'AIzaSyALU66lM4mv9MRWVNsAgXTIQIvNdEYeXqU',
   authDomain: 'alsintanlinkadmin.firebaseapp.com',
   projectId: 'alsintanlinkadmin',
@@ -29,6 +29,7 @@ const showTransaction = React.lazy(() =>
 );
 
 const getBasename = () => {
+  console.log('PUBLIC URL: ', `/${process.env.PUBLIC_URL.split('/').pop()}`);
   return `/${process.env.PUBLIC_URL.split('/').pop()}`;
 };
 
@@ -37,34 +38,10 @@ class App extends React.Component {
     title: '',
     color: '',
     menuID: '',
-    reqData: [],
   };
 
   setTitle = (title, color) => {
     this.setState({ title: title, color: color });
-  };
-
-  passData = (type, data) => {
-    var tempArr = this.state.reqData;
-    if (type === 'SPManual') {
-      var newObj = {
-        selectedTipeLaporan: data.selectedTipeLaporan,
-        selectedJenisLaporan: data.selectedJenisLaporan,
-        inputDate: data.inputDate,
-        spNotPrintChecked: data.spNotPrintChecked,
-        notFound: data.notFound,
-        hasilSP: data.hasilSP,
-      };
-      tempArr.push(newObj);
-      this.setState({
-        reqData: tempArr,
-      });
-    }
-    if (type === 'clear') {
-      this.setState({
-        reqData: [],
-      });
-    }
   };
 
   getAccess() {
@@ -104,7 +81,6 @@ class App extends React.Component {
               layout={EmptyLayout}
               component={props => <AuthPage {...props} />}
             />
-            {console.log('TITLE', this.state.title, 'COLOR', this.state.color)}
             <MainLayout
               breakpoint={this.props.breakpoint}
               title={this.state.title}

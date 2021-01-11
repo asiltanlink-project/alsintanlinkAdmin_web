@@ -1841,39 +1841,6 @@ class showTransaction extends React.Component {
       });
   };
 
-  hapusProduk = first_param => () => {
-    var url = myUrl.url_hapusProdukOutlet;
-    const delete_data = first_param;
-    var pelapakID = this.state.pilihPelapak;
-    this.fetchData();
-    var payload = {
-      outlet_id: delete_data.pelapakID,
-      procod: delete_data.procod,
-    };
-
-    const option = {
-      method: 'DELETE',
-      json: true,
-      headers: {
-        'Content-Type': 'application/json;charset=UTF-8',
-        Authorization: window.localStorage.getItem('tokenCookies'),
-      },
-      body: JSON.stringify(payload),
-    };
-    fetch(url, option)
-      .then(response => response.json())
-      .then(data => {
-        this.setState({
-          modal_delete: false,
-          modal_nested_delete: false,
-          modal_nested_parent_delete: false,
-          loading: false,
-        });
-        this.getListbyPaging(this.state.currentPage, this.state.todosPerPage);
-        this.setState({ modal_delete: false });
-        this.showNotification('Data Berhasil Di Hapus', 'info');
-      });
-  };
 
   setData = (data = null) => {
     if (data === null || data === -1) {
@@ -4027,7 +3994,7 @@ class showTransaction extends React.Component {
           <ModalFooter>
             <Button
               color="primary"
-              onClick={this.hapusProduk(this.state.delete_data)}
+              // onClick={this.hapusProduk(this.state.delete_data)}
               disabled={loading}
             >
               {!loading && <span>Ya</span>}
