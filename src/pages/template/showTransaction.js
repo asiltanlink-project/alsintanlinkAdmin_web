@@ -2623,43 +2623,7 @@ class showTransaction extends React.Component {
               {formatter.format(todo.limitpriceecommerce)}
             </td>
             <td>{todo.sellpackname}</td>
-            {todo.activeyn === 'Y' && (
-              <td>
-                <Badge color="success">Sudah Lunas</Badge>
-              </td>
-            )}
-            {todo.activeyn === 'N' && (
-              <td>
-                <Badge color="danger">Menunggu Pembayaran</Badge>
-              </td>
-            )}
             <td>{new Date(todo.lastupdated).toDateString()}</td>
-            <td>
-              <Button
-                style={{ margin: '0px' }}
-                color="secondary"
-                size="sm"
-                onClick={() =>
-                  this.toggleEditData('nested_parent_edit', { ...todo })
-                }
-              >
-                <MdEdit />
-              </Button>
-            </td>
-            <td>
-              <Button
-                style={{ margin: '0px' }}
-                color="danger"
-                size="sm"
-                onClick={() =>
-                  this.toggleDeleteData('nested_parent_nonaktifHeaderData', {
-                    ...todo,
-                  })
-                }
-              >
-                <MdDelete />
-              </Button>
-            </td>
           </tr>
         );
       });
@@ -2813,9 +2777,9 @@ class showTransaction extends React.Component {
                       placeholder="Pilih Domisili"
                       style={{ fontWeight: 'bold' }}
                       value={
-                        this.state.namaProvinsi
+                        // this.state.namaProvinsi
                         // this.state.namaKotaKab
-                        // this.state.namaKecamatan
+                        this.state.namaKecamatan
                       }
                       // onChange={event => this.setEcommerce(event)}
                     ></Input>
@@ -3006,10 +2970,7 @@ class showTransaction extends React.Component {
                       <th>Periode Akhir</th>
                       <th style={{ textAlign: 'right' }}>Batas Bawah</th>
                       <th>Sellpack</th>
-                      <th>Status</th>
                       <th>Tgl Update</th>
-                      <th>Edit</th>
-                      <th>Hapus</th>
                     </tr>
                   </thead>
 

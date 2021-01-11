@@ -18,6 +18,7 @@ class AuthPage extends React.Component {
       password: password,
     };
 
+    console.log("PAYLOAD", payload)
     const option = {
       method: 'POST',
       json: true,
