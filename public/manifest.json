@@ -1,6 +1,11 @@
 {
-  "short_name": "Alsintanlink Admin",
   "name": "Alsintanlink Admin",
+  "short_name": "Alsintanlink Admin",
+  "theme_color": "#2196f3",
+  "background_color": "#2196f3",
+  "display": "standalone",
+  "scope": "/",
+  "start_url": "/",
   "icons": [
     {
       "src": "favicon-16x16.png",
@@ -48,9 +53,5 @@
       "sizes": "512x512",
       "type": "image/png"
     }
-  ],
-  "start_url": "/",
-  "display": "standalone",
-  "theme_color": "#000000",
-  "background_color": "#ffffff"
+  ]
 }

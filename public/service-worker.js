@@ -38,7 +38,7 @@ self.addEventListener('install', function(event) {
               // We could also cache any static assets like CSS or images
               const urlsToCache = [
                 "/",
-                assets["main.js"]
+                assets["App.js"]
               ]
               cache.addAll(urlsToCache)
               console.log('cached');
