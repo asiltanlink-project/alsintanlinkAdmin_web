@@ -11,14 +11,14 @@ import * as firebase from 'firebase/app';
 // import 'firebase/performance';
 // import 'firebase/auth';
 
-const firebaseConfig = {
-  apiKey: 'AIzaSyDPJxUKdofUnKhDCFOgZnQFjTqMWqqw56g',
-  authDomain: 'neo-genesis-ordermonitoring.firebaseapp.com',
-  databaseURL: 'https://neo-genesis-ordermonitoring.firebaseio.com',
-  projectId: 'neo-genesis-ordermonitoring',
-  storageBucket: 'neo-genesis-ordermonitoring.appspot.com',
-  messagingSenderId: '937266444089',
-  appId: '1:937266444089:web:b54f43bda668efd1199ae8',
+var firebaseConfig = {
+  apiKey: 'AIzaSyALU66lM4mv9MRWVNsAgXTIQIvNdEYeXqU',
+  authDomain: 'alsintanlinkadmin.firebaseapp.com',
+  projectId: 'alsintanlinkadmin',
+  storageBucket: 'alsintanlinkadmin.appspot.com',
+  messagingSenderId: '772261001994',
+  appId: '1:772261001994:web:d84c4f54d9c08ff47f98f3',
+  measurementId: 'G-9NNSN7F2KF',
 };
 
 // Initialize Firebase
@@ -104,7 +104,7 @@ class App extends React.Component {
               layout={EmptyLayout}
               component={props => <AuthPage {...props} />}
             />
-
+            {console.log('TITLE', this.state.title, 'COLOR', this.state.color)}
             <MainLayout
               breakpoint={this.props.breakpoint}
               title={this.state.title}

@@ -21,7 +21,7 @@ class MainLayout extends React.Component {
     this.checkBreakpoint(this.props.breakpoint);
 
     setTimeout(() => {
-      console.log('TERPANGGIL', this.notificationSystem);
+      // console.log('TERPANGGIL', this.notificationSystem);
       if (!this.notificationSystem) {
         return;
       }

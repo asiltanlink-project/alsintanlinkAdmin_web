@@ -938,26 +938,16 @@ class showTransaction extends React.Component {
   }
 
   componentDidMount() {
-    this.props.setTitle('Alsintanlink Admin', 'black');
-    // this.showNotification(
-    //   'Silahkan Pilih Pelapak, Ecommerce & Periode terlebih dahulu!',
-    //   'warning',
-    // );
+    // this.props.setTitle('Alsintanlink Admin', 'black');
     this.setProfileData();
     this.getAllEcommerce();
-    // this.getListbyPaging(this.state.currentPage, this.state.todosPerPage);
-    // this.getListbyPagingAll(this.state.currentPage, this.state.todosPerPage);
     this.getOutletEcommerce();
     this.getListPerOutlet(this.state.currentPage, this.state.todosPerPage);
     this.getListDefault();
     this.getPelapak(this.state.currentPages, this.state.todosPerPages);
-    // console.log("TOKEN", window.localStorage.getItem('tokenCookies'))
   }
 
   getPelapakID() {
-    // console.log('KEPANGGIL');
-    // const trace = perf.trace('getPelapak');
-    // trace.start();
     const urlA =
       myUrl.url_getPelapakID +
       'outletId=' +
@@ -2719,7 +2709,11 @@ class showTransaction extends React.Component {
       });
 
     return (
-      <Page>
+      <Page
+        title="Alsintanlink Admin"
+        breadcrumbs={[{ name: 'Admin', active: true }]}
+        className="Alsintanlink Admin"
+      >
         <Row>
           <Col>
             <Card className="mb-3">
@@ -2848,32 +2842,10 @@ class showTransaction extends React.Component {
                     />
                   </Form>
                 </Col>
-                <Col sm={7} style={{ textAlign: 'right', paddingRight: 0 }}>
-                  {/* <Button
-                    // size="sm"
-                    onClick={this.toggle('nested_parent')}
-                    // disabled={!pelapakID}
-                    style={{ marginLeft: '1%' }}
-                  >
-                    Detail Farmer
-                  </Button>
-                  <Button
-                    // size="sm"
-                    onClick={this.toggle('nested_parent_batasPerPelapak')}
-                    // disabled={!pelapakID}
-                    style={{ marginLeft: '1%' }}
-                  >
-                    Detail UPJA
-                  </Button>
-                  <Button
-                    // size="sm"
-                    onClick={this.toggle('nested_parent_editMassal')}
-                    // disabled={!pelapakID}
-                    style={{ marginLeft: '1%' }}
-                  >
-                    Detail Alsin
-                  </Button> */}
-                </Col>
+                <Col
+                  sm={7}
+                  style={{ textAlign: 'right', paddingRight: 0 }}
+                ></Col>
               </CardHeader>
               <CardBody>
                 <Row style={{ paddingBottom: 0, marginBottom: 0 }}>
@@ -3039,87 +3011,6 @@ class showTransaction extends React.Component {
                     </ButtonGroup>
                   </Col>
                 </Row>
-                {/* <Row>
-                  <Col md="9" sm="12" xs="12">
-                    <InputGroup>
-                      <InputGroupAddon addonType="prepend">
-                        Tampilkan
-                      </InputGroupAddon>
-                      <select
-                        name="todosPerPage"
-                        style={{ height: '38px' }}
-                        value={this.state.value}
-                        onChange={e => this.handleSelect(e)}
-                      >
-                        <option value="5">5</option>
-                        <option value="10">10</option>
-                        <option value="20">20</option>
-                      </select>
-                      <InputGroupAddon addonType="append">
-                        Baris Per-Halaman
-                      </InputGroupAddon>
-                    </InputGroup>
-                  </Col>
-                  <Col md="3" sm="12" xs="12">
-                    <Card className="mb-3s">
-                      <ButtonGroup>
-                        <Button
-                          name="FirstButton"
-                          value={1}
-                          // onClick={e =>
-                          //   this.paginationButton(e, 0, this.state.lastID)
-                          // }
-                          onClick={() => this.firstPage()}
-                        >
-                          First &#10092;&#10092;
-                        </Button>
-                        <Button
-                          name="PrevButton"
-                          value={this.state.currentPage}
-                          onClick={e =>
-                            this.paginationButton(e, -1, this.state.maxPage)
-                          }
-                        >
-                          &#10092;
-                        </Button>
-                        <input
-                          type="text"
-                          placeholder="Page"
-                          outline="none"
-                          value={this.state.currentPage}
-                          onChange={e =>
-                            this.setState({ currentPage: e.target.value })
-                          }
-                          onKeyPress={e => this.enterPressedPage(e)}
-                          style={{
-                            height: '38px',
-                            width: '75px',
-                            textAlign: 'center',
-                          }}
-                        />
-                        <Button
-                          name="NextButton"
-                          value={this.state.currentPage}
-                          // onClick={e =>
-                          //   this.paginationButton(e, 1, this.state.maxPage)
-                          // }
-                          onClick={() => this.getListbyPaging()}
-                        >
-                          Next &#10093;
-                        </Button>
-                        <Button
-                          name="LastButton"
-                          value={this.state.maxPage}
-                          onClick={e =>
-                            this.paginationButton(e, 0, this.state.maxPage)
-                          }
-                        >
-                          &#10093;&#10093;
-                        </Button>
-                      </ButtonGroup>
-                    </Card>
-                  </Col>
-                </Row> */}
               </CardBody>
             </Card>
           </Col>
@@ -3309,59 +3200,6 @@ class showTransaction extends React.Component {
             Batas per Pelapak
           </ModalHeader>
           <ModalBody style={{ paddingTop: 0 }}>
-            {/* <CardHeader
-              className="d-flex justify-content-between"
-              style={{ paddingLeft: 0, paddingRight: 0 }}
-            >
-              <Col sm={6} style={{ paddingLeft: 0 }}>
-                <Form
-                  inline
-                  className="cr-search-form"
-                  onSubmit={e => e.preventDefault()}
-                >
-                  <MdSearch
-                    size="20"
-                    className="cr-search-form__icon-search text-secondary"
-                  />
-                  <Input
-                    autoComplete="off"
-                    type="search"
-                    className="cr-search-form__input"
-                    placeholder="Search ..."
-                    id="search"
-                    onChange={evt => this.updateSearchValueList(evt)}
-                    onKeyPress={event =>
-                      this.enterPressedSearchList(event, true)
-                    }
-                  />
-                </Form>
-              </Col>
-              <Col sm={6} style={{ paddingRight: 0 }}>
-                <Form inline style={{ float: 'right' }}>
-                  <Label
-                    id="ecommerceBatasPerPelapak"
-                    style={{
-                      fontWeight: 'bold',
-                    }}
-                  >
-                    E-commerce:&nbsp;
-                  </Label>
-                  <Input
-                    type="select"
-                    // disabled={this.state.domisiliDisabled}
-                    placeholder="Pilih E-Commerce"
-                    style={{ fontWeight: 'bold' }}
-                    value={this.state.namaEcommerce}
-                    onChange={event => this.setEcommerceBatasPerPelapak(event)}
-                  >
-                    <option selected hidden id="pilih">
-                      Pilih E-Commerce
-                    </option>
-                    {renderEcommerce}
-                  </Input>
-                </Form>
-              </Col>
-            </CardHeader> */}
             <CardBody style={{ paddingTop: 0 }}>
               <Table responsive striped id="tableBatasPerPelapak">
                 <thead>
@@ -4899,7 +4737,8 @@ class showTransaction extends React.Component {
   updateInputValue(value, field, Dimen) {
     let currentDimen = this.state[Dimen];
     currentDimen[field] = value;
-    this.setState({ currentDimen }, 
+    this.setState(
+      { currentDimen },
       // () =>
       // console.log(
       //   'CURRA',

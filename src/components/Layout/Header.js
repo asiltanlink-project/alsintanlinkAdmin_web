@@ -90,11 +90,6 @@ class Header extends React.Component {
     return (
       <Navbar light expand className={bem.b('bg-white')}>
         {this.renderRedirect()}
-        {/* <Nav navbar className="mr-2">
-          <Button outline onClick={this.handleSidebarControlButton}>
-            <MdClearAll size={25} />
-          </Button>
-        </Nav> */}
         <Label
           style={{
             fontWeight: 'bold',

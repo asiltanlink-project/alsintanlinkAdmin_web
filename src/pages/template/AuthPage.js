@@ -18,7 +18,7 @@ class AuthPage extends React.Component {
       password: password,
     };
 
-    console.log("PAYLOAD", payload)
+    console.log('PAYLOAD', payload);
     const option = {
       method: 'POST',
       json: true,
@@ -58,7 +58,7 @@ class AuthPage extends React.Component {
       var token = data.headers.get('Authorization');
       data = await data.json();
 
-      //console.log(data);
+      console.log('DATA LOGIN', data);
       var data1 = data.data;
       var error = data.error;
       var metadata = data.metadata;

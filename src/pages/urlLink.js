@@ -3,8 +3,8 @@
 if (window.location.hostname.includes('staging-logistic')) {
   console.log('STAGING-logistic');
   //URL LOGIN
-  // var url_login = 'http://alsintanlink.com/api/admin/login';
-  var url_login = 'https://api.cfu.pharmalink.id/auth/login';
+  var url_login = 'http://alsintanlink.com/api/admin/login';
+  // var url_login = 'https://api.cfu.pharmalink.id/auth/login';
   var url_changeForgottenPassword =
     'https://staging-api.cfu.pharmalink.id/auth/forgotpassword';
   var url_verifyOTP = 'https://staging-api.cfu.pharmalink.id/auth/verifyotp';
@@ -93,8 +93,8 @@ if (window.location.hostname.includes('staging-logistic')) {
   console.log('logistic');
 
   //URL LOGIN
-  var url_login = 'https://api.cfu.pharmalink.id/auth/login';
-  // var url_login = 'http://alsintanlink.com/api/admin/login';
+  // var url_login = 'https://api.cfu.pharmalink.id/auth/login';
+  var url_login = 'http://alsintanlink.com/api/admin/login';
   var url_changeForgottenPassword =
     'https://api.cfu.pharmalink.id/auth/forgotpassword';
   var url_verifyOTP = 'https://api.cfu.pharmalink.id/auth/verifyotp';
@@ -313,6 +313,9 @@ if (window.location.hostname.includes('staging-logistic')) {
 
   var url_scanProcodProductOutlet;
 }
+
+// var url_login = 'https://api.cfu.pharmalink.id/auth/login';
+var url_login = 'http://alsintanlink.com/api/admin/login';
 
 export {
   url_login,
