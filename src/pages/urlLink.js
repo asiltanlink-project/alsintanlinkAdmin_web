@@ -18,7 +18,7 @@ var url_getPelapak =
 var url_scanProcod =
   'https://staging-api.cfu.pharmalink.id/product-bundling/getProductByProductId';
 var url_getAllData =
-  'https://staging-api.cfu.pharmalink.id/master-plafond-ecommerce/integra/getlimitproduct?';
+  'http://alsintanlink.com/api/admin/';
 var url_getListPerOulet =
   'https://staging-api.cfu.pharmalink.id/master-plafond-ecommerce/integra/getlimitoutlet?';
 var url_getLimitDefault =

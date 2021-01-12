@@ -84,11 +84,11 @@ class showTransaction extends React.Component {
       resetInfo: false,
       resultType: [
         {
-          type_id: 'farmer',
+          type_id: 'show_farmer',
           type_name: 'Farmer',
         },
         {
-          type_id: 'upja',
+          type_id: 'show_upja',
           type_name: 'UPJA',
         },
       ],
@@ -299,45 +299,11 @@ class showTransaction extends React.Component {
 
   getListbyPaging(currPage, currLimit) {
     // const trace = perf.trace('getBundling');
-    var pelapakID = this.state.pilihPelapak;
-    var ecommerceID = this.state.resultPelapakID;
-    var periodeID = this.state.pilihType;
-    // var pelapakID = '';
-    // var ecommerceID = '';
-    // var periodeID = '';
-    var lastID = this.state.lastID;
-    var keyword = this.state.keyword;
-    var action = this.state.action;
-    // trace.start();
-
-    // console.log(
-    //   'pelapak',
-    //   pelapakID,
-    //   'ecommerce',
-    //   ecommerceID,
-    //   'periode',
-    //   periodeID,
-    // );
-
+    var namaKecamatan = this.state.namaKecamatanSave;
+    var showType = this.state.pilihType;
     const url =
-      myUrl.url_getAllData +
-      'length=' +
-      currLimit +
-      '&page=' +
-      currPage +
-      '&status=' +
-      periodeID +
-      '&outletid=' +
-      pelapakID +
-      '&ecommerceid=' +
-      ecommerceID +
-      '&procod=' +
-      keyword +
-      '&lastid=' +
-      lastID +
-      '&action=' +
-      action;
-    // console.log('URL GET LIST', url);
+      myUrl.url_getAllData + showType + '?district=' + encodeURI(namaKecamatan);
+    console.log('URL GET LIST', url);
     // console.log("offset", offset, "currLimit", currLimit);
 
     const option = {
@@ -484,7 +450,7 @@ class showTransaction extends React.Component {
   getKecamatan(currPage, currLimit) {
     var offset = (currPage - 1) * currLimit;
     var keyword = this.state.keywordList;
-    const urlA = myUrl.url_getDistrict + '?city=' + this.state.pilihKotaKab;
+    const urlA = myUrl.url_getDistrict + '?city_id=' + this.state.pilihKotaKab;
     console.log('jalan kecamatan', urlA);
     const option = {
       method: 'GET',
@@ -507,7 +473,7 @@ class showTransaction extends React.Component {
         } else {
           this.setState(
             {
-              resultKecamatan: data.result.districs,
+              resultKecamatan: data.result.districts,
               // maxPages: data.metadata.pages ? data.metadata.pages : 1,
               loading: false,
             },
