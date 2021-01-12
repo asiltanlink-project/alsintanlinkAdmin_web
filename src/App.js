@@ -5,12 +5,9 @@ import PageSpinner from 'components/PageSpinner';
 import AuthPage from 'pages/template/AuthPage';
 import React from 'react';
 import componentQueries from 'react-component-queries';
-import { BrowserRouter, Redirect, Switch } from 'react-router-dom';
+import { BrowserRouter, Redirect, Route, Switch } from 'react-router-dom';
 import './styles/reduction.scss';
 import * as firebase from 'firebase/app';
-// import 'firebase/performance';
-// import 'firebase/auth';
-
 const firebaseConfig = {
   apiKey: 'AIzaSyALU66lM4mv9MRWVNsAgXTIQIvNdEYeXqU',
   authDomain: 'alsintanlinkadmin.firebaseapp.com',
@@ -37,38 +34,11 @@ class App extends React.Component {
   state = {
     title: '',
     color: '',
-    menuID: '',
   };
 
   setTitle = (title, color) => {
     this.setState({ title: title, color: color });
   };
-
-  getAccess() {
-    var accessList = JSON.parse(window.localStorage.getItem('accessList'));
-    if (accessList !== null && accessList !== undefined) {
-      // console.log('MENU ID MASUK 1');
-      if (Object.keys(accessList).includes('18')) {
-        // console.log('MENU ID 18');
-        this.setState({ menuID: '18' });
-      } else if (Object.keys(accessList).includes('5')) {
-        // console.log('MENU ID 5');
-        this.setState({ menuID: '5' });
-      } else if (Object.keys(accessList).includes('3')) {
-        // console.log('MENU ID 3');
-        this.setState({ menuID: '3' });
-      } else {
-        // console.log('MENU ID MASUK 2');
-        return;
-      }
-    }
-    // console.log('MENU ID MASUK 3');
-    // return;
-  }
-
-  componentDidMount() {
-    this.getAccess();
-  }
 
   render() {
     return (
@@ -87,17 +57,15 @@ class App extends React.Component {
               color={this.state.color}
             >
               <React.Suspense fallback={<PageSpinner />}>
-                <PrivateRoute
+                <Route
                   exact
                   setTitle={this.setTitle}
-                  menuID={this.state.menuID}
                   path="/"
                   component={Dashboard}
                 />
-                <PrivateRoute
+                <Route
                   exact
                   setTitle={this.setTitle}
-                  menuID={this.state.menuID}
                   path="/showtransaction"
                   component={showTransaction}
                 />

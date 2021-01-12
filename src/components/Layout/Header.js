@@ -52,7 +52,7 @@ class Header extends React.Component {
 
   signOut = () => {
     window.localStorage.removeItem('tokenCookies');
-    window.localStorage.removeItem('accessList');
+    window.localStorage.removeItem('profile');
     this.setState({
       redirect: true,
     });
@@ -77,8 +77,7 @@ class Header extends React.Component {
       return;
     } else {
       this.setState({
-        nip: profileName.mem_nip,
-        nama: profileName.mem_username,
+        nama: profileName.username,
       });
     }
   }

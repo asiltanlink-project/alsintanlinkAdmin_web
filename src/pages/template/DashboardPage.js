@@ -10,27 +10,18 @@ class DashboardPage extends React.Component {
 
   setProfileData() {
     var profileName = JSON.parse(window.localStorage.getItem('profile'));
-    // console.log('PROFILE', profileName);
+    console.log('PROFILE', profileName);
 
     if (profileName === null) {
       return profileName;
     } else {
       this.setState(
         {
-          nip: profileName.mem_nip,
-          nama: profileName.mem_username,
+          nama: profileName.username,
         },
         // () => console.log('profile name', profileName.mem_access),
       );
     }
-  }
-
-  refreshPage() {
-    if (window.location.search.length < 1) {
-      window.top.location = window.top.location + '?reload';
-      // console.log('LOG');
-    }
-    // console.log('LOKASI', location);
   }
 
   componentDidMount() {

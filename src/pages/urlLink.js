@@ -3,14 +3,12 @@
 
 //URL LOGIN
 var url_login = 'http://alsintanlink.com/api/admin/login';
-// var url_login = 'https://api.cfu.pharmalink.id/auth/login';
-var url_changeForgottenPassword =
-  'https://staging-api.cfu.pharmalink.id/auth/forgotpassword';
-var url_verifyOTP = 'https://staging-api.cfu.pharmalink.id/auth/verifyotp';
-var url_changePassword =
-  'https://staging-api.cfu.pharmalink.id/auth//changePassword';
 
 // ShowTransaction
+var url_getProvince = 'http://alsintanlink.com/api/location/province';
+var url_getCity = 'http://alsintanlink.com/api/location/city';
+var url_getDistrict = 'http://alsintanlink.com/api/location/district';
+
 var url_getEcommerce =
   'https://staging-api.cfu.pharmalink.id/support/getEcommerceData';
 var url_getPelapakID =
@@ -42,10 +40,10 @@ var url_insertDataOutlet =
 
 export {
   url_login,
-  url_changeForgottenPassword,
-  url_verifyOTP,
-  url_changePassword,
   // showTransaction
+  url_getProvince,
+  url_getCity,
+  url_getDistrict,
   url_getListPerOulet,
   url_getLimitDefault,
   url_editLimitDefault,

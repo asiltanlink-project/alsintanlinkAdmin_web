@@ -11,7 +11,6 @@ import { MdLoyalty } from 'react-icons/md';
 class AuthPage extends React.Component {
   requestLogin = async (username, password) => {
     const urlA = myUrl.url_login;
-    //console.log("url", urlA);
 
     var payload = {
       username: username,
@@ -28,7 +27,6 @@ class AuthPage extends React.Component {
       },
       body: JSON.stringify(payload),
     };
-    //console.log(option);
     let data = await fetch(urlA, option)
       .then(response => {
         if (response.ok) {
@@ -39,14 +37,12 @@ class AuthPage extends React.Component {
           } else if (response.status === 500) {
             this.showNotification('Internal Server Error', 'error');
           } else {
-            // console.log("FETCHING DONE");
             this.showNotification('Koneksi ke server gagal 1', 'error');
           }
           return true;
         }
       })
       .catch(() => {
-        //console.log(err);
         this.showNotification('Koneksi ke server gagal!', 'error');
         return true;
       });
@@ -55,46 +51,25 @@ class AuthPage extends React.Component {
       return true;
     }
     if (data) {
-      var token = data.headers.get('Authorization');
       data = await data.json();
 
       console.log('DATA LOGIN', data);
-      var data1 = data.data;
-      var error = data.error;
-      var metadata = data.metadata;
+      var message = data.result.message;
+      var profile = data.result.admin;
+      var token = data.result.token;
+      var status = data.status;
 
-      if (error.status === false) {
-        if (metadata.status === true) {
-          window.localStorage.setItem('tokenCookies', token);
-          window.localStorage.setItem(
-            'accessList',
-            JSON.stringify(data1.mem_access),
-          );
-          window.localStorage.setItem('profile', JSON.stringify(data1));
-          //console.log("TOKEN", window.localStorage.getItem('tokenCookies'));
-          //console.log("accessList", window.localStorage.getItem('accessList'));
-
-          if (data1.mem_forcechangepasswordyn === 'Y') {
-            //console.log("FORE CHANGE YES");
-            this.props.history.push({
-              pathname: '/',
-              state: { ok: true },
-            });
-          } else {
-            window.location.replace('/');
-          }
-        } else {
-          this.showNotification(metadata.message, 'error');
-          //console.log(metadata.message);
-        }
+      if (status === 1) {
+        this.showNotification(message, 'info');
+        window.localStorage.setItem('tokenCookies', token);
+        window.localStorage.setItem('profile', JSON.stringify(profile));
+        window.location.replace('/');
       } else {
-        this.showNotification(error.msg, 'error');
+        this.showNotification(message, 'error');
       }
     } else {
-      //console.log("FETCHING DONE");
       this.showNotification('Koneksi ke server gagal', 'error');
     }
-
     return true;
   };
 

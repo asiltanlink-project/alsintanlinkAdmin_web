@@ -12,7 +12,7 @@ function getPermission(page, Component, rest) {
     accessList = JSON.parse(window.localStorage.getItem('accessList'));
     result = true;
   } else {
-    result = false;
+    result = true;
   }
     // console.log("Hak Access: ",accessList);
   // console.log(window.localStorage.getItem('accessList'), "B");
