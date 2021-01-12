@@ -518,6 +518,10 @@ class showTransaction extends React.Component {
   }
 
   componentDidMount() {
+    var token = window.localStorage.getItem('tokenCookies');
+    if (token === '' || token === null || token === undefined) {
+      window.location.replace('/login');
+    }
     this.getProvinsi(this.state.currentPages, this.state.todosPerPages);
   }
 

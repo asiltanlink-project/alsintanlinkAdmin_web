@@ -25,6 +25,10 @@ class DashboardPage extends React.Component {
   }
 
   componentDidMount() {
+    var token = window.localStorage.getItem('tokenCookies');
+    if (token === '' || token === null || token === undefined) {
+      window.location.replace('/login');
+    }
     this.setProfileData();
     // alert("Jika menu tidak keluar silahkan refresh page")
   }
