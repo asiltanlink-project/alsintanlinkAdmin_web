@@ -8,6 +8,10 @@ var url_login = 'http://alsintanlink.com/api/admin/login';
 var url_getProvince = 'http://alsintanlink.com/api/location/province';
 var url_getCity = 'http://alsintanlink.com/api/location/city';
 var url_getDistrict = 'http://alsintanlink.com/api/location/district';
+var url_getAllData = 'http://alsintanlink.com/api/admin/';
+var url_showDetailFarmer =
+  'http://alsintanlink.com/api/admin/show_detail_farmer';
+var url_showDetailUpja = 'http://alsintanlink.com/api/admin/show_detail_upja';
 
 var url_getEcommerce =
   'https://staging-api.cfu.pharmalink.id/support/getEcommerceData';
@@ -17,8 +21,7 @@ var url_getPelapak =
   'https://api.cfu.pharmalink.id/support/getOutletData?type=getPelapakList';
 var url_scanProcod =
   'https://staging-api.cfu.pharmalink.id/product-bundling/getProductByProductId';
-var url_getAllData =
-  'http://alsintanlink.com/api/admin/';
+
 var url_getListPerOulet =
   'https://staging-api.cfu.pharmalink.id/master-plafond-ecommerce/integra/getlimitoutlet?';
 var url_getLimitDefault =
@@ -40,6 +43,9 @@ var url_insertDataOutlet =
 
 export {
   url_login,
+  url_showDetailFarmer,
+  url_showDetailUpja,
+  url_getAllData,
   // showTransaction
   url_getProvince,
   url_getCity,
@@ -52,7 +58,6 @@ export {
   url_getOutletEcommerce,
   url_editDataHeader,
   url_deleteHeaderData,
-  url_getAllData,
   url_insertDataOutlet,
   url_getEcommerce,
   url_getPelapak,

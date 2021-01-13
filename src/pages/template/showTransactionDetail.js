@@ -38,12 +38,15 @@ import * as firebase from 'firebase/app';
 import { Scrollbar } from 'react-scrollbars-custom';
 import LoadingSpinner from 'pages/LoadingSpinner.js';
 import { BrowserRouter as Router, Route, Link } from 'react-router-dom';
-class showTransaction extends React.Component {
+class showTransactionDetail extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       resultFarmer: [],
       resultUpja: [],
+      resultFarmerTransaction: [],
+      resultUpjaTransaction: [],
+      resultUpjaAlsin: [],
       currentPage: 1,
       currentPages: 1,
       realCurrentPage: 1,
@@ -57,6 +60,7 @@ class showTransaction extends React.Component {
       keywordList: '',
       procod: '',
       loading: false,
+      loadingPage: true,
       checked: false,
       barcode: '',
       newProductDesc: '',
@@ -65,7 +69,6 @@ class showTransaction extends React.Component {
       resultProvinsi: [],
       resultKotaKab: [],
       resultKecamatan: [],
-      loadingPage: false,
       pilihType: '',
       pilihProvinsi: '',
       pilihKotaKab: '',
@@ -98,6 +101,9 @@ class showTransaction extends React.Component {
       ecommerceDetail: [],
       dynamicHeightEcommerce: '0px',
       dynamicHeightPelapak: '0px',
+
+      farmer_id: props.match.params.farmer_id,
+      upja_id: props.match.params.upja_id,
     };
   }
 
@@ -166,77 +172,14 @@ class showTransaction extends React.Component {
     });
   }
 
-  getListbyPaging(currPage, currLimit) {
-    // const trace = perf.trace('getBundling');
-    var namaKecamatan = this.state.namaKecamatanSave;
-    var showType = this.state.pilihType;
-    var kecamatanID = this.state.pilihKecamatan;
-    const url = myUrl.url_getAllData + showType + '?district_id=' + kecamatanID;
-    var token = window.localStorage.getItem('tokenCookies');
-    // console.log('URL GET LIST', url);
-
-    this.setState({ loading: true });
-    // console.log("offset", offset, "currLimit", currLimit);
-
-    const option = {
-      method: 'GET',
-      json: true,
-      headers: {
-        'Content-Type': 'application/json;charset=UTF-8',
-        Authorization: `${'Bearer'} ${token}`,
-      },
-    };
-    // console.log('option', option);
-    fetch(url, option)
-      .then(response => {
-        // trace.stop();
-        if (response.ok) {
-          return response.json();
-        } else {
-          if (response.status === 401) {
-            this.showNotification('Username/Password salah!', 'error');
-          } else if (response.status === 500) {
-            this.showNotification('Internal Server Error', 'error');
-          } else {
-            this.showNotification('Response ke server gagal!', 'error');
-          }
-          this.setState({
-            loading: false,
-          });
-        }
-      })
-      .then(data => {
-        var status = data.status;
-        var result = data.result.farmers;
-        var message = data.result.message;
-        // console.log('data jalan GetlistByPaging', data);
-        if (status === 0) {
-          this.showNotification(message, 'error');
-        } else {
-          this.showNotification('Data ditemukan!', 'info');
-          this.setState({
-            result: result,
-            loading: false,
-          });
-        }
-      })
-      .catch(err => {
-        // console.log('ERRORNYA', err);
-        this.showNotification('Error ke server!', 'error');
-        this.setState({
-          loading: false,
-        });
-      });
-  }
-
   // get data farmer
   getListbyPagingFarmer(currPage, currLimit) {
-    var kecamatanID = this.state.pilihKecamatan;
-    const url = myUrl.url_getAllData + 'show_farmer?district_id=' + kecamatanID;
+    var farmer_id = this.state.farmer_id;
+    const url = myUrl.url_showDetailFarmer + '?farmer_id=' + farmer_id;
     var token = window.localStorage.getItem('tokenCookies');
     // console.log('URL GET LIST', url);
 
-    this.setState({ loading: true });
+    this.setState({ loadingPage: true });
     // console.log("offset", offset, "currLimit", currLimit);
 
     const option = {
@@ -262,43 +205,51 @@ class showTransaction extends React.Component {
             this.showNotification('Response ke server gagal!', 'error');
           }
           this.setState({
-            loading: false,
+            loadingPage: false,
           });
         }
       })
       .then(data => {
         var status = data.status;
-        var result = data.result.farmers;
+        var resultFarmer = data.result.farmer;
+        var resultTransaction = data.result.transactions.transactions;
         var message = data.result.message;
-        // console.log('data jalan GetlistByPaging', data);
+        // console.log('data jalan GetlistByPaging farmer', data);
         if (status === 0) {
           this.showNotification(message, 'error');
         } else {
           this.showNotification('Data ditemukan!', 'info');
-          this.setState({
-            resultFarmer: result,
-            loading: false,
-          });
+          this.setState(
+            {
+              resultFarmer: [resultFarmer],
+              resultFarmerTransaction: resultTransaction,
+              loadingPage: false,
+            },
+            // () =>
+            //   console.log(
+            //     'TRANSAKSI FARMER',
+            //     this.state.resultFarmerTransaction,
+            //   ),
+          );
         }
       })
       .catch(err => {
         // console.log('ERRORNYA', err);
         this.showNotification('Error ke server!', 'error');
         this.setState({
-          loading: false,
+          loadingPage: false,
         });
       });
   }
 
-  // get data Upja
+  // get data upja
   getListbyPagingUpja(currPage, currLimit) {
-    // const trace = perf.trace('getBundling');
-    var kecamatanID = this.state.pilihKecamatan;
-    const url = myUrl.url_getAllData + 'show_upja?district_id=' + kecamatanID;
+    var upja_id = this.state.upja_id;
+    const url = myUrl.url_showDetailUpja + '?upja_id=' + upja_id;
     var token = window.localStorage.getItem('tokenCookies');
     // console.log('URL GET LIST', url);
 
-    this.setState({ loading: true });
+    this.setState({ loadingPage: true });
     // console.log("offset", offset, "currLimit", currLimit);
 
     const option = {
@@ -324,22 +275,26 @@ class showTransaction extends React.Component {
             this.showNotification('Response ke server gagal!', 'error');
           }
           this.setState({
-            loading: false,
+            loadingPage: false,
           });
         }
       })
       .then(data => {
         var status = data.status;
-        var result = data.result.upjas;
+        var resultUpja = data.result.upja;
+        var resultTransaction = data.result.transactions;
+        var resultAlsin = data.result.alsins;
         var message = data.result.message;
-        // console.log('data jalan GetlistByPaging', data);
+        // console.log('data jalan GetlistByPaging upja', data);
         if (status === 0) {
           this.showNotification(message, 'error');
         } else {
           this.showNotification('Data ditemukan!', 'info');
           this.setState({
-            resultUpja: result,
-            loading: false,
+            resultUpja: [resultUpja],
+            resultUpjaTransaction: resultTransaction,
+            resultUpjaAlsin: resultAlsin,
+            loadingPage: false,
           });
         }
       })
@@ -347,115 +302,8 @@ class showTransaction extends React.Component {
         // console.log('ERRORNYA', err);
         this.showNotification('Error ke server!', 'error');
         this.setState({
-          loading: false,
+          loadingPage: false,
         });
-      });
-  }
-
-  // Get Provinsi
-  getProvinsi(currPage, currLimit) {
-    var offset = (currPage - 1) * currLimit;
-    var keyword = this.state.keywordList;
-    const urlA = myUrl.url_getProvince;
-    // console.log('jalan', urlA);
-    this.setState({ loadingPage: true });
-    const option = {
-      method: 'GET',
-      json: true,
-      headers: {
-        'Content-Type': 'application/json;charset=UTF-8',
-        Authorization: window.localStorage.getItem('tokenCookies'),
-      },
-    };
-    fetch(urlA, option)
-      .then(response => {
-        if (response.ok) {
-          return response.json();
-        }
-      })
-      .then(data => {
-        // console.log('data Provinsi', data.result);
-        if (data.status === 0) {
-          this.showNotification('Data tidak ditemukan!', 'error');
-        } else {
-          this.setState({
-            resultProvinsi: data.result.provinces,
-            // maxPages: data.metadata.pages ? data.metadata.pages : 1,
-            loading: false,
-            loadingPage: false,
-          });
-        }
-      });
-  }
-  // Get KotaKab
-  getKotaKab(currPage, currLimit) {
-    var offset = (currPage - 1) * currLimit;
-    var keyword = this.state.keywordList;
-    const urlA = myUrl.url_getCity + '?province_id=' + this.state.pilihProvinsi;
-    // console.log('jalan kota', urlA);
-    this.setState({ loadingPage: true });
-    const option = {
-      method: 'GET',
-      json: true,
-      headers: {
-        'Content-Type': 'application/json;charset=UTF-8',
-        Authorization: window.localStorage.getItem('tokenCookies'),
-      },
-    };
-    fetch(urlA, option)
-      .then(response => {
-        if (response.ok) {
-          return response.json();
-        }
-      })
-      .then(data => {
-        // console.log('data Kota/Kabupaten', data.result);
-        if (data.status === 0) {
-          this.showNotification('Data tidak ditemukan!', 'error');
-        } else {
-          this.setState({
-            resultKotaKab: data.result.citys,
-            // maxPages: data.metadata.pages ? data.metadata.pages : 1,
-            loading: false,
-            loadingPage: false,
-          });
-        }
-      });
-  }
-
-  // Get Kecamatan
-  getKecamatan(currPage, currLimit) {
-    var offset = (currPage - 1) * currLimit;
-    var keyword = this.state.keywordList;
-    const urlA = myUrl.url_getDistrict + '?city_id=' + this.state.pilihKotaKab;
-    // console.log('jalan kecamatan', urlA);
-    this.setState({ loadingPage: true });
-    const option = {
-      method: 'GET',
-      json: true,
-      headers: {
-        'Content-Type': 'application/json;charset=UTF-8',
-        Authorization: window.localStorage.getItem('tokenCookies'),
-      },
-    };
-    fetch(urlA, option)
-      .then(response => {
-        if (response.ok) {
-          return response.json();
-        }
-      })
-      .then(data => {
-        // console.log('data Kecamatan', data.result);
-        if (data.status === 0) {
-          this.showNotification('Data tidak ditemukan!', 'error');
-        } else {
-          this.setState({
-            resultKecamatan: data.result.districts,
-            // maxPages: data.metadata.pages ? data.metadata.pages : 1,
-            loading: false,
-            loadingPage: false,
-          });
-        }
       });
   }
 
@@ -464,89 +312,14 @@ class showTransaction extends React.Component {
     if (token === '' || token === null || token === undefined) {
       window.location.replace('/login');
     }
-    this.getProvinsi(this.state.currentPages, this.state.todosPerPages);
+    if (window.location.pathname.includes('farmer')) {
+      // console.log('INCLUDES FARMER');
+      this.getListbyPagingFarmer();
+    } else {
+      // console.log('INCLUDES UPJA');
+      this.getListbyPagingUpja();
+    }
   }
-
-  // untuk pilih Provinsi
-  setProvinsi = event => {
-    var nama = this.state.resultProvinsi.find(function (element) {
-      return element.id === parseInt(event.target.value);
-    });
-
-    this.setState(
-      {
-        pilihProvinsi: event.target.value,
-        namaProvinsi: nama.name,
-        modal_nested_parent_list_provinsi: false,
-        keywordList: '',
-        domisiliDisabled: false,
-      },
-      // () => console.log('PILIH PROVINSI', this.state.pilihProvinsi),
-      () => this.getKotaKab(this.state.currentPages, this.state.todosPerPages),
-    );
-  };
-  // untuk pilih Provinsi
-
-  // untuk pilih Kota/Kabupaten
-  setKotakab = event => {
-    var nama = this.state.resultKotaKab.find(function (element) {
-      return element.id === parseInt(event.target.value);
-    });
-
-    this.setState(
-      {
-        pilihKotaKab: event.target.value,
-        namaKotaKab: nama.name,
-        modal_nested_parent_list_kotakab: false,
-        keywordList: '',
-        domisiliDisabled: false,
-      },
-      () =>
-        this.getKecamatan(this.state.currentPages, this.state.todosPerPages),
-    );
-  };
-  // untuk pilih Kota/Kabupaten
-
-  // untuk pilih Kecamatan
-  setKecamatan = event => {
-    var nama = this.state.resultKecamatan.find(function (element) {
-      return element.id === parseInt(event.target.value);
-    });
-
-    this.setState(
-      {
-        pilihKecamatan: event.target.value,
-        namaKecamatan: nama.name,
-        modal_nested_parent_list_kecamatan: false,
-        keywordList: '',
-        domisiliDisabled: false,
-      },
-      () => this.getProvinsi(this.state.currentPages, this.state.todosPerPages),
-    );
-  };
-  // untuk pilih Kecamatan
-
-  // untuk pilih Type
-  setType = event => {
-    var nama = this.state.resultType.find(function (element) {
-      return element.type_id === event.target.value;
-    });
-    this.setState(
-      {
-        pilihType: event.target.value,
-        namaType: nama.type_name,
-        namaTypeTemp: nama.type_name,
-        modal_nested_parent_list: false,
-        domisiliDisabled: false,
-        pilihProvinsi: '',
-        pilihKotaKab: '',
-        pilihKecamatan: '',
-      },
-      // () => console.log('CEK CEK CEK', this.state.pilihType),
-      // () =>
-      // this.getListbyPaging(),
-    );
-  };
 
   //modal batas standar
   state = {
@@ -697,60 +470,6 @@ class showTransaction extends React.Component {
     );
   }
 
-  findData() {
-    // console.log('KLIK FIND DATA');
-    var buttonSearch = document.getElementById('buttonSearch');
-    buttonSearch.disabled = true;
-    this.setState(
-      {
-        namaProvinsiSave: this.state.namaProvinsi,
-        namaKotaKabSave: this.state.namaKotaKab,
-        namaKecamatanSave: this.state.namaKecamatan,
-        namaTypeSave: this.state.namaTypeTemp,
-        domisiliDisabled: true,
-        typeDisabled: false,
-        periodeDisabled: true,
-        lastID: 0,
-        resultFarmer: [],
-        resultUpja: [],
-        resultKotaKab: [],
-        resultKecamatan: [],
-      },
-      () =>
-        this.setState(
-          {
-            namaProvinsi: '',
-            namaKotaKab: '',
-            namaKecamatan: '',
-            namaType: '',
-          },
-          () => this.findUpjaFarmer(),
-        ),
-    );
-  }
-
-  findUpjaFarmer() {
-    var show_type = this.state.pilihType;
-    if (show_type === 'show_farmer') {
-      this.getListbyPagingFarmer();
-    } else {
-      this.getListbyPagingUpja();
-    }
-  }
-
-  resetSearch() {
-    var buttonSearch = document.getElementById('buttonSearch');
-    buttonSearch.disabled = true;
-    this.setState({
-      namaType: '',
-      namaKotaKab: '',
-      namaProvinsi: '',
-      namaKecamatan: '',
-      domisiliDisabled: true,
-      typeDisabled: false,
-    });
-  }
-
   setModalType() {
     this.setState(
       {
@@ -758,59 +477,6 @@ class showTransaction extends React.Component {
         // namaEcommerce: '',
       },
       this.toggle('nested_parent_list'),
-    );
-  }
-
-  setModalDomisili() {
-    this.setState(
-      {
-        periodeDisabled: false,
-        typeDisabled: true,
-        // namaEcommerce: '',
-      },
-      this.toggle('nested_parent_list_domisili'),
-    );
-  }
-
-  setModalProvinsi() {
-    var buttonSearch = document.getElementById('buttonSearch');
-    buttonSearch.disabled = false;
-    this.setState(
-      {
-        periodeDisabled: false,
-        typeDisabled: true,
-        // domisiliDisabled: true,
-        // namaEcommerce: '',
-      },
-      this.toggle('nested_parent_list_provinsi'),
-    );
-  }
-
-  setModalKotaKab() {
-    var buttonSearch = document.getElementById('buttonSearch');
-    buttonSearch.disabled = false;
-    this.setState(
-      {
-        periodeDisabled: false,
-        typeDisabled: true,
-        domisiliDisabled: true,
-        // namaEcommerce: '',
-      },
-      this.toggle('nested_parent_list_kotakab'),
-    );
-  }
-
-  setModalKecamatan() {
-    var buttonSearch = document.getElementById('buttonSearch');
-    buttonSearch.disabled = false;
-    this.setState(
-      {
-        periodeDisabled: false,
-        typeDisabled: true,
-        domisiliDisabled: true,
-        // namaEcommerce: '',
-      },
-      this.toggle('nested_parent_list_kecamatan'),
     );
   }
 
@@ -865,6 +531,9 @@ class showTransaction extends React.Component {
     const { loading, loadingPage } = this.state;
     const currentTodosFarmer = this.state.resultFarmer;
     const currentTodosUpja = this.state.resultUpja;
+    const currentTodosFarmerTransaction = this.state.resultFarmerTransaction;
+    const currentTodosUpjaTransaction = this.state.resultUpjaTransaction;
+    const currentTodosUpjaAlsin = this.state.resultUpjaAlsin;
     const provinsiTodos = this.state.resultProvinsi;
     const kotakabTodos = this.state.resultKotaKab;
     const kecamatanTodos = this.state.resultKecamatan;
@@ -957,55 +626,17 @@ class showTransaction extends React.Component {
       });
 
     const renderTodosFarmer =
-      currentTodosFarmer &&
-      currentTodosFarmer.map((todo, i) => {
+      currentTodosFarmerTransaction &&
+      currentTodosFarmerTransaction.map((todo, i) => {
         return (
           <tr key={i}>
-            <th scope="row">{todo.farmer_id}</th>
-            {todo.farmer_name !== '' && (
-              <td style={{ width: '10%', textAlign: 'left' }}>
-                <Link to={`/showTransaction/farmer/${todo.farmer_id}`}>
-                  {
-                    <Label
-                      style={{
-                        fontWeight: 'bold',
-                        cursor: 'pointer',
-                        textDecoration: 'underline',
-                        color: '#009688',
-                      }}
-                    >
-                      {todo.farmer_name}
-                    </Label>
-                  }
-                </Link>
-              </td>
-            )}
-            <td>{todo.phone_number}</td>
-            {todo.phone_verify === 1 && (
-              <td>
-                <Badge color="success">Sudah Terverifikasi</Badge>
-              </td>
-            )}
-            {todo.phone_verify === 0 && (
-              <td>
-                <Badge color="danger">Belum Terverifikasi</Badge>
-              </td>
-            )}
-          </tr>
-        );
-      });
-
-    const renderTodosUpja =
-      currentTodosUpja &&
-      currentTodosUpja.map((todo, i) => {
-        return (
-          <tr key={i}>
-            <th scope="row">{todo.upja_id}</th>
-            <td>{todo.village}</td>
-            <td>{todo.leader_name}</td>
+            <td scope="row">{todo.transaction_order_id}</td>
+            <td>{todo.transport_cost}</td>
+            <td>{todo.total_cost}</td>
+            <td>{todo.upja_id}</td>
             {todo.upja_name !== '' && (
               <td style={{ width: '10%', textAlign: 'left' }}>
-                <Link to={`/showTransaction/upja/${todo.upja_id}`}>
+                <Link to={`/showTransactionDetail/upja/${todo.upja_name}`}>
                   {
                     <Label
                       style={{
@@ -1021,21 +652,94 @@ class showTransaction extends React.Component {
                 </Link>
               </td>
             )}
-            {(todo.class === 'Pemula' || todo.class === '1') && (
+            <td>{todo.order_time}</td>
+            <td>{todo.delivery_time}</td>
+            {todo.payment_yn === 1 && (
               <td>
-                <Badge color="success">Pemula </Badge>
+                <Badge color="success">Sudah Lunas</Badge>
               </td>
             )}
-            {(todo.class === 'Berkembang' || todo.class === '2') && (
+            {todo.payment_yn === 0 && (
               <td>
-                <Badge color="warning">Berkembang </Badge>
+                <Badge color="danger">Belum Dibayar</Badge>
               </td>
             )}
-            {(todo.class === 'Profesional' || todo.class === '3') && (
-              <td>
-                <Badge color="danger">Profesional </Badge>
+          </tr>
+        );
+      });
+
+    const renderTodosUpja =
+      currentTodosUpjaTransaction &&
+      currentTodosUpjaTransaction.map((todo, i) => {
+        return (
+          <tr key={i}>
+            <td scope="row">{todo.transaction_order_id}</td>
+            <td>{todo.transport_cost}</td>
+            <td>{todo.total_cost}</td>
+            <td>{todo.farmer_id}</td>
+            {todo.farmer_name !== '' && (
+              <td style={{ width: '10%', textAlign: 'left' }}>
+                <Link to={`/showTransactionDetail/upja/${todo.farmer_name}`}>
+                  {
+                    <Label
+                      style={{
+                        fontWeight: 'bold',
+                        cursor: 'pointer',
+                        textDecoration: 'underline',
+                        color: '#009688',
+                      }}
+                    >
+                      {todo.farmer_name}
+                    </Label>
+                  }
+                </Link>
               </td>
             )}
+            <td>{todo.order_time}</td>
+            <td>{todo.delivery_time}</td>
+            {todo.payment_yn === 1 && (
+              <td>
+                <Badge color="success">Sudah Lunas</Badge>
+              </td>
+            )}
+            {todo.payment_yn === 0 && (
+              <td>
+                <Badge color="danger">Belum Dibayar</Badge>
+              </td>
+            )}
+          </tr>
+        );
+      });
+
+    const renderTodosUpjaAlsin =
+      currentTodosUpjaAlsin &&
+      currentTodosUpjaAlsin.map((todo, i) => {
+        return (
+          <tr key={i}>
+            <th scope="row">{todo.alsin_type_id}</th>
+            {todo.alsin_type_name !== '' && (
+              <td style={{ width: '10%', textAlign: 'left' }}>
+                <Link to={`/showTransaction/upja/${todo.alsin_type_name}`}>
+                  {
+                    <Label
+                      style={{
+                        fontWeight: 'bold',
+                        cursor: 'pointer',
+                        textDecoration: 'underline',
+                        color: '#009688',
+                      }}
+                    >
+                      {todo.alsin_type_name}
+                    </Label>
+                  }
+                </Link>
+              </td>
+            )}
+            <td>{todo.picture}</td>
+            <td>{todo.cost}</td>
+            <td>{todo.available}</td>
+            <td>{todo.not_available}</td>
+            <td>{todo.total_item}</td>
           </tr>
         );
       });
@@ -1056,94 +760,6 @@ class showTransaction extends React.Component {
                 }
                 style={NOTIFICATION_SYSTEM_STYLE}
               />
-              <CardHeader
-                className="d-flex justify-content-between"
-                style={{ paddingBottom: 0 }}
-              >
-                <Col
-                  style={{
-                    paddingLeft: 0,
-                    paddingBottom: 0,
-                    paddingRight: 0,
-                    marginBottom: 0,
-                  }}
-                >
-                  <InputGroup style={{ float: 'right' }}>
-                    <Input
-                      disabled
-                      placeholder="Pilih Type"
-                      style={{ fontWeight: 'bold' }}
-                      value={this.state.namaType}
-                    />
-                    <InputGroupAddon addonType="append">
-                      <Button
-                        disabled={this.state.typeDisabled}
-                        onClick={() => this.setModalType()}
-                      >
-                        <MdList />
-                      </Button>
-                    </InputGroupAddon>
-                  </InputGroup>
-                </Col>
-                <Col
-                  style={{ paddingRight: 0, paddingBottom: 0, marginBottom: 0 }}
-                >
-                  <InputGroup style={{ float: 'right' }}>
-                    <Input
-                      type="text"
-                      id="ecommerceValue"
-                      disabled={true}
-                      placeholder="Pilih Domisili"
-                      style={{ fontWeight: 'bold' }}
-                      value={
-                        // this.state.namaProvinsi
-                        // this.state.namaKotaKab
-                        this.state.namaKecamatan
-                      }
-                      // onChange={event => this.setEcommerce(event)}
-                    ></Input>
-                    <InputGroupAddon addonType="append">
-                      <Button
-                        disabled={this.state.domisiliDisabled}
-                        onClick={() => this.setModalDomisili()}
-                      >
-                        <MdList />
-                      </Button>
-                    </InputGroupAddon>
-                  </InputGroup>
-                </Col>
-                <Col style={{ paddingRight: 0, float: 'right' }}>
-                  <ButtonGroup style={{ float: 'right' }}>
-                    <Button
-                      id="resetInfo"
-                      color="danger"
-                      style={{ float: 'right' }}
-                      onClick={() => this.resetSearch()}
-                    >
-                      <MdRefresh />
-                    </Button>
-                    <Tooltip
-                      placement="bottom"
-                      isOpen={this.state.resetInfo}
-                      target="resetInfo"
-                      toggle={() =>
-                        this.setState({ resetInfo: !this.state.resetInfo })
-                      }
-                    >
-                      Reset Farmer/UPJA dan Domisili yang telah dipilih
-                    </Tooltip>
-                    <Button
-                      style={{ float: 'right' }}
-                      onClick={() => this.findData()}
-                      disabled={!isSearch}
-                      id="buttonSearch"
-                    >
-                      <MdSearch />
-                      Cari
-                    </Button>
-                  </ButtonGroup>
-                </Col>
-              </CardHeader>
 
               {/* <CardHeader className="d-flex justify-content-between">
                 <Col sm={5} style={{ paddingLeft: 0 }}>
@@ -1176,19 +792,154 @@ class showTransaction extends React.Component {
                 <Row style={{ paddingBottom: 0, marginBottom: 0 }}>
                   <Col>
                     <Row style={{ paddingBottom: 0, marginBottom: 0 }}>
-                      {(currentTodosFarmer.length !== 0 ||
-                        currentTodosUpja.length !== 0) && (
+                      {window.location.pathname.includes('farmer') && (
                         <Col
-                          sm={2}
+                          sm={3}
                           style={{ paddingBottom: 0, marginBottom: 0 }}
                         >
-                          <Label style={{ fontWeight: 'bold' }}>Type</Label>
+                          <Label style={{ fontWeight: 'bold' }}>Nama</Label>
                         </Col>
                       )}
-                      {(currentTodosFarmer.length !== 0 ||
-                        currentTodosUpja.length !== 0) && (
+                      {window.location.pathname.includes('upja') && (
                         <Col
-                          sm={10}
+                          sm={3}
+                          style={{ paddingBottom: 0, marginBottom: 0 }}
+                        >
+                          <Label style={{ fontWeight: 'bold' }}>Nama</Label>
+                        </Col>
+                      )}
+                      {window.location.pathname.includes('farmer') && (
+                        <Col
+                          sm={9}
+                          style={{ paddingBottom: 0, marginBottom: 0 }}
+                        >
+                          :&nbsp;
+                          {currentTodosFarmer[0] &&
+                          currentTodosFarmer[0].length === 0 ? (
+                            <Label style={{ fontWeight: 'bold' }}>-</Label>
+                          ) : (
+                            <Label style={{ fontWeight: 'bold' }}>
+                              &nbsp;
+                              {currentTodosFarmer[0] &&
+                                currentTodosFarmer[0].farmer_name}
+                            </Label>
+                          )}
+                        </Col>
+                      )}
+                      {window.location.pathname.includes('upja') && (
+                        <Col
+                          sm={9}
+                          style={{ paddingBottom: 0, marginBottom: 0 }}
+                        >
+                          :&nbsp;
+                          {currentTodosUpja[0] &&
+                          currentTodosUpja[0].length === 0 ? (
+                            <Label style={{ fontWeight: 'bold' }}>-</Label>
+                          ) : (
+                            <Label style={{ fontWeight: 'bold' }}>
+                              &nbsp;
+                              {currentTodosUpja[0] &&
+                                currentTodosUpja[0].upja_name}
+                              &nbsp;
+                              {(currentTodosUpja[0] &&
+                                currentTodosUpja[0].class) === 'Pemula' &&
+                                '(Pemula)'}
+                              {(currentTodosUpja[0] &&
+                                currentTodosUpja[0].class) === 'Berkembang' &&
+                                '(Berkembang)'}
+                              {(currentTodosUpja[0] &&
+                                currentTodosUpja[0].class) === 'Profesional' &&
+                                '(Profesional)'}
+                            </Label>
+                          )}
+                        </Col>
+                      )}
+                    </Row>
+                    <Row style={{ paddingBottom: 0, marginBottom: 0 }}>
+                      {window.location.pathname.includes('farmer') && (
+                        <Col
+                          sm={3}
+                          style={{ paddingBottom: 0, marginBottom: 0 }}
+                        >
+                          <Label style={{ fontWeight: 'bold' }}>
+                            No. Telepon
+                          </Label>
+                        </Col>
+                      )}
+                      {window.location.pathname.includes('upja') && (
+                        <Col
+                          sm={3}
+                          style={{ paddingBottom: 0, marginBottom: 0 }}
+                        >
+                          <Label style={{ fontWeight: 'bold' }}>
+                            Kepala Desa
+                          </Label>
+                        </Col>
+                      )}
+                      {window.location.pathname.includes('farmer') && (
+                        <Col
+                          sm={9}
+                          style={{ paddingBottom: 0, marginBottom: 0 }}
+                        >
+                          :&nbsp;
+                          {currentTodosFarmer[0] &&
+                          currentTodosFarmer[0].length === 0 ? (
+                            <Label style={{ fontWeight: 'bold' }}>-</Label>
+                          ) : (
+                            <Label style={{ fontWeight: 'bold' }}>
+                              &nbsp;
+                              {currentTodosFarmer[0] &&
+                                currentTodosFarmer[0].phone_number}
+                              &nbsp;
+                              {(currentTodosFarmer[0] &&
+                                currentTodosFarmer[0].phone_verify) === 1 &&
+                                '(Sudah Verifikasi)'}
+                              {(currentTodosFarmer[0] &&
+                                currentTodosFarmer[0].phone_verify) === 0 &&
+                                '(Belum Verifikasi)'}
+                            </Label>
+                          )}
+                        </Col>
+                      )}
+                      {window.location.pathname.includes('upja') && (
+                        <Col
+                          sm={9}
+                          style={{ paddingBottom: 0, marginBottom: 0 }}
+                        >
+                          :&nbsp;
+                          {currentTodosUpja[0] &&
+                          currentTodosUpja[0].length === 0 ? (
+                            <Label style={{ fontWeight: 'bold' }}>-</Label>
+                          ) : (
+                            <Label style={{ fontWeight: 'bold' }}>
+                              &nbsp;
+                              {currentTodosUpja[0] &&
+                                currentTodosUpja[0].leader_name}
+                            </Label>
+                          )}
+                        </Col>
+                      )}
+                    </Row>
+                    <Row style={{ paddingBottom: 0, marginBottom: 0 }}>
+                      {window.location.pathname.includes('farmer') && (
+                        <Col
+                          sm={3}
+                          style={{ paddingBottom: 0, marginBottom: 0 }}
+                        >
+                          <Label style={{ fontWeight: 'bold' }}>Alamat</Label>
+                        </Col>
+                      )}
+                      {window.location.pathname.includes('upja') && (
+                        <Col
+                          sm={3}
+                          style={{ paddingBottom: 0, marginBottom: 0 }}
+                        >
+                          <Label style={{ fontWeight: 'bold' }}>Desa</Label>
+                        </Col>
+                      )}
+                      {window.location.pathname.includes('farmer') && (
+                        <Col
+                          sm={9}
                           style={{ paddingBottom: 0, marginBottom: 0 }}
                         >
                           :&nbsp;
@@ -1201,109 +952,90 @@ class showTransaction extends React.Component {
                           )}
                         </Col>
                       )}
-                    </Row>
-
-                    <Row style={{ paddingBottom: 0, marginBottom: 0 }}>
-                      {(currentTodosFarmer.length !== 0 ||
-                        currentTodosUpja.length !== 0) && (
+                      {window.location.pathname.includes('upja') && (
                         <Col
-                          sm={2}
-                          style={{ paddingBottom: 0, marginBottom: 0 }}
-                        >
-                          <Label style={{ fontWeight: 'bold' }}>Alamat</Label>
-                        </Col>
-                      )}
-                      {(currentTodosFarmer.length !== 0 ||
-                        currentTodosUpja.length !== 0) && (
-                        <Col
-                          sm={10}
+                          sm={9}
                           style={{ paddingBottom: 0, marginBottom: 0 }}
                         >
                           :&nbsp;
-                          {this.state.namaProvinsiSave === undefined ? (
+                          {currentTodosUpja[0] &&
+                          currentTodosUpja[0].length === 0 ? (
                             <Label style={{ fontWeight: 'bold' }}>-</Label>
                           ) : (
                             <Label style={{ fontWeight: 'bold' }}>
-                              {this.state.namaProvinsiSave},&nbsp;
-                              {this.state.namaKotaKabSave},&nbsp;
-                              {this.state.namaKecamatanSave}
+                              &nbsp;
+                              {currentTodosUpja[0] &&
+                                currentTodosUpja[0].village}
                             </Label>
                           )}
                         </Col>
                       )}
                     </Row>
                   </Col>
-
-                  {/* <Col>
-                    <Row style={{ paddingBottom: 0, marginBottom: 0 }}>
-                      <Col sm={2} style={{ paddingBottom: 0, marginBottom: 0 }}>
-                        <Label style={{ fontWeight: 'bold' }}>Kota/Kab</Label>
-                      </Col>
-                      <Col
-                        sm={10}
-                        style={{ paddingBottom: 0, marginBottom: 0 }}
+                  <Col style={{ marginBottom: 0, paddingBottom: 0 }}>
+                    <Button
+                      style={{
+                        float: 'right',
+                        width: '120px',
+                        marginLeft: '1%',
+                      }}
+                      onClick={() => window.history.back()}
+                    >
+                      Kembali
+                    </Button>
+                    {window.location.pathname.includes('upja') && (
+                      <Button
+                        color="orange"
+                        style={{
+                          float: 'right',
+                          color: 'white',
+                          width: '120px',
+                        }}
+                        onClick={this.toggle('nested_parent_list')}
                       >
-                        :&nbsp;
-                        {this.state.namaKotaKabSave === undefined ? (
-                          <Label style={{ fontWeight: 'bold' }}>-</Label>
-                        ) : (
-                          <Label style={{ fontWeight: 'bold' }}>
-                            {this.state.namaKotaKabSave}
-                          </Label>
-                        )}
-                      </Col>
-                    </Row>
-
-                    <Row style={{ paddingBottom: 0, marginBottom: 0 }}>
-                      <Col sm={2} style={{ paddingBottom: 0, marginBottom: 0 }}>
-                        <Label style={{ fontWeight: 'bold' }}>Kecamatan</Label>
-                      </Col>
-                      <Col
-                        sm={10}
-                        style={{ paddingBottom: 0, marginBottom: 0 }}
-                      >
-                        :&nbsp;
-                        {this.state.namaKecamatanSave === undefined ? (
-                          <Label style={{ fontWeight: 'bold' }}>-</Label>
-                        ) : (
-                          <Label style={{ fontWeight: 'bold' }}>
-                            {this.state.namaKecamatanSave}
-                          </Label>
-                        )}
-                      </Col>
-                    </Row>
-                  </Col> */}
+                        Detail Alsin
+                      </Button>
+                    )}
+                  </Col>
                 </Row>
 
                 <Table responsive striped id="tableUtama">
-                  {currentTodosFarmer.length > currentTodosUpja.length && (
+                  {window.location.pathname.includes('farmer') && (
                     <thead>
                       <tr>
-                        <th>ID</th>
-                        <th>Nama Petani</th>
-                        <th>No. Telepon</th>
+                        <th>Transaksi ID</th>
+                        <th>Biaya Transport</th>
+                        <th>Total Biaya</th>
+                        <th>UPJA ID</th>
+                        <th>UPJA</th>
+                        <th>Waktu Order</th>
+                        <th>Waktu Kirim</th>
                         <th>Status</th>
                       </tr>
                     </thead>
                   )}
-                  {currentTodosFarmer.length < currentTodosUpja.length && (
+                  {window.location.pathname.includes('upja') && (
                     <thead>
                       <tr>
-                        <th>ID</th>
-                        <th>Desa</th>
-                        <th>Kepala Desa</th>
-                        <th>UPJA</th>
-                        <th>Kelas</th>
+                        <th>Transaksi ID</th>
+                        <th>Biaya Transport</th>
+                        <th>Total Biaya</th>
+                        <th>Farmer ID</th>
+                        <th>Farmer</th>
+                        <th>Waktu Order</th>
+                        <th>Waktu Kirim</th>
+                        <th>Status</th>
                       </tr>
                     </thead>
                   )}
 
-                  {currentTodosFarmer.length > currentTodosUpja.length && (
+                  {window.location.pathname.includes('farmer') && (
                     <tbody>
-                      {currentTodosFarmer.length === 0 && loading === true ? (
+                      {currentTodosFarmerTransaction.length === 0 &&
+                      loadingPage === true ? (
                         <LoadingSpinner status={4} />
-                      ) : loading === false &&
-                        currentTodosFarmer.length === 0 ? (
+                      ) : loadingPage === false &&
+                        currentTodosFarmerTransaction.length === 0 ? (
                         (
                           <tr>
                             <td
@@ -1315,19 +1047,29 @@ class showTransaction extends React.Component {
                             </td>
                           </tr>
                         ) || <LoadingSpinner status={4} />
-                      ) : loading === true &&
-                        currentTodosFarmer.length !== 0 ? (
+                      ) : loadingPage === true &&
+                        currentTodosFarmerTransaction.length !== 0 ? (
                         <LoadingSpinner status={4} />
                       ) : (
                         renderTodosFarmer
                       )}
                     </tbody>
                   )}
-                  {currentTodosFarmer.length < currentTodosUpja.length && (
+                  {/* {console.log(
+                    'CURRENT TODOS',
+                    currentTodosUpjaTransaction.length,
+                    // >=
+                    // currentTodosUpjaTransaction.length,
+                    'LOADING',
+                    loadingPage,
+                  )} */}
+                  {window.location.pathname.includes('upja') && (
                     <tbody>
-                      {currentTodosUpja.length === 0 && loading === true ? (
+                      {currentTodosUpjaTransaction.length === 0 &&
+                      loadingPage === true ? (
                         <LoadingSpinner status={4} />
-                      ) : loading === false && currentTodosUpja.length === 0 ? (
+                      ) : loadingPage === false &&
+                        currentTodosUpjaTransaction.length === 0 ? (
                         (
                           <tr>
                             <td
@@ -1339,7 +1081,8 @@ class showTransaction extends React.Component {
                             </td>
                           </tr>
                         ) || <LoadingSpinner status={4} />
-                      ) : loading === true && currentTodosUpja.length !== 0 ? (
+                      ) : loadingPage === true &&
+                        currentTodosUpjaTransaction.length !== 0 ? (
                         <LoadingSpinner status={4} />
                       ) : (
                         renderTodosUpja
@@ -1348,86 +1091,62 @@ class showTransaction extends React.Component {
                   )}
                 </Table>
               </CardBody>
-              {/* <CardBody>
-                <Row>
-                  <Col>
-                    <Button
-                      name="firstPageHeader"
-                      value={1}
-                      // onClick={e =>
-                      //   this.paginationButton(e, 0, this.state.lastID)
-                      // }
-                      onClick={() => this.actionPage('firstPageHeader')}
-                      disabled={
-                        this.state.result.length === 0 ||
-                        this.state.result !== null
-                      }
-                    >
-                      First &#10092;&#10092;
-                    </Button>
-                    <ButtonGroup style={{ float: 'right' }}>
-                      <Button
-                        name="prevPageHeader"
-                        style={{ float: 'right' }}
-                        onClick={() => this.actionPage('prevPageHeader')}
-                        disabled={
-                          this.state.result.length === 0 ||
-                          this.state.result !== null
-                        }
-                      >
-                        Prev &#10092;
-                      </Button>
-                      <Button
-                        name="nextPageHeader"
-                        // value={this.state.currentPage}
-                        style={{ float: 'right' }}
-                        onClick={() => this.actionPage('nextPageHeader')}
-                        disabled={
-                          this.state.result.length === 0 ||
-                          this.state.result !== null
-                        }
-                      >
-                        Next &#10093;
-                      </Button>
-                    </ButtonGroup>
-                  </Col>
-                </Row>
-              </CardBody> */}
             </Card>
           </Col>
         </Row>
 
         {/* KHUSUS MODAL */}
-        {/* Modal List Type */}
+        {/* Modal Detail Alsin */}
         <Modal
+          size="xl"
           onExit={this.handleClose}
           isOpen={this.state.modal_nested_parent_list}
           toggle={this.toggle('nested_parent_list')}
           className={this.props.className}
         >
           <ModalHeader toggle={this.toggle('nested_parent_list')}>
-            List Type
+            Detail Alsin
           </ModalHeader>
           <ModalBody>
             <Table responsive striped>
+              <thead>
+                <tr>
+                  <th>Alsin ID</th>
+                  <th>Alsin</th>
+                  <th>Gambar</th>
+                  <th>Harga</th>
+                  <th>Tersedia</th>
+                  <th>Tidak Tersedia</th>
+                  <th>Total Item</th>
+                </tr>
+              </thead>
               <tbody>
-                {renderType}
-                {!typeTodos && (
-                  <tr>
-                    <td
-                      style={{ backgroundColor: 'white' }}
-                      colSpan="11"
-                      className="text-center"
-                    >
-                      TIDAK ADA DATA
-                    </td>
-                  </tr>
+                {currentTodosUpjaAlsin.length === 0 && loadingPage === true ? (
+                  <LoadingSpinner status={4} />
+                ) : loadingPage === false &&
+                  currentTodosUpjaAlsin.length === 0 ? (
+                  (
+                    <tr>
+                      <td
+                        style={{ backgroundColor: 'white' }}
+                        colSpan="17"
+                        className="text-center"
+                      >
+                        TIDAK ADA DATA
+                      </td>
+                    </tr>
+                  ) || <LoadingSpinner status={4} />
+                ) : loadingPage === true &&
+                  currentTodosUpjaAlsin.length !== 0 ? (
+                  <LoadingSpinner status={4} />
+                ) : (
+                  renderTodosUpjaAlsin
                 )}
               </tbody>
             </Table>
           </ModalBody>
         </Modal>
-        {/* Modal List Type */}
+        {/* Modal Detail Alsin */}
 
         {/* Modal List Domisili */}
         <Modal
@@ -1673,4 +1392,4 @@ class showTransaction extends React.Component {
     });
   }
 }
-export default showTransaction;
+export default showTransactionDetail;
