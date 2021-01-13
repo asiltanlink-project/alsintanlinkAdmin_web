@@ -63,14 +63,11 @@ class showTransaction extends React.Component {
       resultProvinsi: [],
       resultKotaKab: [],
       resultKecamatan: [],
+      loadingPage: false,
       pilihType: '',
       pilihProvinsi: '',
       pilihKotaKab: '',
       pilihKecamatan: '',
-      pilihPelapak: '',
-      pilihPelapak2: '',
-      pilihEcommerce: '',
-      pilihEcommerce2: '',
       lastID: 0,
       namaPeriode: '',
       ecommerceID: '',
@@ -102,23 +99,6 @@ class showTransaction extends React.Component {
     };
   }
 
-  //state pilih Outlet
-  state = { pilihPelapak: '', namaOutlet: '' };
-
-  //set Current Limit
-  handleSelect(event) {
-    this.setState(
-      {
-        [event.target.name]: event.target.value,
-        currentPage: 1,
-        realCurrentPage: 1,
-      },
-      () => {
-        this.getListbyPaging(1, this.state.todosPerPage, this.state.keyword);
-      },
-    );
-  }
-
   //set Current Page
   paginationButton(event, flag, maxPage = 0) {
     var currPage = Number(event.target.value);
@@ -138,87 +118,6 @@ class showTransaction extends React.Component {
       );
     }
   }
-
-  paginationButtonList(event, flag, maxPages = 0) {
-    var currPages = Number(event.target.value);
-    if (currPages + flag > 0 && currPages + flag <= maxPages) {
-      this.setState(
-        {
-          currentPages: currPages + flag,
-          realCurrentPages: currPages + flag,
-        },
-        () => {
-          this.getProvinsi(this.state.currentPages, this.state.todosPerPages);
-        },
-      );
-    }
-  }
-
-  enterPressedPage = event => {
-    var code = event.keyCode || event.which;
-    if (code === 13) {
-      if (this.state.currentPage > 0) {
-        if (this.state.currentPage > this.state.maxPage) {
-          this.setState(
-            prevState => ({
-              realCurrentPage: prevState.maxPage,
-              currentPage: prevState.maxPage,
-            }),
-            () =>
-              this.getListbyPaging(
-                this.state.currentPage,
-                this.state.todosPerPage,
-                this.state.keyword,
-              ),
-          );
-        } else {
-          this.setState(
-            prevState => ({
-              realCurrentPage: prevState.currentPage,
-            }),
-            () =>
-              this.getListbyPaging(
-                this.state.currentPage,
-                this.state.todosPerPage,
-                this.state.keyword,
-              ),
-          );
-        }
-      }
-    }
-  };
-
-  enterPressedPageList = event => {
-    var code = event.keyCode || event.which;
-    if (code === 13) {
-      if (this.state.currentPages > 0) {
-        if (this.state.currentPages > this.state.maxPages) {
-          this.setState(
-            prevState => ({
-              realCurrentPages: prevState.maxPages,
-              currentPages: prevState.maxPages,
-            }),
-            () =>
-              this.getProvinsi(
-                this.state.currentPages,
-                this.state.todosPerPages,
-              ),
-          );
-        } else {
-          this.setState(
-            prevState => ({
-              realCurrentPages: prevState.currentPages,
-            }),
-            () =>
-              this.getProvinsi(
-                this.state.currentPages,
-                this.state.todosPerPages,
-              ),
-          );
-        }
-      }
-    }
-  };
 
   enterPressedSearch = event => {
     var code = event.keyCode || event.which;
@@ -241,23 +140,6 @@ class showTransaction extends React.Component {
     }
   };
 
-  enterPressedSearchList = event => {
-    var code = event.keyCode || event.which;
-    if (code === 13) {
-      event.preventDefault();
-      this.setState(
-        {
-          currentPages: 1,
-          realCurrentPages: 1,
-          // modal_nested_parent_list: false
-        },
-        () => {
-          this.getProvinsi(this.state.currentPages, this.state.todosPerPages);
-        },
-      );
-    }
-  };
-
   showNotification = (currMessage, levelType) => {
     setTimeout(() => {
       if (!this.notificationSystem) {
@@ -270,21 +152,6 @@ class showTransaction extends React.Component {
       });
     }, 300);
   };
-
-  setDataStatus() {
-    if (
-      this.state.resultProvinsi !== null ||
-      this.state.resultProvinsi !== undefined
-    ) {
-      this.setState({
-        dataAvailable: true,
-      });
-    } else {
-      this.setState({
-        dataAvailable: false,
-      });
-    }
-  }
 
   saveDomisili() {
     this.setState({
@@ -301,9 +168,11 @@ class showTransaction extends React.Component {
     // const trace = perf.trace('getBundling');
     var namaKecamatan = this.state.namaKecamatanSave;
     var showType = this.state.pilihType;
-    const url =
-      myUrl.url_getAllData + showType + '?district=' + encodeURI(namaKecamatan);
+    var kecamatanID = this.state.pilihKecamatan;
+    const url = myUrl.url_getAllData + showType + '?district_id=' + kecamatanID;
     console.log('URL GET LIST', url);
+
+    this.setState({ loading: true });
     // console.log("offset", offset, "currLimit", currLimit);
 
     const option = {
@@ -341,7 +210,7 @@ class showTransaction extends React.Component {
             });
           }
           if (data.error.code === 101) {
-            this.setDataStatus();
+            window.location.replace('/login');
           }
         } else {
           // console.log("datametadata", data.metadata.pages);
@@ -350,17 +219,14 @@ class showTransaction extends React.Component {
             this.setState({ maxPage: 1 });
             // console.log("ini jalan 1");
           } else {
-            this.setState(
-              {
-                setDataErrorStatus: true,
-                result: data,
-                maxPage: data.metadata.pages ? data.metadata.pages : 1,
-                lastID: data.metadata.lastid,
-                lastIDprev: data.metadata.lastidprev,
-                loading: false,
-              },
-              () => this.setDataStatus(),
-            );
+            this.setState({
+              setDataErrorStatus: true,
+              result: data,
+              maxPage: data.metadata.pages ? data.metadata.pages : 1,
+              lastID: data.metadata.lastid,
+              lastIDprev: data.metadata.lastidprev,
+              loading: false,
+            });
             // console.log("ini jalan 2");
           }
         }
@@ -379,6 +245,7 @@ class showTransaction extends React.Component {
     var keyword = this.state.keywordList;
     const urlA = myUrl.url_getProvince;
     console.log('jalan', urlA);
+    this.setState({ loadingPage: true });
     const option = {
       method: 'GET',
       json: true,
@@ -398,14 +265,12 @@ class showTransaction extends React.Component {
         if (data.status === 0) {
           this.showNotification('Data tidak ditemukan!', 'error');
         } else {
-          this.setState(
-            {
-              resultProvinsi: data.result.provinces,
-              // maxPages: data.metadata.pages ? data.metadata.pages : 1,
-              loading: false,
-            },
-            () => this.setDataStatus(),
-          );
+          this.setState({
+            resultProvinsi: data.result.provinces,
+            // maxPages: data.metadata.pages ? data.metadata.pages : 1,
+            loading: false,
+            loadingPage: false,
+          });
         }
       });
   }
@@ -415,6 +280,7 @@ class showTransaction extends React.Component {
     var keyword = this.state.keywordList;
     const urlA = myUrl.url_getCity + '?province_id=' + this.state.pilihProvinsi;
     console.log('jalan kota', urlA);
+    this.setState({ loadingPage: true });
     const option = {
       method: 'GET',
       json: true,
@@ -434,14 +300,12 @@ class showTransaction extends React.Component {
         if (data.status === 0) {
           this.showNotification('Data tidak ditemukan!', 'error');
         } else {
-          this.setState(
-            {
-              resultKotaKab: data.result.citys,
-              // maxPages: data.metadata.pages ? data.metadata.pages : 1,
-              loading: false,
-            },
-            () => this.setDataStatus(),
-          );
+          this.setState({
+            resultKotaKab: data.result.citys,
+            // maxPages: data.metadata.pages ? data.metadata.pages : 1,
+            loading: false,
+            loadingPage: false,
+          });
         }
       });
   }
@@ -452,6 +316,7 @@ class showTransaction extends React.Component {
     var keyword = this.state.keywordList;
     const urlA = myUrl.url_getDistrict + '?city_id=' + this.state.pilihKotaKab;
     console.log('jalan kecamatan', urlA);
+    this.setState({ loadingPage: true });
     const option = {
       method: 'GET',
       json: true,
@@ -471,14 +336,12 @@ class showTransaction extends React.Component {
         if (data.status === 0) {
           this.showNotification('Data tidak ditemukan!', 'error');
         } else {
-          this.setState(
-            {
-              resultKecamatan: data.result.districts,
-              // maxPages: data.metadata.pages ? data.metadata.pages : 1,
-              loading: false,
-            },
-            () => this.setDataStatus(),
-          );
+          this.setState({
+            resultKecamatan: data.result.districts,
+            // maxPages: data.metadata.pages ? data.metadata.pages : 1,
+            loading: false,
+            loadingPage: false,
+          });
         }
       });
   }
@@ -683,10 +546,6 @@ class showTransaction extends React.Component {
     );
   };
 
-  fetchData = () => {
-    this.setState({ loading: true });
-  };
-
   handleCloseDomisili = () => {
     this.setState(
       {
@@ -881,7 +740,7 @@ class showTransaction extends React.Component {
   }
 
   render() {
-    const { loading } = this.state;
+    const { loading, loadingPage } = this.state;
     const currentTodos = this.state.result.data;
     const provinsiTodos = this.state.resultProvinsi;
     const kotakabTodos = this.state.resultKotaKab;
@@ -979,18 +838,10 @@ class showTransaction extends React.Component {
       currentTodos.map((todo, i) => {
         return (
           <tr key={i}>
-            <th scope="row">{todo.outletid}</th>
-            {/* <td>{todo.outletname}</td>
-            <td>{todo.ecommercename}</td> */}
-            <td>{todo.procod}</td>
-            <td>{todo.productname}</td>
-            <td>{new Date(todo.startdate).toDateString()}</td>
-            <td>{new Date(todo.enddate).toDateString()}</td>
-            <td style={{ textAlign: 'right' }}>
-              {formatter.format(todo.limitpriceecommerce)}
-            </td>
-            <td>{todo.sellpackname}</td>
-            <td>{new Date(todo.lastupdated).toDateString()}</td>
+            <th scope="row">{todo.farmer_id}</th>
+            <td>{todo.farmer_name}</td>
+            <td>{todo.phone_number}</td>
+            <td>{todo.phone_verify}</td>
           </tr>
         );
       });
@@ -1015,16 +866,15 @@ class showTransaction extends React.Component {
                 className="d-flex justify-content-between"
                 style={{ paddingBottom: 0 }}
               >
-                <Col style={{ paddingLeft: 0, paddingBottom: 0 }}>
+                <Col
+                  style={{
+                    paddingLeft: 0,
+                    paddingBottom: 0,
+                    paddingRight: 0,
+                    marginBottom: 0,
+                  }}
+                >
                   <InputGroup style={{ float: 'right' }}>
-                    <Label
-                      style={{
-                        fontWeight: 'bold',
-                        marginTop: '8px',
-                      }}
-                    >
-                      Type:&nbsp;
-                    </Label>
                     <Input
                       disabled
                       placeholder="Pilih Type"
@@ -1041,16 +891,10 @@ class showTransaction extends React.Component {
                     </InputGroupAddon>
                   </InputGroup>
                 </Col>
-                <Col style={{ paddingRight: 0 }}>
+                <Col
+                  style={{ paddingRight: 0, paddingBottom: 0, marginBottom: 0 }}
+                >
                   <InputGroup style={{ float: 'right' }}>
-                    <Label
-                      style={{
-                        fontWeight: 'bold',
-                        marginTop: '8px',
-                      }}
-                    >
-                      Domisili:&nbsp;
-                    </Label>
                     <Input
                       type="text"
                       id="ecommerceValue"
@@ -1107,7 +951,7 @@ class showTransaction extends React.Component {
                 </Col>
               </CardHeader>
 
-              <CardHeader className="d-flex justify-content-between">
+              {/* <CardHeader className="d-flex justify-content-between">
                 <Col sm={5} style={{ paddingLeft: 0 }}>
                   <Form
                     inline
@@ -1133,7 +977,7 @@ class showTransaction extends React.Component {
                   sm={7}
                   style={{ textAlign: 'right', paddingRight: 0 }}
                 ></Col>
-              </CardHeader>
+              </CardHeader> */}
               <CardBody>
                 <Row style={{ paddingBottom: 0, marginBottom: 0 }}>
                   <Col>
@@ -1220,21 +1064,17 @@ class showTransaction extends React.Component {
                 <Table responsive striped id="tableUtama">
                   <thead>
                     <tr>
-                      <th>Kode</th>
-                      {/* <th>Pelapak</th>
-                      <th>Ecommerce</th> */}
-                      <th>Procod</th>
-                      <th>Nama Produk</th>
-                      <th>Periode Awal</th>
-                      <th>Periode Akhir</th>
-                      <th style={{ textAlign: 'right' }}>Batas Bawah</th>
-                      <th>Sellpack</th>
-                      <th>Tgl Update</th>
+                      <th>ID</th>
+                      <th>Nama Petani</th>
+                      <th>No. Telepon</th>
+                      <th>Status</th>
                     </tr>
                   </thead>
 
                   <tbody>
-                    {!currentTodos ? (
+                    {!currentTodos && loading === true ? (
+                      <LoadingSpinner status={4} />
+                    ) : loading === false && !currentTodos ? (
                       (
                         <tr>
                           <td
@@ -1245,16 +1085,16 @@ class showTransaction extends React.Component {
                             TIDAK ADA DATA
                           </td>
                         </tr>
-                      ) || <LoadingSpinner status={4}></LoadingSpinner>
-                    ) : this.state.dataAvailable ? (
-                      renderTodos
-                    ) : (
+                      ) || <LoadingSpinner status={4} />
+                    ) : loading === true && currentTodos ? (
                       <LoadingSpinner status={4} />
+                    ) : (
+                      renderTodos
                     )}
                   </tbody>
                 </Table>
               </CardBody>
-              <CardBody>
+              {/* <CardBody>
                 <Row>
                   <Col>
                     <Button
@@ -1298,7 +1138,7 @@ class showTransaction extends React.Component {
                     </ButtonGroup>
                   </Col>
                 </Row>
-              </CardBody>
+              </CardBody> */}
             </Card>
           </Col>
         </Row>
@@ -1463,32 +1303,24 @@ class showTransaction extends React.Component {
           <ModalBody>
             <Table responsive striped>
               <tbody>
-                {/* {renderProvinsi}
-                {!provinsiTodos && (
-                  <tr>
-                    <td
-                      style={{ backgroundColor: 'white' }}
-                      colSpan="11"
-                      className="text-center"
-                    >
-                      TIDAK ADA DATA
-                    </td>
-                  </tr>
-                )} */}
-                {provinsiTodos ? (
-                  renderProvinsi || <LoadingSpinner status={4}></LoadingSpinner>
-                ) : this.state.dataAvailable ? (
-                  <tr>
-                    <td
-                      style={{ backgroundColor: 'white' }}
-                      colSpan="17"
-                      className="text-center"
-                    >
-                      TIDAK ADA DATA
-                    </td>
-                  </tr>
-                ) : (
+                {!provinsiTodos && loadingPage === true ? (
                   <LoadingSpinner status={4} />
+                ) : loadingPage === false && !provinsiTodos ? (
+                  (
+                    <tr>
+                      <td
+                        style={{ backgroundColor: 'white' }}
+                        colSpan="17"
+                        className="text-center"
+                      >
+                        TIDAK ADA DATA
+                      </td>
+                    </tr>
+                  ) || <LoadingSpinner status={4} />
+                ) : loadingPage === true && provinsiTodos ? (
+                  <LoadingSpinner status={4} />
+                ) : (
+                  renderProvinsi
                 )}
               </tbody>
             </Table>
@@ -1509,17 +1341,24 @@ class showTransaction extends React.Component {
           <ModalBody>
             <Table responsive striped>
               <tbody>
-                {renderKotakab}
-                {!kotakabTodos && (
-                  <tr>
-                    <td
-                      style={{ backgroundColor: 'white' }}
-                      colSpan="11"
-                      className="text-center"
-                    >
-                      TIDAK ADA DATA
-                    </td>
-                  </tr>
+                {!kotakabTodos && loadingPage === true ? (
+                  <LoadingSpinner status={4} />
+                ) : loadingPage === false && !kotakabTodos ? (
+                  (
+                    <tr>
+                      <td
+                        style={{ backgroundColor: 'white' }}
+                        colSpan="17"
+                        className="text-center"
+                      >
+                        TIDAK ADA DATA
+                      </td>
+                    </tr>
+                  ) || <LoadingSpinner status={4} />
+                ) : loadingPage === true && kotakabTodos ? (
+                  <LoadingSpinner status={4} />
+                ) : (
+                  renderKotakab
                 )}
               </tbody>
             </Table>
@@ -1540,17 +1379,24 @@ class showTransaction extends React.Component {
           <ModalBody>
             <Table responsive striped>
               <tbody>
-                {renderKecamatan}
-                {!kecamatanTodos && (
-                  <tr>
-                    <td
-                      style={{ backgroundColor: 'white' }}
-                      colSpan="11"
-                      className="text-center"
-                    >
-                      TIDAK ADA DATA
-                    </td>
-                  </tr>
+                {!kecamatanTodos && loadingPage === true ? (
+                  <LoadingSpinner status={4} />
+                ) : loadingPage === false && !kecamatanTodos ? (
+                  (
+                    <tr>
+                      <td
+                        style={{ backgroundColor: 'white' }}
+                        colSpan="17"
+                        className="text-center"
+                      >
+                        TIDAK ADA DATA
+                      </td>
+                    </tr>
+                  ) || <LoadingSpinner status={4} />
+                ) : loadingPage === true && kecamatanTodos ? (
+                  <LoadingSpinner status={4} />
+                ) : (
+                  renderKecamatan
                 )}
               </tbody>
             </Table>

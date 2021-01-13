@@ -19,16 +19,29 @@ class DashboardPage extends React.Component {
         {
           nama: profileName.username,
         },
-        // () => console.log('profile name', profileName.mem_access),
+        () => this.dashboardValidation(),
       );
     }
   }
 
-  componentDidMount() {
+  dashboardValidation() {
     var token = window.localStorage.getItem('tokenCookies');
-    if (token === '' || token === null || token === undefined) {
+    var nama = this.state.nama;
+    if (
+      token === '' ||
+      token === null ||
+      token === undefined ||
+      nama === '' ||
+      nama === null ||
+      nama === undefined
+    ) {
       window.location.replace('/login');
+    } else {
+      return;
     }
+  }
+
+  componentDidMount() {
     this.setProfileData();
     // alert("Jika menu tidak keluar silahkan refresh page")
   }
