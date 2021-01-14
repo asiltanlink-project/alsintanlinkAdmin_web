@@ -1,5 +1,6 @@
 import Page from 'components/Page';
 import React from 'react';
+import imageNotFound from 'assets/img/imageNotFound.jpg';
 import {
   Button,
   Card,
@@ -29,6 +30,7 @@ import {
   MdDelete,
   MdList,
   MdAdd,
+  MdHome,
 } from 'react-icons/md';
 import { MdLoyalty, MdRefresh } from 'react-icons/md';
 import NotificationSystem from 'react-notification-system';
@@ -47,6 +49,10 @@ class showTransactionDetail extends React.Component {
       resultFarmerTransaction: [],
       resultUpjaTransaction: [],
       resultUpjaAlsin: [],
+      resultAlsin: [],
+      resultAlsinItem: [],
+      resultDetailAlsinItem: [],
+      resultDetailTransactionAlsinItem: [],
       currentPage: 1,
       currentPages: 1,
       realCurrentPage: 1,
@@ -61,6 +67,8 @@ class showTransactionDetail extends React.Component {
       procod: '',
       loading: false,
       loadingPage: true,
+      loadingPageAlsin: true,
+      loadingPageDetailAlsin: true,
       checked: false,
       barcode: '',
       newProductDesc: '',
@@ -214,9 +222,12 @@ class showTransactionDetail extends React.Component {
         var resultFarmer = data.result.farmer;
         var resultTransaction = data.result.transactions.transactions;
         var message = data.result.message;
-        // console.log('data jalan GetlistByPaging farmer', data);
+        console.log('data jalan GetlistByPaging farmer', data);
         if (status === 0) {
           this.showNotification(message, 'error');
+          this.setState({
+            loadingPage: false,
+          });
         } else {
           this.showNotification('Data ditemukan!', 'info');
           this.setState(
@@ -280,6 +291,7 @@ class showTransactionDetail extends React.Component {
         }
       })
       .then(data => {
+        console.log('DATA UPJA', data);
         var status = data.status;
         var resultUpja = data.result.upja;
         var resultTransaction = data.result.transactions;
@@ -288,6 +300,9 @@ class showTransactionDetail extends React.Component {
         // console.log('data jalan GetlistByPaging upja', data);
         if (status === 0) {
           this.showNotification(message, 'error');
+          this.setState({
+            loadingPage: false,
+          });
         } else {
           this.showNotification('Data ditemukan!', 'info');
           this.setState({
@@ -303,6 +318,151 @@ class showTransactionDetail extends React.Component {
         this.showNotification('Error ke server!', 'error');
         this.setState({
           loadingPage: false,
+        });
+      });
+  }
+
+  getDetailAlsin(currPage, currLimit) {
+    var upja_id = this.state.upja_id;
+    console.log('UPJA ID', upja_id);
+    var alsin_type_id = this.state.detailAlsin.alsin_type_id;
+    const url =
+      myUrl.url_getDetailAlsin +
+      '?upja_id=' +
+      upja_id +
+      '&alsin_type_id=' +
+      alsin_type_id;
+    var token = window.localStorage.getItem('tokenCookies');
+    console.log('URL GET LIST ALSIN', url);
+
+    this.setState(
+      { loadingPageAlsin: true },
+      this.toggle('nested_parent_detail_alsin'),
+    );
+    // console.log("offset", offset, "currLimit", currLimit);
+
+    const option = {
+      method: 'GET',
+      json: true,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+        Authorization: `${'Bearer'} ${token}`,
+      },
+    };
+    // console.log('option', option);
+    fetch(url, option)
+      .then(response => {
+        // trace.stop();
+        if (response.ok) {
+          return response.json();
+        } else {
+          if (response.status === 401) {
+            this.showNotification('Username/Password salah!', 'error');
+          } else if (response.status === 500) {
+            this.showNotification('Internal Server Error', 'error');
+          } else {
+            this.showNotification('Response ke server gagal!', 'error');
+          }
+          this.setState({
+            loadingPageAlsin: false,
+          });
+        }
+      })
+      .then(data => {
+        console.log('DATA ALSIN', data);
+        var status = data.status;
+        var resultAlsinItem = data.result.alsin_items;
+        var resultAlsin = data.result.alsin;
+        var message = data.result.message;
+        // console.log('data jalan GetlistByPaging upja', data);
+        if (status === 0) {
+          this.showNotification(message, 'error');
+          this.setState({
+            loadingPageAlsin: false,
+          });
+        } else {
+          this.showNotification('Data ditemukan!', 'info');
+          this.setState({
+            resultAlsin: [resultAlsin],
+            resultAlsinItem: resultAlsinItem,
+            loadingPageAlsin: false,
+          });
+        }
+      })
+      .catch(err => {
+        // console.log('ERRORNYA', err);
+        this.showNotification('Error ke server!', 'error');
+        this.setState({
+          loadingPageAlsin: false,
+        });
+      });
+  }
+
+  getDetailAlsinItem(currPage, currLimit) {
+    var alsin_item_id = this.state.detailAlsinItem.alsin_item_id;
+    const url = myUrl.url_getDetailAlsin + '?alsin_item_id=' + alsin_item_id;
+    var token = window.localStorage.getItem('tokenCookies');
+    console.log('URL GET LIST ALSIN DETAIL', url);
+
+    this.setState(
+      { loadingPageDetailAlsin: true },
+      this.toggle('nested_parent_detail_alsin_item'),
+    );
+    // console.log("offset", offset, "currLimit", currLimit);
+
+    const option = {
+      method: 'GET',
+      json: true,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+        Authorization: `${'Bearer'} ${token}`,
+      },
+    };
+    // console.log('option', option);
+    fetch(url, option)
+      .then(response => {
+        // trace.stop();
+        if (response.ok) {
+          return response.json();
+        } else {
+          if (response.status === 401) {
+            this.showNotification('Username/Password salah!', 'error');
+          } else if (response.status === 500) {
+            this.showNotification('Internal Server Error', 'error');
+          } else {
+            this.showNotification('Response ke server gagal!', 'error');
+          }
+          this.setState({
+            loadingPageDetailAlsin: false,
+          });
+        }
+      })
+      .then(data => {
+        console.log('DATA ALSIN DETAIL', data);
+        var status = data.status;
+        var resultDetailAlsinItem = data.result.alsin_items;
+        var resultDetailTransactionAlsinItem = data.result.transactions;
+        var message = data.result.message;
+        // console.log('data jalan GetlistByPaging upja', data);
+        if (status === 0) {
+          this.showNotification(message, 'error');
+          this.setState({
+            loadingPageDetailAlsin: false,
+          });
+        } else {
+          this.showNotification('Data ditemukan!', 'info');
+          this.setState({
+            resultDetailAlsinItem: [resultDetailAlsinItem],
+            resultDetailTransactionAlsinItem: resultDetailTransactionAlsinItem,
+            loadingPageDetailAlsin: false,
+          });
+        }
+      })
+      .catch(err => {
+        // console.log('ERRORNYA', err);
+        this.showNotification('Error ke server!', 'error');
+        this.setState({
+          loadingPageAlsin: false,
         });
       });
   }
@@ -406,6 +566,7 @@ class showTransactionDetail extends React.Component {
   // KHUSUS STATE MODAL
 
   toggle = modalType => () => {
+    console.log('TERPANGGIL');
     if (!modalType) {
       return this.setState(
         {
@@ -480,6 +641,26 @@ class showTransactionDetail extends React.Component {
     );
   }
 
+  setModalDetailAlsin(todo) {
+    this.setState(
+      {
+        detailAlsin: todo,
+        // namaEcommerce: '',
+      },
+      () => this.getDetailAlsin(),
+    );
+  }
+
+  setModalDetailAlsinItem(todo) {
+    this.setState(
+      {
+        detailAlsinItem: todo,
+        // namaEcommerce: '',
+      },
+      () => this.getDetailAlsinItem(),
+    );
+  }
+
   firstPage() {
     this.setState(
       {
@@ -528,12 +709,20 @@ class showTransactionDetail extends React.Component {
   }
 
   render() {
-    const { loading, loadingPage } = this.state;
+    const {
+      loading,
+      loadingPage,
+      loadingPageAlsin,
+      loadingPageDetailAlsin,
+    } = this.state;
     const currentTodosFarmer = this.state.resultFarmer;
     const currentTodosUpja = this.state.resultUpja;
     const currentTodosFarmerTransaction = this.state.resultFarmerTransaction;
     const currentTodosUpjaTransaction = this.state.resultUpjaTransaction;
     const currentTodosUpjaAlsin = this.state.resultUpjaAlsin;
+    const currentTodosAlsinItem = this.state.resultAlsinItem;
+    const currentTodosDetailAlsinItem = this.state
+      .resultDetailTransactionAlsinItem;
     const provinsiTodos = this.state.resultProvinsi;
     const kotakabTodos = this.state.resultKotaKab;
     const kecamatanTodos = this.state.resultKecamatan;
@@ -545,98 +734,16 @@ class showTransactionDetail extends React.Component {
       currency: 'IDR',
     });
 
-    const renderType =
-      typeTodos &&
-      typeTodos.map((todo, i) => {
-        return (
-          <tr key={i}>
-            <td>{todo.type_name}</td>
-            <td style={{ textAlign: 'right' }}>
-              <Button
-                color="primary"
-                style={{ margin: '0px', fontSize: '15px' }}
-                value={todo.type_id}
-                onClick={this.setType}
-              >
-                Pilih
-              </Button>
-            </td>
-          </tr>
-        );
-      });
-
-    const renderProvinsi =
-      provinsiTodos &&
-      provinsiTodos.map((todo, i) => {
-        return (
-          <tr key={i}>
-            <td>{todo.name}</td>
-            <td style={{ textAlign: 'right' }}>
-              <Button
-                color="primary"
-                style={{ margin: '0px', fontSize: '15px' }}
-                value={todo.id}
-                onClick={this.setProvinsi}
-              >
-                Pilih
-              </Button>
-            </td>
-          </tr>
-        );
-      });
-
-    const renderKotakab =
-      kotakabTodos &&
-      kotakabTodos.map((todo, i) => {
-        return (
-          <tr key={i}>
-            <td>{todo.name}</td>
-            <td style={{ textAlign: 'right' }}>
-              <Button
-                color="primary"
-                style={{ margin: '0px', fontSize: '15px' }}
-                value={todo.id}
-                onClick={this.setKotakab}
-              >
-                Pilih
-              </Button>
-            </td>
-          </tr>
-        );
-      });
-
-    const renderKecamatan =
-      kecamatanTodos &&
-      kecamatanTodos.map((todo, i) => {
-        return (
-          <tr key={i}>
-            <td>{todo.name}</td>
-            <td style={{ textAlign: 'right' }}>
-              <Button
-                color="primary"
-                style={{ margin: '0px', fontSize: '15px' }}
-                value={todo.id}
-                onClick={this.setKecamatan}
-              >
-                Pilih
-              </Button>
-            </td>
-          </tr>
-        );
-      });
-
     const renderTodosFarmer =
       currentTodosFarmerTransaction &&
       currentTodosFarmerTransaction.map((todo, i) => {
         return (
           <tr key={i}>
-            <td scope="row">{todo.transaction_order_id}</td>
-            <td>{todo.transport_cost}</td>
-            <td>{todo.total_cost}</td>
-            <td>{todo.upja_id}</td>
+            <td>{formatter.format(todo.transport_cost)}</td>
+            <td>{formatter.format(todo.total_cost)}</td>
             {todo.upja_name !== '' && (
-              <td style={{ width: '10%', textAlign: 'left' }}>
-                <Link to={`/showTransactionDetail/upja/${todo.upja_name}`}>
+              <td style={{ textAlign: 'left' }}>
+                <Link to={`/showTransaction/upja=${todo.upja_id}`}>
                   {
                     <Label
                       style={{
@@ -673,13 +780,11 @@ class showTransactionDetail extends React.Component {
       currentTodosUpjaTransaction.map((todo, i) => {
         return (
           <tr key={i}>
-            <td scope="row">{todo.transaction_order_id}</td>
-            <td>{todo.transport_cost}</td>
-            <td>{todo.total_cost}</td>
-            <td>{todo.farmer_id}</td>
+            <td>{formatter.format(todo.transport_cost)}</td>
+            <td>{formatter.format(todo.total_cost)}</td>
             {todo.farmer_name !== '' && (
-              <td style={{ width: '10%', textAlign: 'left' }}>
-                <Link to={`/showTransactionDetail/upja/${todo.farmer_name}`}>
+              <td style={{ textAlign: 'left' }}>
+                <Link to={`/showTransaction/farmer=${todo.farmer_id}`}>
                   {
                     <Label
                       style={{
@@ -716,30 +821,128 @@ class showTransactionDetail extends React.Component {
       currentTodosUpjaAlsin.map((todo, i) => {
         return (
           <tr key={i}>
-            <th scope="row">{todo.alsin_type_id}</th>
             {todo.alsin_type_name !== '' && (
-              <td style={{ width: '10%', textAlign: 'left' }}>
-                <Link to={`/showTransaction/upja/${todo.alsin_type_name}`}>
-                  {
-                    <Label
-                      style={{
-                        fontWeight: 'bold',
-                        cursor: 'pointer',
-                        textDecoration: 'underline',
-                        color: '#009688',
-                      }}
-                    >
-                      {todo.alsin_type_name}
-                    </Label>
-                  }
-                </Link>
+              <td style={{ textAlign: 'left' }}>
+                {
+                  <Label
+                    style={{
+                      fontWeight: 'bold',
+                      cursor: 'pointer',
+                      textDecoration: 'underline',
+                      color: '#009688',
+                    }}
+                    onClick={() => this.setModalDetailAlsin({ ...todo })}
+                  >
+                    {todo.alsin_type_name}
+                  </Label>
+                }
               </td>
             )}
-            <td>{todo.picture}</td>
-            <td>{todo.cost}</td>
+            {todo.picture === null && (
+              <td>
+                <img
+                  src={imageNotFound}
+                  width="100"
+                  height="50"
+                  className="pr-2"
+                  alt=""
+                />
+              </td>
+            )}
+            {todo.picture !== null && (
+              <td>
+                <img
+                  src={todo.picture}
+                  width="100"
+                  height="50"
+                  className="pr-2"
+                  alt=""
+                />
+              </td>
+            )}
+
+            <td>{formatter.format(todo.cost)}</td>
             <td>{todo.available}</td>
             <td>{todo.not_available}</td>
             <td>{todo.total_item}</td>
+          </tr>
+        );
+      });
+
+    const renderTodosAlsinItem =
+      currentTodosAlsinItem &&
+      currentTodosAlsinItem.map((todo, i) => {
+        return (
+          <tr key={i}>
+            {todo.vechile_code !== '' && (
+              <td style={{ textAlign: 'left' }}>
+                {
+                  <Label
+                    style={{
+                      fontWeight: 'bold',
+                      cursor: 'pointer',
+                      textDecoration: 'underline',
+                      color: '#009688',
+                    }}
+                    onClick={() => this.setModalDetailAlsinItem({ ...todo })}
+                  >
+                    {todo.vechile_code}
+                  </Label>
+                }
+              </td>
+            )}
+            {todo.status === 1 && (
+              <td>
+                <Badge color="red">Tidak Tersedia</Badge>
+              </td>
+            )}
+            {todo.status === 0 && (
+              <td>
+                <Badge color="success">Tersedia</Badge>
+              </td>
+            )}
+          </tr>
+        );
+      });
+
+    const renderTodosDetailAlsinItem =
+      currentTodosDetailAlsinItem &&
+      currentTodosDetailAlsinItem.map((todo, i) => {
+        return (
+          <tr key={i}>
+            <th scope="row">{todo.upja_name}</th>
+            <td>{todo.farmer_name}</td>
+            {/* {todo.vechile_code !== '' && (
+              <td style={{ textAlign: 'left' }}>
+                {
+                  <Label
+                    style={{
+                      fontWeight: 'bold',
+                      cursor: 'pointer',
+                      textDecoration: 'underline',
+                      color: '#009688',
+                    }}
+                    onClick={() => this.setModalDetailAlsinItem({ ...todo })}
+                  >
+                    {todo.vechile_code}
+                  </Label>
+                }
+              </td>
+            )} */}
+            <td>{formatter.format(todo.transport_cost)}</td>
+            <td>{formatter.format(todo.total_cost)}</td>
+            <td>{todo.order_time}</td>
+            <td>{todo.delivery_time}</td>
+            {todo.payment_yn === 1 && (
+              <td>
+                <Badge color="red">Belum Dibayar</Badge>
+              </td>
+            )}
+            {todo.payment_yn === 0 && (
+              <td>
+                <Badge color="success">Sudah Lunas</Badge>
+              </td>
+            )}
           </tr>
         );
       });
@@ -814,8 +1017,8 @@ class showTransactionDetail extends React.Component {
                           style={{ paddingBottom: 0, marginBottom: 0 }}
                         >
                           :&nbsp;
-                          {currentTodosFarmer[0] &&
-                          currentTodosFarmer[0].length === 0 ? (
+                          {currentTodosFarmer &&
+                          currentTodosFarmer.length === 0 ? (
                             <Label style={{ fontWeight: 'bold' }}>-</Label>
                           ) : (
                             <Label style={{ fontWeight: 'bold' }}>
@@ -832,8 +1035,7 @@ class showTransactionDetail extends React.Component {
                           style={{ paddingBottom: 0, marginBottom: 0 }}
                         >
                           :&nbsp;
-                          {currentTodosUpja[0] &&
-                          currentTodosUpja[0].length === 0 ? (
+                          {currentTodosUpja && currentTodosUpja.length === 0 ? (
                             <Label style={{ fontWeight: 'bold' }}>-</Label>
                           ) : (
                             <Label style={{ fontWeight: 'bold' }}>
@@ -882,8 +1084,8 @@ class showTransactionDetail extends React.Component {
                           style={{ paddingBottom: 0, marginBottom: 0 }}
                         >
                           :&nbsp;
-                          {currentTodosFarmer[0] &&
-                          currentTodosFarmer[0].length === 0 ? (
+                          {currentTodosFarmer &&
+                          currentTodosFarmer.length === 0 ? (
                             <Label style={{ fontWeight: 'bold' }}>-</Label>
                           ) : (
                             <Label style={{ fontWeight: 'bold' }}>
@@ -907,8 +1109,7 @@ class showTransactionDetail extends React.Component {
                           style={{ paddingBottom: 0, marginBottom: 0 }}
                         >
                           :&nbsp;
-                          {currentTodosUpja[0] &&
-                          currentTodosUpja[0].length === 0 ? (
+                          {currentTodosUpja && currentTodosUpja.length === 0 ? (
                             <Label style={{ fontWeight: 'bold' }}>-</Label>
                           ) : (
                             <Label style={{ fontWeight: 'bold' }}>
@@ -943,11 +1144,19 @@ class showTransactionDetail extends React.Component {
                           style={{ paddingBottom: 0, marginBottom: 0 }}
                         >
                           :&nbsp;
-                          {this.state.namaTypeSave === undefined ? (
+                          {currentTodosFarmer &&
+                          currentTodosFarmer.length === 0 ? (
                             <Label style={{ fontWeight: 'bold' }}>-</Label>
                           ) : (
                             <Label style={{ fontWeight: 'bold' }}>
-                              {this.state.namaTypeSave}
+                              {currentTodosFarmer[0] &&
+                                currentTodosFarmer[0].province}
+                              ,&nbsp;
+                              {currentTodosFarmer[0] &&
+                                currentTodosFarmer[0].city}
+                              ,&nbsp;
+                              {currentTodosFarmer[0] &&
+                                currentTodosFarmer[0].district}
                             </Label>
                           )}
                         </Col>
@@ -958,8 +1167,7 @@ class showTransactionDetail extends React.Component {
                           style={{ paddingBottom: 0, marginBottom: 0 }}
                         >
                           :&nbsp;
-                          {currentTodosUpja[0] &&
-                          currentTodosUpja[0].length === 0 ? (
+                          {currentTodosUpja && currentTodosUpja.length === 0 ? (
                             <Label style={{ fontWeight: 'bold' }}>-</Label>
                           ) : (
                             <Label style={{ fontWeight: 'bold' }}>
@@ -974,6 +1182,16 @@ class showTransactionDetail extends React.Component {
                   </Col>
                   <Col style={{ marginBottom: 0, paddingBottom: 0 }}>
                     <Button
+                      color="danger"
+                      style={{
+                        float: 'right',
+                        marginLeft: '1%',
+                      }}
+                      onClick={() => window.history.back()}
+                    >
+                      <MdHome></MdHome>
+                    </Button>
+                    <Button
                       style={{
                         float: 'right',
                         width: '120px',
@@ -983,6 +1201,7 @@ class showTransactionDetail extends React.Component {
                     >
                       Kembali
                     </Button>
+
                     {window.location.pathname.includes('upja') && (
                       <Button
                         color="orange"
@@ -1003,10 +1222,8 @@ class showTransactionDetail extends React.Component {
                   {window.location.pathname.includes('farmer') && (
                     <thead>
                       <tr>
-                        <th>Transaksi ID</th>
                         <th>Biaya Transport</th>
                         <th>Total Biaya</th>
-                        <th>UPJA ID</th>
                         <th>UPJA</th>
                         <th>Waktu Order</th>
                         <th>Waktu Kirim</th>
@@ -1017,10 +1234,8 @@ class showTransactionDetail extends React.Component {
                   {window.location.pathname.includes('upja') && (
                     <thead>
                       <tr>
-                        <th>Transaksi ID</th>
                         <th>Biaya Transport</th>
                         <th>Total Biaya</th>
-                        <th>Farmer ID</th>
                         <th>Farmer</th>
                         <th>Waktu Order</th>
                         <th>Waktu Kirim</th>
@@ -1111,7 +1326,6 @@ class showTransactionDetail extends React.Component {
             <Table responsive striped>
               <thead>
                 <tr>
-                  <th>Alsin ID</th>
                   <th>Alsin</th>
                   <th>Gambar</th>
                   <th>Harga</th>
@@ -1148,120 +1362,401 @@ class showTransactionDetail extends React.Component {
         </Modal>
         {/* Modal Detail Alsin */}
 
-        {/* Modal List Domisili */}
+        {/* Modal Detail Alsin List */}
         <Modal
+          size="xl"
           onExit={this.handleCloseDomisili}
-          isOpen={this.state.modal_nested_parent_list_domisili}
-          toggle={this.toggle('nested_parent_list_domisili')}
+          isOpen={this.state.modal_nested_parent_detail_alsin}
+          toggle={this.toggle('nested_parent_detail_alsin')}
           className={this.props.className}
         >
-          <ModalHeader>List Domisili</ModalHeader>
+          <ModalHeader toggle={this.toggle('nested_parent_detail_alsin')}>
+            Detail Alsin 2
+          </ModalHeader>
           <ModalBody>
-            <Row>
-              <Col>
-                <Label style={{ fontSize: '0.6em' }}>
-                  *NB: Harap isi sesuai alur Provinsi - Kota/Kab - Kecamatan
-                  untuk mendapatkan Data
-                </Label>
-              </Col>
-            </Row>
-            <Row>
-              <Col sm={3}>
-                <Label
-                  style={{
-                    fontWeight: 'bold',
-                    marginTop: '8px',
-                  }}
-                >
-                  Provinsi:&nbsp;
-                </Label>
-              </Col>
-              <Col sm={9}>
-                <InputGroup style={{ float: 'right' }}>
-                  <Input
-                    disabled
-                    placeholder="Pilih Provinsi"
-                    style={{ fontWeight: 'bold' }}
-                    value={this.state.namaProvinsi}
-                  />
-                  {/* {console.log('ISINYA:', this.state.namaProvinsi)} */}
-                  <InputGroupAddon addonType="append">
-                    <Button onClick={() => this.setModalProvinsi()}>
-                      <MdList />
-                    </Button>
-                  </InputGroupAddon>
-                </InputGroup>
-              </Col>
-            </Row>
-            <Row>
-              <Col sm={3}>
-                <Label
-                  style={{
-                    fontWeight: 'bold',
-                    marginTop: '8px',
-                  }}
-                >
-                  Kota/Kab:&nbsp;
-                </Label>
-              </Col>
-              <Col sm={9}>
-                <InputGroup style={{ float: 'right' }}>
-                  <Input
-                    disabled
-                    placeholder="Pilih Kota/Kab"
-                    style={{ fontWeight: 'bold' }}
-                    value={this.state.namaKotaKab}
-                  />
-                  <InputGroupAddon addonType="append">
-                    <Button onClick={() => this.setModalKotaKab()}>
-                      <MdList />
-                    </Button>
-                  </InputGroupAddon>
-                </InputGroup>
-              </Col>
-            </Row>
-            <Row>
-              <Col sm={3}>
-                <Label
-                  style={{
-                    fontWeight: 'bold',
-                    marginTop: '8px',
-                  }}
-                >
-                  Kecamatan:&nbsp;
-                </Label>
-              </Col>
-              <Col sm={9}>
-                <InputGroup style={{ float: 'right' }}>
-                  <Input
-                    disabled
-                    placeholder="Pilih Kecamatan"
-                    style={{ fontWeight: 'bold' }}
-                    value={this.state.namaKecamatan}
-                  />
-                  <InputGroupAddon addonType="append">
-                    <Button onClick={() => this.setModalKecamatan()}>
-                      <MdList />
-                    </Button>
-                  </InputGroupAddon>
-                </InputGroup>
-              </Col>
-            </Row>
+            <Form>
+              <Row>
+                <Col style={{ textAlign: 'center' }}>
+                  {this.state.resultAlsin[0] &&
+                    this.state.resultAlsin[0].picture === null && (
+                      <img
+                        src={imageNotFound}
+                        width="300"
+                        height="180"
+                        className="pr-2"
+                        alt=""
+                      />
+                    )}
+                  {this.state.resultAlsin[0] &&
+                    this.state.resultAlsin[0].picture !== null && (
+                      <img
+                        src={
+                          this.state.resultAlsin[0] &&
+                          this.state.resultAlsin[0].picture
+                        }
+                        width="300"
+                        height="180"
+                        className="pr-2"
+                        alt=""
+                      />
+                    )}
+                </Col>
+              </Row>
+              <Row>
+                <Col>
+                  <Row>
+                    <Col sm={4}>
+                      <Label style={{ marginTop: '8px', fontWeight: 'bold' }}>
+                        Alsin
+                      </Label>
+                    </Col>
+                    <Col sm={8}>
+                      {this.state.resultAlsin &&
+                        this.state.resultAlsin.length === 0 && (
+                          <Label
+                            style={{ marginTop: '8px', fontWeight: 'bold' }}
+                          >
+                            :&nbsp;-
+                          </Label>
+                        )}
+                      {this.state.resultAlsin &&
+                        this.state.resultAlsin.length !== 0 && (
+                          <Label
+                            style={{ marginTop: '8px', fontWeight: 'bold' }}
+                          >
+                            :&nbsp;
+                            {this.state.resultAlsin[0] &&
+                              this.state.resultAlsin[0].alsin_type_name}
+                          </Label>
+                        )}
+                    </Col>
+                  </Row>
+                  <Row>
+                    <Col sm={4}>
+                      <Label style={{ marginTop: '8px', fontWeight: 'bold' }}>
+                        Harga
+                      </Label>
+                    </Col>
+                    <Col sm={8}>
+                      {this.state.resultAlsin &&
+                        this.state.resultAlsin.length === 0 && (
+                          <Label
+                            style={{ marginTop: '8px', fontWeight: 'bold' }}
+                          >
+                            :&nbsp;-
+                          </Label>
+                        )}
+                      {this.state.resultAlsin &&
+                        this.state.resultAlsin.length !== 0 && (
+                          <Label
+                            style={{ marginTop: '8px', fontWeight: 'bold' }}
+                          >
+                            :&nbsp;
+                            {formatter.format(
+                              this.state.resultAlsin[0] &&
+                                this.state.resultAlsin[0].cost,
+                            )}
+                          </Label>
+                        )}
+                    </Col>
+                  </Row>
+                  <Row>
+                    <Col sm={4}>
+                      <Label style={{ marginTop: '8px', fontWeight: 'bold' }}>
+                        Total Item
+                      </Label>
+                    </Col>
+                    <Col sm={8}>
+                      {this.state.resultAlsin &&
+                        this.state.resultAlsin.length === 0 && (
+                          <Label
+                            style={{ marginTop: '8px', fontWeight: 'bold' }}
+                          >
+                            :&nbsp;-
+                          </Label>
+                        )}
+                      {this.state.resultAlsin &&
+                        this.state.resultAlsin.length !== 0 && (
+                          <Label
+                            style={{ marginTop: '8px', fontWeight: 'bold' }}
+                          >
+                            :&nbsp;
+                            {this.state.resultAlsin[0] &&
+                              this.state.resultAlsin[0].total_item}
+                          </Label>
+                        )}
+                    </Col>
+                  </Row>
+                </Col>
+                <Col>
+                  <Row>
+                    <Col sm={4}>
+                      <Label style={{ marginTop: '8px', fontWeight: 'bold' }}>
+                        Tersedia
+                      </Label>
+                    </Col>
+                    <Col sm={8}>
+                      {this.state.resultAlsin &&
+                        this.state.resultAlsin.length === 0 && (
+                          <Label
+                            style={{ marginTop: '8px', fontWeight: 'bold' }}
+                          >
+                            :&nbsp;-
+                          </Label>
+                        )}
+                      {this.state.resultAlsin &&
+                        this.state.resultAlsin.length !== 0 && (
+                          <Label
+                            style={{ marginTop: '8px', fontWeight: 'bold' }}
+                          >
+                            :&nbsp;
+                            {this.state.resultAlsin[0] &&
+                              this.state.resultAlsin[0].available}
+                          </Label>
+                        )}
+                    </Col>
+                  </Row>
+                  <Row>
+                    <Col sm={4}>
+                      <Label style={{ marginTop: '8px', fontWeight: 'bold' }}>
+                        Tidak Tersedia
+                      </Label>
+                    </Col>
+                    <Col sm={8}>
+                      {this.state.resultAlsin &&
+                        this.state.resultAlsin.length === 0 && (
+                          <Label
+                            style={{ marginTop: '8px', fontWeight: 'bold' }}
+                          >
+                            :&nbsp;-
+                          </Label>
+                        )}
+                      {this.state.resultAlsin &&
+                        this.state.resultAlsin.length !== 0 && (
+                          <Label
+                            style={{ marginTop: '8px', fontWeight: 'bold' }}
+                          >
+                            :&nbsp;
+                            {this.state.resultAlsin[0] &&
+                              this.state.resultAlsin[0].not_available}
+                          </Label>
+                        )}
+                    </Col>
+                  </Row>
+                </Col>
+              </Row>
+            </Form>
           </ModalBody>
           <ModalFooter>
-            <Button
-              color="primary"
-              onClick={() => this.saveDomisili()}
-              disabled={!isEnabledSaveDomisili}
-            >
-              Simpan Domisili
-            </Button>
-            <Button color="danger" onClick={this.handleCloseDomisili}>
-              Batal
-            </Button>
+            <Table responsive striped>
+              <thead>
+                <tr>
+                  {/* <th>Alsin ID</th> */}
+                  <th>Kode Kendaraan</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {currentTodosAlsinItem.length === 0 &&
+                loadingPageAlsin === true ? (
+                  <LoadingSpinner status={4} />
+                ) : loadingPageAlsin === false &&
+                  currentTodosAlsinItem.length === 0 ? (
+                  (
+                    <tr>
+                      <td
+                        style={{ backgroundColor: 'white' }}
+                        colSpan="17"
+                        className="text-center"
+                      >
+                        TIDAK ADA DATA
+                      </td>
+                    </tr>
+                  ) || <LoadingSpinner status={4} />
+                ) : loadingPageAlsin === true &&
+                  currentTodosAlsinItem.length !== 0 ? (
+                  <LoadingSpinner status={4} />
+                ) : (
+                  renderTodosAlsinItem
+                )}
+              </tbody>
+            </Table>
           </ModalFooter>
         </Modal>
-        {/* Modal List Domisili */}
+        {/* Modal Detail Alsin List */}
+
+        {/* Modal Detail Alsin Item List */}
+        <Modal
+          size="xl"
+          onExit={this.handleCloseDomisili}
+          isOpen={this.state.modal_nested_parent_detail_alsin_item}
+          toggle={this.toggle('nested_parent_detail_alsi_itemn')}
+          className={this.props.className}
+        >
+          <ModalHeader toggle={this.toggle('nested_parent_detail_alsin_item')}>
+            Detail Alsin Item
+          </ModalHeader>
+          <ModalBody>
+            <Form>
+              <Row>
+                <Col>
+                  <Row>
+                    <Col sm={4}>
+                      <Label style={{ marginTop: '8px', fontWeight: 'bold' }}>
+                        UPJA
+                      </Label>
+                    </Col>
+                    <Col sm={8}>
+                      {this.state.resultDetailAlsinItem &&
+                        this.state.resultDetailAlsinItem.length === 0 && (
+                          <Label
+                            style={{ marginTop: '8px', fontWeight: 'bold' }}
+                          >
+                            :&nbsp;-
+                          </Label>
+                        )}
+                      {this.state.resultDetailAlsinItem &&
+                        this.state.resultDetailAlsinItem.length !== 0 && (
+                          <Label
+                            style={{ marginTop: '8px', fontWeight: 'bold' }}
+                          >
+                            :&nbsp;
+                            {this.state.resultDetailAlsinItem[0] &&
+                              this.state.resultDetailAlsinItem[0].upja_name}
+                          </Label>
+                        )}
+                    </Col>
+                  </Row>
+                  <Row>
+                    <Col sm={4}>
+                      <Label style={{ marginTop: '8px', fontWeight: 'bold' }}>
+                        Alsin
+                      </Label>
+                    </Col>
+                    <Col sm={8}>
+                      {this.state.resultDetailAlsinItem &&
+                        this.state.resultDetailAlsinItem.length === 0 && (
+                          <Label
+                            style={{ marginTop: '8px', fontWeight: 'bold' }}
+                          >
+                            :&nbsp;-
+                          </Label>
+                        )}
+                      {this.state.resultDetailAlsinItem &&
+                        this.state.resultDetailAlsinItem.length !== 0 && (
+                          <Label
+                            style={{ marginTop: '8px', fontWeight: 'bold' }}
+                          >
+                            :&nbsp;
+                            {this.state.resultDetailAlsinItem[0] &&
+                              this.state.resultDetailAlsinItem[0]
+                                .alsin_type_name}
+                          </Label>
+                        )}
+                    </Col>
+                  </Row>
+                </Col>
+                <Col>
+                  <Row>
+                    <Col sm={4}>
+                      <Label style={{ marginTop: '8px', fontWeight: 'bold' }}>
+                        Kode Kendaraan
+                      </Label>
+                    </Col>
+                    <Col sm={8}>
+                      {this.state.resultDetailAlsinItem &&
+                        this.state.resultDetailAlsinItem.length === 0 && (
+                          <Label
+                            style={{ marginTop: '8px', fontWeight: 'bold' }}
+                          >
+                            :&nbsp;-
+                          </Label>
+                        )}
+                      {this.state.resultDetailAlsinItem &&
+                        this.state.resultDetailAlsinItem.length !== 0 && (
+                          <Label
+                            style={{ marginTop: '8px', fontWeight: 'bold' }}
+                          >
+                            :&nbsp;
+                            {this.state.resultDetailAlsinItem[0] &&
+                              this.state.resultDetailAlsinItem[0].vechile_code}
+                          </Label>
+                        )}
+                    </Col>
+                  </Row>
+                  <Row>
+                    <Col sm={4}>
+                      <Label style={{ marginTop: '8px', fontWeight: 'bold' }}>
+                        Status
+                      </Label>
+                    </Col>
+                    <Col sm={8}>
+                      {this.state.resultDetailAlsinItem &&
+                        this.state.resultDetailAlsinItem.length === 0 && (
+                          <Label
+                            style={{ marginTop: '8px', fontWeight: 'bold' }}
+                          >
+                            :&nbsp; -
+                          </Label>
+                        )}
+                      {this.state.resultDetailAlsinItem &&
+                        this.state.resultDetailAlsinItem.length !== 0 && (
+                          <Label
+                            style={{ marginTop: '8px', fontWeight: 'bold' }}
+                          >
+                            :&nbsp;
+                            {this.state.resultDetailAlsinItem[0] &&
+                              this.state.resultDetailAlsinItem[0].status}
+                          </Label>
+                        )}
+                    </Col>
+                  </Row>
+                </Col>
+              </Row>
+            </Form>
+          </ModalBody>
+          <ModalFooter>
+            <Table responsive striped>
+              <thead>
+                <tr>
+                  <th>UPJA</th>
+                  <th>Farmer</th>
+                  <th>Biaya Transport</th>
+                  <th>Total Biaya</th>
+                  <th>Waktu Pesan</th>
+                  <th>Waktu Kirim</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {/* {console.log('DETAIL ALSIN ITEMS', currentTodosDetailAlsinItem)} */}
+                {currentTodosDetailAlsinItem.length === 0 &&
+                loadingPageDetailAlsin === true ? (
+                  <LoadingSpinner status={4} />
+                ) : loadingPageDetailAlsin === false &&
+                  currentTodosDetailAlsinItem.length === 0 ? (
+                  (
+                    <tr>
+                      <td
+                        style={{ backgroundColor: 'white' }}
+                        colSpan="17"
+                        className="text-center"
+                      >
+                        TIDAK ADA DATA
+                      </td>
+                    </tr>
+                  ) || <LoadingSpinner status={4} />
+                ) : loadingPageDetailAlsin === true &&
+                  currentTodosDetailAlsinItem.length !== 0 ? (
+                  <LoadingSpinner status={4} />
+                ) : (
+                  renderTodosDetailAlsinItem
+                )}
+              </tbody>
+            </Table>
+          </ModalFooter>
+        </Modal>
+        {/* Modal Detail Alsin Item List */}
 
         {/* Modal List Provinsi */}
         <Modal
@@ -1293,7 +1788,8 @@ class showTransactionDetail extends React.Component {
                 ) : loadingPage === true && provinsiTodos.length !== 0 ? (
                   <LoadingSpinner status={4} />
                 ) : (
-                  renderProvinsi
+                  // renderProvinsi
+                  <Label>ADA PROVINSI</Label>
                 )}
               </tbody>
             </Table>
@@ -1331,7 +1827,7 @@ class showTransactionDetail extends React.Component {
                 ) : loadingPage === true && kotakabTodos.length !== 0 ? (
                   <LoadingSpinner status={4} />
                 ) : (
-                  renderKotakab
+                  <Label>ADA KOTA KABUPATEN</Label>
                 )}
               </tbody>
             </Table>
@@ -1369,7 +1865,7 @@ class showTransactionDetail extends React.Component {
                 ) : loadingPage === true && kecamatanTodos.length !== 0 ? (
                   <LoadingSpinner status={4} />
                 ) : (
-                  renderKecamatan
+                  <Label>ADA KECAMATAN</Label>
                 )}
               </tbody>
             </Table>

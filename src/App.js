@@ -75,6 +75,18 @@ class App extends React.Component {
                 <Route
                   exact
                   setTitle={this.setTitle}
+                  path="/showtransaction/farmer=:farmer_id"
+                  component={showTransactionDetail}
+                />
+                <Route
+                  exact
+                  setTitle={this.setTitle}
+                  path="/showtransaction/upja=:upja_id"
+                  component={showTransactionDetail}
+                />
+                <Route
+                  exact
+                  setTitle={this.setTitle}
                   path="/showtransaction/farmer/:farmer_id"
                   component={showTransactionDetail}
                 />

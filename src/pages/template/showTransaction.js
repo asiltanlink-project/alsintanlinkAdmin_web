@@ -270,15 +270,29 @@ class showTransaction extends React.Component {
         var status = data.status;
         var result = data.result.farmers;
         var message = data.result.message;
-        // console.log('data jalan GetlistByPaging', data);
+        console.log('data jalan GetlistByPaging', data);
+        console.log('message GetlistByPaging', message);
         if (status === 0) {
           this.showNotification(message, 'error');
         } else {
-          this.showNotification('Data ditemukan!', 'info');
-          this.setState({
-            resultFarmer: result,
-            loading: false,
-          });
+          if (result.length === 0) {
+            this.showNotification(
+              `${'Data'} ${
+                this.state.namaTypeSave
+              } ${', '} ${this.state.namaProvinsiSave.toLowerCase()} ${'-'} ${this.state.namaKotaKabSave.toLowerCase()} ${'-'} ${this.state.namaKecamatanSave.toLowerCase()} ${', tidak ditemukan!'} `,
+              'error',
+            );
+            this.setState({
+              // resultFarmer: [{}],
+              loading: false,
+            });
+          } else {
+            this.showNotification('Data ditemukan!', 'info');
+            this.setState({
+              resultFarmer: result,
+              loading: false,
+            });
+          }
         }
       })
       .catch(err => {
@@ -336,11 +350,24 @@ class showTransaction extends React.Component {
         if (status === 0) {
           this.showNotification(message, 'error');
         } else {
-          this.showNotification('Data ditemukan!', 'info');
-          this.setState({
-            resultUpja: result,
-            loading: false,
-          });
+          if (result.length === 0) {
+            this.showNotification(
+              `${'Data'} ${
+                this.state.namaTypeSave
+              } ${', '} ${this.state.namaProvinsiSave.toLowerCase()} ${'-'} ${this.state.namaKotaKabSave.toLowerCase()} ${'-'} ${this.state.namaKecamatanSave.toLowerCase()} ${', tidak ditemukan!'} `,
+              'error',
+            );
+            this.setState({
+              // resultUpja: [{}],
+              loading: false,
+            });
+          } else {
+            this.showNotification('Data ditemukan!', 'info');
+            this.setState({
+              resultUpja: result,
+              loading: false,
+            });
+          }
         }
       })
       .catch(err => {
@@ -1297,7 +1324,6 @@ class showTransaction extends React.Component {
                       </tr>
                     </thead>
                   )}
-
                   {currentTodosFarmer.length > currentTodosUpja.length && (
                     <tbody>
                       {currentTodosFarmer.length === 0 && loading === true ? (

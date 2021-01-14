@@ -2,16 +2,19 @@
 /* eslint-disable no-redeclare */
 
 //URL LOGIN
-var url_login = 'http://alsintanlink.com/api/admin/login';
+var url_login = 'https://alsintanlink.com/api/admin/login';
 
 // ShowTransaction
-var url_getProvince = 'http://alsintanlink.com/api/location/province';
-var url_getCity = 'http://alsintanlink.com/api/location/city';
-var url_getDistrict = 'http://alsintanlink.com/api/location/district';
-var url_getAllData = 'http://alsintanlink.com/api/admin/';
+var url_getProvince = 'https://alsintanlink.com/api/location/province';
+var url_getCity = 'https://alsintanlink.com/api/location/city';
+var url_getDistrict = 'https://alsintanlink.com/api/location/district';
+var url_getAllData = 'https://alsintanlink.com/api/admin/';
 var url_showDetailFarmer =
-  'http://alsintanlink.com/api/admin/show_detail_farmer';
-var url_showDetailUpja = 'http://alsintanlink.com/api/admin/show_detail_upja';
+  'https://alsintanlink.com/api/admin/show_detail_farmer';
+var url_showDetailUpja = 'https://alsintanlink.com/api/admin/show_detail_upja';
+var url_getDetailAlsin = 'https://alsintanlink.com/api/admin/show_detail_alsin';
+var url_getDetailAlsinItem =
+  'https://alsintanlink.com/api/admin/show_detail_alsin_item';
 
 var url_getEcommerce =
   'https://staging-api.cfu.pharmalink.id/support/getEcommerceData';
@@ -46,6 +49,8 @@ export {
   url_showDetailFarmer,
   url_showDetailUpja,
   url_getAllData,
+  url_getDetailAlsin,
+  url_getDetailAlsinItem,
   // showTransaction
   url_getProvince,
   url_getCity,
