@@ -15,6 +15,10 @@ var url_showDetailUpja = 'https://alsintanlink.com/api/admin/show_detail_upja';
 var url_getDetailAlsin = 'https://alsintanlink.com/api/admin/show_detail_alsin';
 var url_getDetailAlsinItem =
   'https://alsintanlink.com/api/admin/show_detail_alsin_item';
+var url_getDetailTransaction =
+  'http://alsintanlink.com/api/admin/show_detail_transaction';
+  var url_getDetailTransactionAlsinItem =
+  'http://alsintanlink.com/api/admin/show_detail_transaction_alsin';
 
 var url_getEcommerce =
   'https://staging-api.cfu.pharmalink.id/support/getEcommerceData';
@@ -51,6 +55,8 @@ export {
   url_getAllData,
   url_getDetailAlsin,
   url_getDetailAlsinItem,
+  url_getDetailTransaction,
+  url_getDetailTransactionAlsinItem,
   // showTransaction
   url_getProvince,
   url_getCity,

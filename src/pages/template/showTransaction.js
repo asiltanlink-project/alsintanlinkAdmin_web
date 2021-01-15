@@ -270,8 +270,8 @@ class showTransaction extends React.Component {
         var status = data.status;
         var result = data.result.farmers;
         var message = data.result.message;
-        console.log('data jalan GetlistByPaging', data);
-        console.log('message GetlistByPaging', message);
+        // console.log('data jalan GetlistByPaging', data);
+        // console.log('message GetlistByPaging', message);
         if (status === 0) {
           this.showNotification(message, 'error');
         } else {

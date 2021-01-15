@@ -53,6 +53,9 @@ class showTransactionDetail extends React.Component {
       resultAlsinItem: [],
       resultDetailAlsinItem: [],
       resultDetailTransactionAlsinItem: [],
+      resultTransactionAlsin: [],
+      resultTransaction: [],
+      resultTransactionAlsinItem: [],
       currentPage: 1,
       currentPages: 1,
       realCurrentPage: 1,
@@ -69,6 +72,8 @@ class showTransactionDetail extends React.Component {
       loadingPage: true,
       loadingPageAlsin: true,
       loadingPageDetailAlsin: true,
+      loadingPageTransaction: true,
+      loadingPageTransactionAlsinItem: true,
       checked: false,
       barcode: '',
       newProductDesc: '',
@@ -222,7 +227,7 @@ class showTransactionDetail extends React.Component {
         var resultFarmer = data.result.farmer;
         var resultTransaction = data.result.transactions.transactions;
         var message = data.result.message;
-        console.log('data jalan GetlistByPaging farmer', data);
+        // console.log('data jalan GetlistByPaging farmer', data);
         if (status === 0) {
           this.showNotification(message, 'error');
           this.setState({
@@ -291,13 +296,12 @@ class showTransactionDetail extends React.Component {
         }
       })
       .then(data => {
-        console.log('DATA UPJA', data);
+        // console.log('DATA UPJA', data);
         var status = data.status;
         var resultUpja = data.result.upja;
         var resultTransaction = data.result.transactions;
         var resultAlsin = data.result.alsins;
         var message = data.result.message;
-        // console.log('data jalan GetlistByPaging upja', data);
         if (status === 0) {
           this.showNotification(message, 'error');
           this.setState({
@@ -324,7 +328,7 @@ class showTransactionDetail extends React.Component {
 
   getDetailAlsin(currPage, currLimit) {
     var upja_id = this.state.upja_id;
-    console.log('UPJA ID', upja_id);
+    // console.log('UPJA ID', upja_id);
     var alsin_type_id = this.state.detailAlsin.alsin_type_id;
     const url =
       myUrl.url_getDetailAlsin +
@@ -333,7 +337,7 @@ class showTransactionDetail extends React.Component {
       '&alsin_type_id=' +
       alsin_type_id;
     var token = window.localStorage.getItem('tokenCookies');
-    console.log('URL GET LIST ALSIN', url);
+    // console.log('URL GET LIST ALSIN', url);
 
     this.setState(
       { loadingPageAlsin: true },
@@ -369,7 +373,7 @@ class showTransactionDetail extends React.Component {
         }
       })
       .then(data => {
-        console.log('DATA ALSIN', data);
+        // console.log('DATA ALSIN', data);
         var status = data.status;
         var resultAlsinItem = data.result.alsin_items;
         var resultAlsin = data.result.alsin;
@@ -400,9 +404,10 @@ class showTransactionDetail extends React.Component {
 
   getDetailAlsinItem(currPage, currLimit) {
     var alsin_item_id = this.state.detailAlsinItem.alsin_item_id;
-    const url = myUrl.url_getDetailAlsin + '?alsin_item_id=' + alsin_item_id;
+    const url =
+      myUrl.url_getDetailAlsinItem + '?alsin_item_id=' + alsin_item_id;
     var token = window.localStorage.getItem('tokenCookies');
-    console.log('URL GET LIST ALSIN DETAIL', url);
+    // console.log('URL GET LIST ALSIN DETAIL', url);
 
     this.setState(
       { loadingPageDetailAlsin: true },
@@ -438,7 +443,7 @@ class showTransactionDetail extends React.Component {
         }
       })
       .then(data => {
-        console.log('DATA ALSIN DETAIL', data);
+        // console.log('DATA ALSIN DETAIL', data);
         var status = data.status;
         var resultDetailAlsinItem = data.result.alsin_items;
         var resultDetailTransactionAlsinItem = data.result.transactions;
@@ -462,7 +467,164 @@ class showTransactionDetail extends React.Component {
         // console.log('ERRORNYA', err);
         this.showNotification('Error ke server!', 'error');
         this.setState({
-          loadingPageAlsin: false,
+          loadingPageDetailAlsin: false,
+        });
+      });
+  }
+
+  getDetailTransaction(currPage, currLimit) {
+    var transaction_order_id = this.state.detailTransaction
+      .transaction_order_id;
+    const url =
+      myUrl.url_getDetailTransaction +
+      '?transaction_order_id=' +
+      transaction_order_id;
+    var token = window.localStorage.getItem('tokenCookies');
+    // console.log('URL GET LIST TRANSACTION', url);
+
+    this.setState(
+      { loadingPageTransaction: true },
+      this.toggle('nested_parent_list_transaksi'),
+    );
+    // console.log("offset", offset, "currLimit", currLimit);
+
+    const option = {
+      method: 'GET',
+      json: true,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+        Authorization: `${'Bearer'} ${token}`,
+      },
+    };
+    // console.log('option', option);
+    fetch(url, option)
+      .then(response => {
+        // trace.stop();
+        if (response.ok) {
+          return response.json();
+        } else {
+          if (response.status === 401) {
+            this.showNotification('Username/Password salah!', 'error');
+          } else if (response.status === 500) {
+            this.showNotification('Internal Server Error', 'error');
+          } else {
+            this.showNotification('Response ke server gagal!', 'error');
+          }
+          this.setState({
+            loadingPageTransaction: false,
+          });
+        }
+      })
+      .then(data => {
+        // console.log('DATA TRANSAKSI', data);
+        var status = data.status;
+        var resultTransaction = data.result.transaction;
+        var resultTransactionAlsin = data.result.alsins;
+        var message = data.result.message;
+        // console.log('data jalan GetlistByPaging upja', data);
+        if (status === 0) {
+          this.showNotification(message, 'error');
+          this.setState({
+            loadingPageTransaction: false,
+          });
+        } else {
+          this.showNotification('Data ditemukan!', 'info');
+          this.setState(
+            {
+              resultTransaction: [resultTransaction],
+              resultTransactionAlsin: resultTransactionAlsin,
+              loadingPageTransaction: false,
+            },
+            // () => console.log('DATA TRANSAKSI', data),
+          );
+        }
+      })
+      .catch(err => {
+        // console.log('ERRORNYA', err);
+        this.showNotification('Error ke server!', 'error');
+        this.setState({
+          loadingPageTransaction: false,
+        });
+      });
+  }
+
+  getDetailTransactionAlsin(currPage, currLimit) {
+    // console.log(
+    //   'this.state.detailTransactionAlsinItem',
+    //   this.state.detailTransactionAlsinItem,
+    // );
+    var transaction_order_id = this.state.detailTransaction
+      .transaction_order_id;
+    var alsin_type_id = this.state.detailTransactionAlsinItem.alsin_type_id;
+    const url =
+      myUrl.url_getDetailTransactionAlsinItem +
+      '?transaction_order_id=' +
+      transaction_order_id +
+      '&alsin_type_id=' +
+      alsin_type_id;
+    var token = window.localStorage.getItem('tokenCookies');
+    // console.log('URL GET LIST TRANSACTION ALSIN ITEM', url);
+
+    this.setState(
+      { loadingPageTransactionAlsinItem: true },
+      this.toggle('nested_parent_list_transaksi_alsinItem'),
+    );
+    // console.log("offset", offset, "currLimit", currLimit);
+
+    const option = {
+      method: 'GET',
+      json: true,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+        Authorization: `${'Bearer'} ${token}`,
+      },
+    };
+    // console.log('option', option);
+    fetch(url, option)
+      .then(response => {
+        // trace.stop();
+        if (response.ok) {
+          return response.json();
+        } else {
+          if (response.status === 401) {
+            this.showNotification('Username/Password salah!', 'error');
+          } else if (response.status === 500) {
+            this.showNotification('Internal Server Error', 'error');
+          } else {
+            this.showNotification('Response ke server gagal!', 'error');
+          }
+          this.setState({
+            loadingPageTransactionAlsinItem: false,
+          });
+        }
+      })
+      .then(data => {
+        // console.log('DATA TRANSAKSI ALSIN ITEM', data);
+        var status = data.status;
+        var resultTransactionAlsinItem = data.result.alsin_items;
+        var message = data.result.message;
+        // console.log('data jalan GetlistByPaging upja', data);
+        if (status === 0) {
+          this.showNotification(message, 'error');
+          this.setState({
+            loadingPageTransactionAlsinItem: false,
+          });
+        } else {
+          this.showNotification('Data ditemukan!', 'info');
+          this.setState(
+            {
+              resultTransactionAlsinItem: resultTransactionAlsinItem,
+              loadingPageTransactionAlsinItem: false,
+            },
+            // () => console.log('DATA TRANSAKSI', data),
+          );
+        }
+      })
+      .catch(err => {
+        // console.log('ERRORNYA', err);
+        this.showNotification('Error ke server!', 'error');
+        this.setState({
+          loadingPageTransactionAlsinItem: false,
         });
       });
   }
@@ -566,7 +728,7 @@ class showTransactionDetail extends React.Component {
   // KHUSUS STATE MODAL
 
   toggle = modalType => () => {
-    console.log('TERPANGGIL');
+    // console.log('TERPANGGIL');
     if (!modalType) {
       return this.setState(
         {
@@ -660,6 +822,25 @@ class showTransactionDetail extends React.Component {
       () => this.getDetailAlsinItem(),
     );
   }
+  setModalDetailTransaction(todo) {
+    this.setState(
+      {
+        detailTransaction: todo,
+        // namaEcommerce: '',
+      },
+      () => this.getDetailTransaction(),
+    );
+  }
+
+  setModalDetailTransaksiAlsin(todo) {
+    this.setState(
+      {
+        detailTransactionAlsinItem: todo,
+        // namaEcommerce: '',
+      },
+      () => this.getDetailTransactionAlsin(),
+    );
+  }
 
   firstPage() {
     this.setState(
@@ -714,6 +895,8 @@ class showTransactionDetail extends React.Component {
       loadingPage,
       loadingPageAlsin,
       loadingPageDetailAlsin,
+      loadingPageTransaction,
+      loadingPageTransactionAlsinItem,
     } = this.state;
     const currentTodosFarmer = this.state.resultFarmer;
     const currentTodosUpja = this.state.resultUpja;
@@ -723,6 +906,9 @@ class showTransactionDetail extends React.Component {
     const currentTodosAlsinItem = this.state.resultAlsinItem;
     const currentTodosDetailAlsinItem = this.state
       .resultDetailTransactionAlsinItem;
+    const currentTodosTransaction = this.state.resultTransactionAlsin;
+    const currentTodosTransactionAlsinItem = this.state
+      .resultTransactionAlsinItem;
     const provinsiTodos = this.state.resultProvinsi;
     const kotakabTodos = this.state.resultKotaKab;
     const kecamatanTodos = this.state.resultKecamatan;
@@ -739,6 +925,23 @@ class showTransactionDetail extends React.Component {
       currentTodosFarmerTransaction.map((todo, i) => {
         return (
           <tr key={i}>
+            {todo.upja_id !== '' && (
+              <td style={{ textAlign: 'left' }}>
+                {
+                  <Label
+                    style={{
+                      fontWeight: 'bold',
+                      cursor: 'pointer',
+                      textDecoration: 'underline',
+                      color: '#009688',
+                    }}
+                    onClick={() => this.setModalDetailTransaction({ ...todo })}
+                  >
+                    {todo.upja_id}
+                  </Label>
+                }
+              </td>
+            )}
             <td>{formatter.format(todo.transport_cost)}</td>
             <td>{formatter.format(todo.total_cost)}</td>
             {todo.upja_name !== '' && (
@@ -775,11 +978,31 @@ class showTransactionDetail extends React.Component {
         );
       });
 
+    // {
+    //   console.log('UPJA TODOS', currentTodosUpjaTransaction);
+    // }
     const renderTodosUpja =
       currentTodosUpjaTransaction &&
       currentTodosUpjaTransaction.map((todo, i) => {
         return (
           <tr key={i}>
+            {todo.farmer_id !== '' && (
+              <td style={{ textAlign: 'left' }}>
+                {
+                  <Label
+                    style={{
+                      fontWeight: 'bold',
+                      cursor: 'pointer',
+                      textDecoration: 'underline',
+                      color: '#009688',
+                    }}
+                    onClick={() => this.setModalDetailTransaction({ ...todo })}
+                  >
+                    {todo.farmer_id}
+                  </Label>
+                }
+              </td>
+            )}
             <td>{formatter.format(todo.transport_cost)}</td>
             <td>{formatter.format(todo.total_cost)}</td>
             {todo.farmer_name !== '' && (
@@ -810,6 +1033,110 @@ class showTransactionDetail extends React.Component {
             {todo.payment_yn === 0 && (
               <td>
                 <Badge color="danger">Belum Dibayar</Badge>
+              </td>
+            )}
+          </tr>
+        );
+      });
+
+    const renderTodosTransaction =
+      currentTodosTransaction &&
+      currentTodosTransaction.map((todo, i) => {
+        return (
+          <tr key={i}>
+            {todo.alsin_type_name !== '' && (
+              <td style={{ textAlign: 'left' }}>
+                {
+                  <Label
+                    style={{
+                      fontWeight: 'bold',
+                      cursor: 'pointer',
+                      textDecoration: 'underline',
+                      color: '#009688',
+                    }}
+                    onClick={() =>
+                      this.setModalDetailTransaksiAlsin({ ...todo })
+                    }
+                  >
+                    {todo.alsin_type_name}
+                  </Label>
+                }
+              </td>
+            )}
+            {todo.alsin_type_name === '' && (
+              <td style={{ textAlign: 'left' }}>
+                {
+                  <Label
+                    style={{
+                      fontWeight: 'bold',
+                    }}
+                  >
+                    -
+                  </Label>
+                }
+              </td>
+            )}
+            <td>{todo.total_alsin}</td>
+          </tr>
+        );
+      });
+
+    const renderTodosTransactionAlsinItem =
+      currentTodosTransactionAlsinItem &&
+      currentTodosTransactionAlsinItem.map((todo, i) => {
+        return (
+          <tr key={i}>
+            {todo.vechile_code !== null && (
+              <td style={{ textAlign: 'left' }}>
+                {
+                  <Label
+                    style={{
+                      fontWeight: 'bold',
+                    }}
+                  >
+                    {todo.vechile_code}
+                  </Label>
+                }
+              </td>
+            )}
+            {todo.vechile_code === null && (
+              <td style={{ textAlign: 'left' }}>
+                {
+                  <Label
+                    style={{
+                      fontWeight: 'bold',
+                    }}
+                  >
+                    -
+                  </Label>
+                }
+              </td>
+            )}
+            <td>{todo.cost}</td>
+            {todo.status === 0 && (
+              <td style={{ textAlign: 'left' }}>
+                {
+                  <Label
+                    style={{
+                      fontWeight: 'bold',
+                    }}
+                  >
+                    <Badge color="danger">Tidak Tersedia</Badge>
+                  </Label>
+                }
+              </td>
+            )}
+            {todo.status === 1 && (
+              <td style={{ textAlign: 'left' }}>
+                {
+                  <Label
+                    style={{
+                      fontWeight: 'bold',
+                    }}
+                  >
+                    <Badge color="success">Tersedia</Badge>
+                  </Label>
+                }
               </td>
             )}
           </tr>
@@ -912,7 +1239,7 @@ class showTransactionDetail extends React.Component {
           <tr key={i}>
             <th scope="row">{todo.upja_name}</th>
             <td>{todo.farmer_name}</td>
-            {/* {todo.vechile_code !== '' && (
+            {todo.vechile_code !== '' && (
               <td style={{ textAlign: 'left' }}>
                 {
                   <Label
@@ -928,7 +1255,8 @@ class showTransactionDetail extends React.Component {
                   </Label>
                 }
               </td>
-            )} */}
+            )}
+            {/* <td>{todo.vechile_code}</td> */}
             <td>{formatter.format(todo.transport_cost)}</td>
             <td>{formatter.format(todo.total_cost)}</td>
             <td>{todo.order_time}</td>
@@ -1187,7 +1515,9 @@ class showTransactionDetail extends React.Component {
                         float: 'right',
                         marginLeft: '1%',
                       }}
-                      onClick={() => window.history.back()}
+                      onClick={() =>
+                        (window.location.href = '/showTransaction')
+                      }
                     >
                       <MdHome></MdHome>
                     </Button>
@@ -1222,6 +1552,7 @@ class showTransactionDetail extends React.Component {
                   {window.location.pathname.includes('farmer') && (
                     <thead>
                       <tr>
+                        <th>Alsin ID</th>
                         <th>Biaya Transport</th>
                         <th>Total Biaya</th>
                         <th>UPJA</th>
@@ -1234,6 +1565,7 @@ class showTransactionDetail extends React.Component {
                   {window.location.pathname.includes('upja') && (
                     <thead>
                       <tr>
+                        <th>Alsin ID</th>
                         <th>Biaya Transport</th>
                         <th>Total Biaya</th>
                         <th>Farmer</th>
@@ -1320,7 +1652,7 @@ class showTransactionDetail extends React.Component {
           className={this.props.className}
         >
           <ModalHeader toggle={this.toggle('nested_parent_list')}>
-            Detail Alsin
+            Detail Alsin List
           </ModalHeader>
           <ModalBody>
             <Table responsive striped>
@@ -1371,7 +1703,7 @@ class showTransactionDetail extends React.Component {
           className={this.props.className}
         >
           <ModalHeader toggle={this.toggle('nested_parent_detail_alsin')}>
-            Detail Alsin 2
+            Detail Alsin
           </ModalHeader>
           <ModalBody>
             <Form>
@@ -1758,22 +2090,30 @@ class showTransactionDetail extends React.Component {
         </Modal>
         {/* Modal Detail Alsin Item List */}
 
-        {/* Modal List Provinsi */}
+        {/* Modal Transaction */}
         <Modal
           onExit={this.handleCloseDomisili}
-          isOpen={this.state.modal_nested_parent_list_provinsi}
-          toggle={this.toggle('nested_parent_list_provinsi')}
+          isOpen={this.state.modal_nested_parent_list_transaksi}
+          toggle={this.toggle('nested_parent_list_transaksi')}
           className={this.props.className}
         >
-          <ModalHeader toggle={this.toggle('nested_parent_list_provinsi')}>
-            List Provinsi
+          <ModalHeader toggle={this.toggle('nested_parent_list_transaksi')}>
+            List Transaksi
           </ModalHeader>
           <ModalBody>
             <Table responsive striped>
+              <thead>
+                <tr>
+                  <th>Alsin</th>
+                  <th>Total Alsin</th>
+                </tr>
+              </thead>
               <tbody>
-                {provinsiTodos.length === 0 && loadingPage === true ? (
+                {currentTodosTransaction.length === 0 &&
+                loadingPageTransaction === true ? (
                   <LoadingSpinner status={4} />
-                ) : loadingPage === false && provinsiTodos.length === 0 ? (
+                ) : loadingPageTransaction === false &&
+                  currentTodosTransaction.length === 0 ? (
                   (
                     <tr>
                       <td
@@ -1785,34 +2125,45 @@ class showTransactionDetail extends React.Component {
                       </td>
                     </tr>
                   ) || <LoadingSpinner status={4} />
-                ) : loadingPage === true && provinsiTodos.length !== 0 ? (
+                ) : loadingPageTransaction === true &&
+                  currentTodosTransaction.length !== 0 ? (
                   <LoadingSpinner status={4} />
                 ) : (
-                  // renderProvinsi
-                  <Label>ADA PROVINSI</Label>
+                  renderTodosTransaction
                 )}
               </tbody>
             </Table>
           </ModalBody>
         </Modal>
-        {/* Modal List Provinsi */}
+        {/* Modal Transaction */}
 
-        {/* Modal List Kota/kabupaten */}
+        {/* Modal Transaction Alsin Item */}
         <Modal
           onExit={this.handleCloseDomisili}
-          isOpen={this.state.modal_nested_parent_list_kotakab}
-          toggle={this.toggle('nested_parent_list_kotakab')}
+          isOpen={this.state.modal_nested_parent_list_transaksi_alsinItem}
+          toggle={this.toggle('nested_parent_list_transaksi_alsinItem')}
           className={this.props.className}
         >
-          <ModalHeader toggle={this.toggle('nested_parent_list_kotakab')}>
-            List Kota/Kabupaten
+          <ModalHeader
+            toggle={this.toggle('nested_parent_list_transaksi_alsinItem')}
+          >
+            List Transaksi Item
           </ModalHeader>
           <ModalBody>
             <Table responsive striped>
+              <thead>
+                <tr>
+                  <th>Kode Kendaraan</th>
+                  <th>Harga</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
               <tbody>
-                {kotakabTodos.length === 0 && loadingPage === true ? (
+                {currentTodosTransactionAlsinItem.length === 0 &&
+                loadingPageTransactionAlsinItem === true ? (
                   <LoadingSpinner status={4} />
-                ) : loadingPage === false && kotakabTodos.length === 0 ? (
+                ) : loadingPageTransactionAlsinItem === false &&
+                  currentTodosTransactionAlsinItem.length === 0 ? (
                   (
                     <tr>
                       <td
@@ -1824,16 +2175,17 @@ class showTransactionDetail extends React.Component {
                       </td>
                     </tr>
                   ) || <LoadingSpinner status={4} />
-                ) : loadingPage === true && kotakabTodos.length !== 0 ? (
+                ) : loadingPageTransactionAlsinItem === true &&
+                  currentTodosTransactionAlsinItem.length !== 0 ? (
                   <LoadingSpinner status={4} />
                 ) : (
-                  <Label>ADA KOTA KABUPATEN</Label>
+                  renderTodosTransactionAlsinItem
                 )}
               </tbody>
             </Table>
           </ModalBody>
         </Modal>
-        {/* Modal List Kota/kabupaten */}
+        {/* Modal Transaction Alsin Item*/}
 
         {/* Modal List Kecamatan */}
         <Modal
