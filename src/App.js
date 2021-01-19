@@ -29,6 +29,10 @@ const showTransactionDetail = React.lazy(() =>
   import('pages/template/showTransactionDetail'),
 );
 
+const showTransactionAlert = React.lazy(() =>
+  import('pages/template/showTransactionAlert'),
+);
+
 const getBasename = () => {
   return `/${process.env.PUBLIC_URL.split('/').pop()}`;
 };
@@ -71,6 +75,12 @@ class App extends React.Component {
                   setTitle={this.setTitle}
                   path="/showtransaction"
                   component={showTransaction}
+                />
+                <Route
+                  exact
+                  setTitle={this.setTitle}
+                  path="/showtransactionAlert"
+                  component={showTransactionAlert}
                 />
                 <Route
                   exact

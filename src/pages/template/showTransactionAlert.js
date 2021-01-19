@@ -711,18 +711,8 @@ class showTransaction extends React.Component {
   handleClose = () => {};
 
   SearchAllList() {
-    const {
-      pilihKecamatan,
-      pilihKotaKab,
-      pilihType,
-      pilihProvinsi,
-    } = this.state;
-    return (
-      pilihKecamatan !== '' &&
-      pilihKotaKab !== '' &&
-      pilihType !== '' &&
-      pilihProvinsi !== ''
-    );
+    const { pilihProvinsi } = this.state;
+    return pilihProvinsi !== '';
   }
 
   findData() {
@@ -1089,95 +1079,46 @@ class showTransaction extends React.Component {
                 style={{ paddingBottom: 0 }}
               >
                 <Col
-                  style={{
-                    paddingLeft: 0,
-                    paddingBottom: 0,
-                    paddingRight: 0,
-                    marginBottom: 0,
-                  }}
-                >
-                  <InputGroup style={{ float: 'right' }}>
-                    <Input
-                      disabled
-                      placeholder="Pilih Type"
-                      style={{ fontWeight: 'bold' }}
-                      value={this.state.namaType}
-                    />
-                    <InputGroupAddon addonType="append">
-                      <Button
-                        disabled={this.state.typeDisabled}
-                        onClick={() => this.setModalType()}
-                      >
-                        <MdList />
-                      </Button>
-                    </InputGroupAddon>
-                  </InputGroup>
-                </Col>
-                <Col
                   style={{ paddingRight: 0, paddingBottom: 0, marginBottom: 0 }}
                 >
                   <InputGroup style={{ float: 'right' }}>
                     <Input
-                      type="text"
-                      id="ecommerceValue"
-                      disabled={true}
-                      placeholder="Pilih Domisili"
+                      disabled
+                      placeholder="Pilih Provinsi"
                       style={{ fontWeight: 'bold' }}
-                      value={
-                        // this.state.namaProvinsi
-                        // this.state.namaKotaKab
-                        this.state.namaKecamatan
-                      }
-                      // onChange={event => this.setEcommerce(event)}
-                    ></Input>
+                      value={this.state.namaProvinsi}
+                    />
+                    {/* {console.log('ISINYA:', this.state.namaProvinsi)} */}
                     <InputGroupAddon addonType="append">
-                      <Button
-                        disabled={this.state.domisiliDisabled}
-                        onClick={() => this.setModalDomisili()}
-                      >
+                      <Button onClick={() => this.setModalProvinsi()}>
                         <MdList />
                       </Button>
                     </InputGroupAddon>
                   </InputGroup>
                 </Col>
                 <Col style={{ paddingRight: 0, float: 'right' }}>
-                  <ButtonGroup style={{ float: 'right' }}>
-                    <Button
-                      id="alertWarning"
-                      color="warning"
-                      style={{ float: 'right' }}
-                      onClick={() => this.props.history.push('/showTransactionAlert')}
-                    >
-                      <MdAddAlert />
-                    </Button>
-                    <Button
-                      id="resetInfo"
-                      color="danger"
-                      style={{ float: 'right' }}
-                      onClick={() => this.resetSearch()}
-                    >
-                      <MdRefresh />
-                    </Button>
-                    <Tooltip
-                      placement="bottom"
-                      isOpen={this.state.resetInfo}
-                      target="resetInfo"
-                      toggle={() =>
-                        this.setState({ resetInfo: !this.state.resetInfo })
-                      }
-                    >
-                      Reset Farmer/UPJA dan Domisili yang telah dipilih
-                    </Tooltip>
-                    <Button
-                      style={{ float: 'right' }}
-                      onClick={() => this.findData()}
-                      disabled={!isSearch}
-                      id="buttonSearch"
-                    >
-                      <MdSearch />
-                      Cari
-                    </Button>
-                  </ButtonGroup>
+                  {/* <ButtonGroup style={{ float: 'right' }}> */}
+                  <Button
+                    color="danger"
+                    style={{
+                      float: 'right',
+                      width: '120px',
+                      marginLeft: '1%',
+                    }}
+                    onClick={() => window.history.back()}
+                  >
+                    Kembali
+                  </Button>
+                  <Button
+                    style={{ float: 'right' }}
+                    onClick={() => this.findData()}
+                    disabled={!isSearch}
+                    id="buttonSearch"
+                  >
+                    <MdSearch />
+                    Cari
+                  </Button>
+                  {/* </ButtonGroup> */}
                 </Col>
               </CardHeader>
 

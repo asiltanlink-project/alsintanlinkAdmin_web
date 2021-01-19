@@ -1113,32 +1113,15 @@ class showTransactionDetail extends React.Component {
               </td>
             )}
             <td>{todo.cost}</td>
-            {todo.status === 0 && (
-              <td style={{ textAlign: 'left' }}>
-                {
-                  <Label
-                    style={{
-                      fontWeight: 'bold',
-                    }}
-                  >
-                    <Badge color="danger">Tidak Tersedia</Badge>
-                  </Label>
-                }
-              </td>
-            )}
-            {todo.status === 1 && (
-              <td style={{ textAlign: 'left' }}>
-                {
-                  <Label
-                    style={{
-                      fontWeight: 'bold',
-                    }}
-                  >
-                    <Badge color="success">Tersedia</Badge>
-                  </Label>
-                }
-              </td>
-            )}
+            <td>
+              <Label
+                style={{
+                  fontWeight: 'bold',
+                }}
+              >
+                <Badge color="success">{todo.status}</Badge>
+              </Label>
+            </td>
           </tr>
         );
       });
@@ -1218,16 +1201,15 @@ class showTransactionDetail extends React.Component {
                 }
               </td>
             )}
-            {todo.status === 1 && (
-              <td>
-                <Badge color="red">Tidak Tersedia</Badge>
-              </td>
-            )}
-            {todo.status === 0 && (
-              <td>
-                <Badge color="success">Tersedia</Badge>
-              </td>
-            )}
+            <td>
+              <Label
+                style={{
+                  fontWeight: 'bold',
+                }}
+              >
+                <Badge color="success">{todo.status}</Badge>
+              </Label>
+            </td>
           </tr>
         );
       });
@@ -1884,7 +1866,7 @@ class showTransactionDetail extends React.Component {
               <thead>
                 <tr>
                   {/* <th>Alsin ID</th> */}
-                  <th>Kode Kendaraan</th>
+                  <th>No. Reg Alsin</th>
                   <th>Status</th>
                 </tr>
               </thead>
@@ -1992,7 +1974,7 @@ class showTransactionDetail extends React.Component {
                   <Row>
                     <Col sm={4}>
                       <Label style={{ marginTop: '8px', fontWeight: 'bold' }}>
-                        Kode Kendaraan
+                        No. Reg Alsin
                       </Label>
                     </Col>
                     <Col sm={8}>
@@ -2153,7 +2135,7 @@ class showTransactionDetail extends React.Component {
             <Table responsive striped>
               <thead>
                 <tr>
-                  <th>Kode Kendaraan</th>
+                  <th>No. Reg Alsin</th>
                   <th>Harga</th>
                   <th>Status</th>
                 </tr>
