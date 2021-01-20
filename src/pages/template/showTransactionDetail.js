@@ -227,7 +227,7 @@ class showTransactionDetail extends React.Component {
         var resultFarmer = data.result.farmer;
         var resultTransaction = data.result.transactions.transactions;
         var message = data.result.message;
-        // console.log('data jalan GetlistByPaging farmer', data);
+        console.log('data jalan GetlistByPaging farmer', data);
         if (status === 0) {
           this.showNotification(message, 'error');
           this.setState({
@@ -964,16 +964,9 @@ class showTransactionDetail extends React.Component {
             )}
             <td>{todo.order_time}</td>
             <td>{todo.delivery_time}</td>
-            {todo.payment_yn === 1 && (
-              <td>
-                <Badge color="success">Sudah Lunas</Badge>
-              </td>
-            )}
-            {todo.payment_yn === 0 && (
-              <td>
-                <Badge color="danger">Belum Dibayar</Badge>
-              </td>
-            )}
+            <td>
+              <Badge color="success">{todo.status}</Badge>
+            </td>
           </tr>
         );
       });
@@ -1025,16 +1018,9 @@ class showTransactionDetail extends React.Component {
             )}
             <td>{todo.order_time}</td>
             <td>{todo.delivery_time}</td>
-            {todo.payment_yn === 1 && (
-              <td>
-                <Badge color="success">Sudah Lunas</Badge>
-              </td>
-            )}
-            {todo.payment_yn === 0 && (
-              <td>
-                <Badge color="danger">Belum Dibayar</Badge>
-              </td>
-            )}
+            <td>
+              <Badge color="success">{todo.status}</Badge>
+            </td>
           </tr>
         );
       });
@@ -1148,29 +1134,6 @@ class showTransactionDetail extends React.Component {
                 }
               </td>
             )}
-            {todo.picture === null && (
-              <td>
-                <img
-                  src={imageNotFound}
-                  width="100"
-                  height="50"
-                  className="pr-2"
-                  alt=""
-                />
-              </td>
-            )}
-            {todo.picture !== null && (
-              <td>
-                <img
-                  src={todo.picture}
-                  width="100"
-                  height="50"
-                  className="pr-2"
-                  alt=""
-                />
-              </td>
-            )}
-
             <td>{formatter.format(todo.cost)}</td>
             <td>{todo.available}</td>
             <td>{todo.not_available}</td>
@@ -1221,38 +1184,13 @@ class showTransactionDetail extends React.Component {
           <tr key={i}>
             <th scope="row">{todo.upja_name}</th>
             <td>{todo.farmer_name}</td>
-            {todo.vechile_code !== '' && (
-              <td style={{ textAlign: 'left' }}>
-                {
-                  <Label
-                    style={{
-                      fontWeight: 'bold',
-                      cursor: 'pointer',
-                      textDecoration: 'underline',
-                      color: '#009688',
-                    }}
-                    onClick={() => this.setModalDetailAlsinItem({ ...todo })}
-                  >
-                    {todo.vechile_code}
-                  </Label>
-                }
-              </td>
-            )}
-            {/* <td>{todo.vechile_code}</td> */}
             <td>{formatter.format(todo.transport_cost)}</td>
             <td>{formatter.format(todo.total_cost)}</td>
             <td>{todo.order_time}</td>
             <td>{todo.delivery_time}</td>
-            {todo.payment_yn === 1 && (
-              <td>
-                <Badge color="red">Belum Dibayar</Badge>
-              </td>
-            )}
-            {todo.payment_yn === 0 && (
-              <td>
-                <Badge color="success">Sudah Lunas</Badge>
-              </td>
-            )}
+            <td>
+              <Badge color="success">{todo.status}</Badge>
+            </td>
           </tr>
         );
       });
@@ -1641,7 +1579,6 @@ class showTransactionDetail extends React.Component {
               <thead>
                 <tr>
                   <th>Alsin</th>
-                  <th>Gambar</th>
                   <th>Harga</th>
                   <th>Tersedia</th>
                   <th>Tidak Tersedia</th>
@@ -1689,7 +1626,7 @@ class showTransactionDetail extends React.Component {
           </ModalHeader>
           <ModalBody>
             <Form>
-              <Row>
+              {/* <Row>
                 <Col style={{ textAlign: 'center' }}>
                   {this.state.resultAlsin[0] &&
                     this.state.resultAlsin[0].picture === null && (
@@ -1715,7 +1652,7 @@ class showTransactionDetail extends React.Component {
                       />
                     )}
                 </Col>
-              </Row>
+              </Row> */}
               <Row>
                 <Col>
                   <Row>
