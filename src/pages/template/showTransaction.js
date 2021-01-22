@@ -82,6 +82,8 @@ class showTransaction extends React.Component {
       startDate: '',
       endDate: '',
       resetInfo: false,
+      statusInfo: false,
+      alertInfo: false,
       resultType: [
         {
           type_id: 'show_farmer',
@@ -1143,7 +1145,7 @@ class showTransaction extends React.Component {
                 <Col style={{ paddingRight: 0, float: 'right' }}>
                   <ButtonGroup style={{ float: 'right' }}>
                     <Button
-                      id="alertWarning"
+                      id="statusInfo"
                       color="info"
                       style={{ float: 'right' }}
                       onClick={() =>
@@ -1152,8 +1154,19 @@ class showTransaction extends React.Component {
                     >
                       <MdList />
                     </Button>
+                    <Tooltip
+                      placement="left"
+                      isOpen={this.state.statusInfo}
+                      target="statusInfo"
+                      toggle={() =>
+                        this.setState({ statusInfo: !this.state.statusInfo })
+                      }
+                    >
+                      Halaman untuk melihat transaksi secara keseluruhan
+                      berdasarkan Status
+                    </Tooltip>
                     <Button
-                      id="alertWarning"
+                      id="alertInfo"
                       color="warning"
                       style={{ float: 'right' }}
                       onClick={() =>
@@ -1162,6 +1175,16 @@ class showTransaction extends React.Component {
                     >
                       <MdAddAlert />
                     </Button>
+                    <Tooltip
+                      placement="top"
+                      isOpen={this.state.alertInfo}
+                      target="alertInfo"
+                      toggle={() =>
+                        this.setState({ alertInfo: !this.state.alertInfo })
+                      }
+                    >
+                      Transaksi Alert untuk UPJA yang belum melakukan transaksi
+                    </Tooltip>
                     <Button
                       id="resetInfo"
                       color="danger"
