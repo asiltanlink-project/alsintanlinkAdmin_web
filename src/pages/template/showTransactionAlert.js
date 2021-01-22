@@ -456,20 +456,20 @@ class showTransaction extends React.Component {
       });
   }
 
-  // Get Kecamatan
-  getKecamatan(currPage, currLimit) {
-    var offset = (currPage - 1) * currLimit;
-    var keyword = this.state.keywordList;
-    const urlA = myUrl.url_getDistrict + '?city_id=' + this.state.pilihKotaKab;
+  // Send Alert
+  sendAlert() {
+    const urlA = myUrl.url_sendUpjaAlert;
     // console.log('jalan kecamatan', urlA);
     this.setState({ loadingPage: true });
+    var payload = {};
     const option = {
-      method: 'GET',
+      method: 'POST',
       json: true,
       headers: {
         'Content-Type': 'application/json;charset=UTF-8',
         Authorization: window.localStorage.getItem('tokenCookies'),
       },
+      body: JSON.stringify(payload),
     };
     fetch(urlA, option)
       .then(response => {
@@ -481,14 +481,22 @@ class showTransaction extends React.Component {
         // console.log('data Kecamatan', data.result);
         if (data.status === 0) {
           this.showNotification('Data tidak ditemukan!', 'error');
-        } else {
           this.setState({
-            resultKecamatan: data.result.districts,
-            // maxPages: data.metadata.pages ? data.metadata.pages : 1,
-            loading: false,
+            loadingPage: false,
+          });
+        } else {
+          this.showNotification(data.result.message, 'error');
+          this.setState({
             loadingPage: false,
           });
         }
+      })
+      .catch(err => {
+        // console.log('ERRORNYA', err);
+        this.showNotification('Koneksi ke Server gagal!', 'error');
+        this.setState({
+          loadingPage: false,
+        });
       });
   }
 
@@ -693,24 +701,15 @@ class showTransaction extends React.Component {
   };
 
   handleCloseDomisili = () => {
-    this.setState(
-      {
-        namaProvinsi: '',
-        namaKotaKab: '',
-        namaKecamatan: '',
-        pilihProvinsi: '',
-        pilihKotaKab: '',
-        pilihKecamatan: '',
-        modal_nested_parent_list_domisili: false,
-      },
-      // () =>
-      //   console.log(
-      //     'ISI SETELAH CLOSE',
-      //     this.state.namaProvinsi,
-      //     this.state.namaKotaKab,
-      //     this.state.namaKecamatan,
-      //   ),
-    );
+    this.setState({
+      namaProvinsi: '',
+      namaKotaKab: '',
+      namaKecamatan: '',
+      pilihProvinsi: '',
+      pilihKotaKab: '',
+      pilihKecamatan: '',
+      modal_nested_parent_list_domisili: false,
+    });
   };
 
   handleClose = () => {};
@@ -1005,9 +1004,11 @@ class showTransaction extends React.Component {
                   <ButtonGroup style={{ float: 'right' }}>
                     <Button
                       color="warning"
-                      onClick={() => this.findData()}
-                      disabled={!isSearch}
-                      id="buttonSearch"
+                      disabled={
+                        this.state.resultTransactionAll.length === 0 ||
+                        loadingPage
+                      }
+                      onClick={this.toggle('nested_parent_list')}
                     >
                       <MdAddAlert />
                     </Button>
@@ -1168,26 +1169,24 @@ class showTransaction extends React.Component {
           className={this.props.className}
         >
           <ModalHeader toggle={this.toggle('nested_parent_list')}>
-            List Type
+            Konfirmasi pengiriman Email
           </ModalHeader>
           <ModalBody>
-            <Table responsive striped>
-              <tbody>
-                {/* {renderType} */}
-                {!typeTodos && (
-                  <tr>
-                    <td
-                      style={{ backgroundColor: 'white' }}
-                      colSpan="11"
-                      className="text-center"
-                    >
-                      TIDAK ADA DATA
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </Table>
+            Apakah Anda yakin untuk mengirim Email peringatan untuk UPJA yang
+            belum melakukan transaksi?
           </ModalBody>
+          <ModalFooter>
+            <Button
+              disabled={loadingPage}
+              onClick={() => this.sendAlert()}
+              color="primary"
+            >
+              {!loadingPage && 'Ya'}
+              {loadingPage && <MdAutorenew />}
+              {loadingPage && 'Sedang diproses'}
+            </Button>
+            <Button onClick={this.toggle('nested_parent_list')}>Tidak</Button>
+          </ModalFooter>
         </Modal>
         {/* Modal List Type */}
 

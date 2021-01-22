@@ -16,11 +16,14 @@ var url_getDetailAlsin = 'https://alsintanlink.com/api/admin/show_detail_alsin';
 var url_getDetailAlsinItem =
   'https://alsintanlink.com/api/admin/show_detail_alsin_item';
 var url_getDetailTransaction =
-  'http://alsintanlink.com/api/admin/show_detail_transaction';
+  'https://alsintanlink.com/api/admin/show_detail_transaction';
 var url_getDetailTransactionAlsinItem =
-  'http://alsintanlink.com/api/admin/show_detail_transaction_alsin';
+  'https://alsintanlink.com/api/admin/show_detail_transaction_alsin';
 var url_getAllUpjaTransaction =
-  'http://alsintanlink.com/api/admin/show_all_upja_traction';
+  'https://alsintanlink.com/api/admin/show_all_upja_traction';
+var url_sendUpjaAlert = 'http://alsintanlink.com/api/admin/send_upja_alert';
+var url_showAllTransaction =
+  'https://alsintanlink.com/api/admin/show_all_transaction';
 
 export {
   url_login,
@@ -35,4 +38,6 @@ export {
   url_getCity,
   url_getDistrict,
   url_getAllUpjaTransaction,
+  url_sendUpjaAlert,
+  url_showAllTransaction,
 };
