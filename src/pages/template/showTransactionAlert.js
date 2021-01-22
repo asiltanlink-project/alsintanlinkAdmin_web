@@ -66,6 +66,8 @@ class showTransaction extends React.Component {
       resultProvinsi: [],
       resultKotaKab: [],
       resultKecamatan: [],
+      resultTransaction: [],
+      resultTransactionAll: [],
       loadingPage: false,
       pilihType: '',
       pilihProvinsi: '',
@@ -305,11 +307,11 @@ class showTransaction extends React.Component {
       });
   }
 
-  // get data Upja
-  getListbyPagingUpja(currPage, currLimit) {
+  // get data Transaksi
+  getListbyPagingTransaksi(currPage, currLimit) {
     // const trace = perf.trace('getBundling');
-    var kecamatanID = this.state.pilihKecamatan;
-    const url = myUrl.url_getAllData + 'show_upja?district_id=' + kecamatanID;
+    var province_id = this.state.pilihProvinsi;
+    const url = myUrl.url_getAllUpjaTransaction + '?provinces=' + province_id;
     var token = window.localStorage.getItem('tokenCookies');
     // console.log('URL GET LIST', url);
 
@@ -345,17 +347,19 @@ class showTransaction extends React.Component {
       })
       .then(data => {
         var status = data.status;
-        var result = data.result.upjas;
+        var resultTransaction = data.result.transactions;
+        var resultTransactionAll = data.result.transactions_all;
         var message = data.result.message;
-        // console.log('data jalan GetlistByPaging', data);
+        console.log('data jalan GetlistByPaging', data);
         if (status === 0) {
           this.showNotification(message, 'error');
         } else {
-          if (result.length === 0) {
+          if (
+            resultTransaction.length === 0 ||
+            resultTransactionAll.length === 0
+          ) {
             this.showNotification(
-              `${'Data'} ${
-                this.state.namaTypeSave
-              } ${', '} ${this.state.namaProvinsiSave.toLowerCase()} ${'-'} ${this.state.namaKotaKabSave.toLowerCase()} ${'-'} ${this.state.namaKecamatanSave.toLowerCase()} ${', tidak ditemukan!'} `,
+              `${'Data UPJA '} ${this.state.namaProvinsiSave.toLowerCase()} ${', tidak ditemukan!'} `,
               'error',
             );
             this.setState({
@@ -365,7 +369,8 @@ class showTransaction extends React.Component {
           } else {
             this.showNotification('Data ditemukan!', 'info');
             this.setState({
-              resultUpja: result,
+              resultTransaction: resultTransaction,
+              resultTransactionAll: resultTransactionAll,
               loading: false,
             });
           }
@@ -722,51 +727,16 @@ class showTransaction extends React.Component {
     this.setState(
       {
         namaProvinsiSave: this.state.namaProvinsi,
-        namaKotaKabSave: this.state.namaKotaKab,
-        namaKecamatanSave: this.state.namaKecamatan,
-        namaTypeSave: this.state.namaTypeTemp,
-        domisiliDisabled: true,
-        typeDisabled: false,
-        periodeDisabled: true,
-        lastID: 0,
-        resultFarmer: [],
         resultUpja: [],
-        resultKotaKab: [],
-        resultKecamatan: [],
       },
       () =>
         this.setState(
           {
             namaProvinsi: '',
-            namaKotaKab: '',
-            namaKecamatan: '',
-            namaType: '',
           },
-          () => this.findUpjaFarmer(),
+          () => this.getListbyPagingTransaksi(),
         ),
     );
-  }
-
-  findUpjaFarmer() {
-    var show_type = this.state.pilihType;
-    if (show_type === 'show_farmer') {
-      this.getListbyPagingFarmer();
-    } else {
-      this.getListbyPagingUpja();
-    }
-  }
-
-  resetSearch() {
-    var buttonSearch = document.getElementById('buttonSearch');
-    buttonSearch.disabled = true;
-    this.setState({
-      namaType: '',
-      namaKotaKab: '',
-      namaProvinsi: '',
-      namaKecamatan: '',
-      domisiliDisabled: true,
-      typeDisabled: false,
-    });
   }
 
   setModalType() {
@@ -887,6 +857,8 @@ class showTransaction extends React.Component {
     const kotakabTodos = this.state.resultKotaKab;
     const kecamatanTodos = this.state.resultKecamatan;
     const typeTodos = this.state.resultType;
+    const TransactionTodos = this.state.resultTransaction;
+    const TransactionAllTodos = this.state.resultTransactionAll;
     const isEnabledSaveDomisili = this.canBeSubmittedDomisili();
     const isSearch = this.SearchAllList();
 
@@ -894,128 +866,9 @@ class showTransaction extends React.Component {
       currency: 'IDR',
     });
 
-    const renderType =
-      typeTodos &&
-      typeTodos.map((todo, i) => {
-        return (
-          <tr key={i}>
-            <td>{todo.type_name}</td>
-            <td style={{ textAlign: 'right' }}>
-              <Button
-                color="primary"
-                style={{ margin: '0px', fontSize: '15px' }}
-                value={todo.type_id}
-                onClick={this.setType}
-              >
-                Pilih
-              </Button>
-            </td>
-          </tr>
-        );
-      });
-
-    const renderProvinsi =
-      provinsiTodos &&
-      provinsiTodos.map((todo, i) => {
-        return (
-          <tr key={i}>
-            <td>{todo.name}</td>
-            <td style={{ textAlign: 'right' }}>
-              <Button
-                color="primary"
-                style={{ margin: '0px', fontSize: '15px' }}
-                value={todo.id}
-                onClick={this.setProvinsi}
-              >
-                Pilih
-              </Button>
-            </td>
-          </tr>
-        );
-      });
-
-    const renderKotakab =
-      kotakabTodos &&
-      kotakabTodos.map((todo, i) => {
-        return (
-          <tr key={i}>
-            <td>{todo.name}</td>
-            <td style={{ textAlign: 'right' }}>
-              <Button
-                color="primary"
-                style={{ margin: '0px', fontSize: '15px' }}
-                value={todo.id}
-                onClick={this.setKotakab}
-              >
-                Pilih
-              </Button>
-            </td>
-          </tr>
-        );
-      });
-
-    const renderKecamatan =
-      kecamatanTodos &&
-      kecamatanTodos.map((todo, i) => {
-        return (
-          <tr key={i}>
-            <td>{todo.name}</td>
-            <td style={{ textAlign: 'right' }}>
-              <Button
-                color="primary"
-                style={{ margin: '0px', fontSize: '15px' }}
-                value={todo.id}
-                onClick={this.setKecamatan}
-              >
-                Pilih
-              </Button>
-            </td>
-          </tr>
-        );
-      });
-
-    const renderTodosFarmer =
-      currentTodosFarmer &&
-      currentTodosFarmer.map((todo, i) => {
-        return (
-          <tr key={i}>
-            <th scope="row">{todo.farmer_id}</th>
-            {todo.farmer_name !== '' && (
-              <td style={{ width: '10%', textAlign: 'left' }}>
-                <Link to={`/showTransaction/farmer/${todo.farmer_id}`}>
-                  {
-                    <Label
-                      style={{
-                        fontWeight: 'bold',
-                        cursor: 'pointer',
-                        textDecoration: 'underline',
-                        color: '#009688',
-                      }}
-                    >
-                      {todo.farmer_name}
-                    </Label>
-                  }
-                </Link>
-              </td>
-            )}
-            <td>{todo.phone_number}</td>
-            {todo.phone_verify === 1 && (
-              <td>
-                <Badge color="success">Sudah Terverifikasi</Badge>
-              </td>
-            )}
-            {todo.phone_verify === 0 && (
-              <td>
-                <Badge color="danger">Belum Terverifikasi</Badge>
-              </td>
-            )}
-          </tr>
-        );
-      });
-
-    const renderTodosUpja =
-      currentTodosUpja &&
-      currentTodosUpja.map((todo, i) => {
+    const renderTransaction =
+      TransactionTodos &&
+      TransactionTodos.map((todo, i) => {
         return (
           <tr key={i}>
             <th scope="row">{todo.upja_id}</th>
@@ -1058,6 +911,44 @@ class showTransaction extends React.Component {
         );
       });
 
+    const renderTransactionAll =
+      TransactionAllTodos &&
+      TransactionAllTodos.map((todo, i) => {
+        return (
+          <tr key={i}>
+            <td>{todo.city}</td>
+            <td>{todo.district}</td>
+            <td>{todo.village}</td>
+            <td>{todo.leader_name}</td>
+            <td>{todo.upja_name}</td>
+            <td>{todo.email}</td>
+            <td>{todo.class}</td>
+            <td>{todo.legality}</td>
+            <td>{todo.total_transaction}</td>
+          </tr>
+        );
+      });
+
+    const renderProvinsi =
+      provinsiTodos &&
+      provinsiTodos.map((todo, i) => {
+        return (
+          <tr key={i}>
+            <td>{todo.name}</td>
+            <td style={{ textAlign: 'right' }}>
+              <Button
+                color="primary"
+                style={{ margin: '0px', fontSize: '15px' }}
+                value={todo.id}
+                onClick={this.setProvinsi}
+              >
+                Pilih
+              </Button>
+            </td>
+          </tr>
+        );
+      });
+
     return (
       <Page
         title="Alsintanlink Admin"
@@ -1079,7 +970,12 @@ class showTransaction extends React.Component {
                 style={{ paddingBottom: 0 }}
               >
                 <Col
-                  style={{ paddingRight: 0, paddingBottom: 0, marginBottom: 0 }}
+                  style={{
+                    paddingRight: 0,
+                    paddingBottom: 0,
+                    marginBottom: 0,
+                    paddingLeft: 0,
+                  }}
                 >
                   <InputGroup style={{ float: 'right' }}>
                     <Input
@@ -1093,32 +989,35 @@ class showTransaction extends React.Component {
                       <Button onClick={() => this.setModalProvinsi()}>
                         <MdList />
                       </Button>
+                      <Button
+                        color="primary"
+                        style={{ float: 'right' }}
+                        onClick={() => this.findData()}
+                        disabled={!isSearch}
+                        id="buttonSearch"
+                      >
+                        <MdSearch />
+                      </Button>
                     </InputGroupAddon>
                   </InputGroup>
                 </Col>
                 <Col style={{ paddingRight: 0, float: 'right' }}>
-                  {/* <ButtonGroup style={{ float: 'right' }}> */}
-                  <Button
-                    color="danger"
-                    style={{
-                      float: 'right',
-                      width: '120px',
-                      marginLeft: '1%',
-                    }}
-                    onClick={() => window.history.back()}
-                  >
-                    Kembali
-                  </Button>
-                  <Button
-                    style={{ float: 'right' }}
-                    onClick={() => this.findData()}
-                    disabled={!isSearch}
-                    id="buttonSearch"
-                  >
-                    <MdSearch />
-                    Cari
-                  </Button>
-                  {/* </ButtonGroup> */}
+                  <ButtonGroup style={{ float: 'right' }}>
+                    <Button
+                      color="warning"
+                      onClick={() => this.findData()}
+                      disabled={!isSearch}
+                      id="buttonSearch"
+                    >
+                      <MdAddAlert />
+                    </Button>
+                    <Button
+                      color="danger"
+                      onClick={() => window.history.back()}
+                    >
+                      Kembali
+                    </Button>
+                  </ButtonGroup>
                 </Col>
               </CardHeader>
 
@@ -1153,175 +1052,62 @@ class showTransaction extends React.Component {
                 <Row style={{ paddingBottom: 0, marginBottom: 0 }}>
                   <Col>
                     <Row style={{ paddingBottom: 0, marginBottom: 0 }}>
-                      {(currentTodosFarmer.length !== 0 ||
-                        currentTodosUpja.length !== 0) && (
-                        <Col
-                          sm={2}
-                          style={{ paddingBottom: 0, marginBottom: 0 }}
-                        >
-                          <Label style={{ fontWeight: 'bold' }}>Type</Label>
-                        </Col>
-                      )}
-                      {(currentTodosFarmer.length !== 0 ||
-                        currentTodosUpja.length !== 0) && (
-                        <Col
-                          sm={10}
-                          style={{ paddingBottom: 0, marginBottom: 0 }}
-                        >
-                          :&nbsp;
-                          {this.state.namaTypeSave === undefined ? (
-                            <Label style={{ fontWeight: 'bold' }}>-</Label>
-                          ) : (
-                            <Label style={{ fontWeight: 'bold' }}>
-                              {this.state.namaTypeSave}
-                            </Label>
-                          )}
-                        </Col>
-                      )}
-                    </Row>
-
-                    <Row style={{ paddingBottom: 0, marginBottom: 0 }}>
-                      {(currentTodosFarmer.length !== 0 ||
-                        currentTodosUpja.length !== 0) && (
-                        <Col
-                          sm={2}
-                          style={{ paddingBottom: 0, marginBottom: 0 }}
-                        >
-                          <Label style={{ fontWeight: 'bold' }}>Alamat</Label>
-                        </Col>
-                      )}
-                      {(currentTodosFarmer.length !== 0 ||
-                        currentTodosUpja.length !== 0) && (
-                        <Col
-                          sm={10}
-                          style={{ paddingBottom: 0, marginBottom: 0 }}
-                        >
-                          :&nbsp;
-                          {this.state.namaProvinsiSave === undefined ? (
-                            <Label style={{ fontWeight: 'bold' }}>-</Label>
-                          ) : (
-                            <Label style={{ fontWeight: 'bold' }}>
-                              {this.state.namaProvinsiSave},&nbsp;
-                              {this.state.namaKotaKabSave},&nbsp;
-                              {this.state.namaKecamatanSave}
-                            </Label>
-                          )}
-                        </Col>
-                      )}
+                      <Col sm={2} style={{ paddingBottom: 0, marginBottom: 0 }}>
+                        <Label style={{ fontWeight: 'bold' }}>Provinsi: </Label>
+                      </Col>
+                      <Col
+                        sm={10}
+                        style={{ paddingBottom: 0, marginBottom: 0 }}
+                      >
+                        :&nbsp;
+                        {this.state.namaProvinsiSave === undefined ? (
+                          <Label style={{ fontWeight: 'bold' }}>-</Label>
+                        ) : (
+                          <Label style={{ fontWeight: 'bold' }}>
+                            {this.state.namaProvinsiSave}
+                          </Label>
+                        )}
+                      </Col>
                     </Row>
                   </Col>
-
-                  {/* <Col>
-                    <Row style={{ paddingBottom: 0, marginBottom: 0 }}>
-                      <Col sm={2} style={{ paddingBottom: 0, marginBottom: 0 }}>
-                        <Label style={{ fontWeight: 'bold' }}>Kota/Kab</Label>
-                      </Col>
-                      <Col
-                        sm={10}
-                        style={{ paddingBottom: 0, marginBottom: 0 }}
-                      >
-                        :&nbsp;
-                        {this.state.namaKotaKabSave === undefined ? (
-                          <Label style={{ fontWeight: 'bold' }}>-</Label>
-                        ) : (
-                          <Label style={{ fontWeight: 'bold' }}>
-                            {this.state.namaKotaKabSave}
-                          </Label>
-                        )}
-                      </Col>
-                    </Row>
-
-                    <Row style={{ paddingBottom: 0, marginBottom: 0 }}>
-                      <Col sm={2} style={{ paddingBottom: 0, marginBottom: 0 }}>
-                        <Label style={{ fontWeight: 'bold' }}>Kecamatan</Label>
-                      </Col>
-                      <Col
-                        sm={10}
-                        style={{ paddingBottom: 0, marginBottom: 0 }}
-                      >
-                        :&nbsp;
-                        {this.state.namaKecamatanSave === undefined ? (
-                          <Label style={{ fontWeight: 'bold' }}>-</Label>
-                        ) : (
-                          <Label style={{ fontWeight: 'bold' }}>
-                            {this.state.namaKecamatanSave}
-                          </Label>
-                        )}
-                      </Col>
-                    </Row>
-                  </Col> */}
                 </Row>
 
                 <Table responsive striped id="tableUtama">
-                  {currentTodosFarmer.length > currentTodosUpja.length && (
-                    <thead>
-                      <tr>
-                        <th>ID</th>
-                        <th>Nama Petani</th>
-                        <th>No. Telepon</th>
-                        <th>Status</th>
-                      </tr>
-                    </thead>
-                  )}
-                  {currentTodosFarmer.length < currentTodosUpja.length && (
-                    <thead>
-                      <tr>
-                        <th>ID</th>
-                        <th>Desa</th>
-                        <th>Kepala Desa</th>
-                        <th>UPJA</th>
-                        <th>Kelas</th>
-                      </tr>
-                    </thead>
-                  )}
-                  {currentTodosFarmer.length > currentTodosUpja.length && (
-                    <tbody>
-                      {currentTodosFarmer.length === 0 && loading === true ? (
-                        <LoadingSpinner status={4} />
-                      ) : loading === false &&
-                        currentTodosFarmer.length === 0 ? (
-                        (
-                          <tr>
-                            <td
-                              style={{ backgroundColor: 'white' }}
-                              colSpan="17"
-                              className="text-center"
-                            >
-                              TIDAK ADA DATA
-                            </td>
-                          </tr>
-                        ) || <LoadingSpinner status={4} />
-                      ) : loading === true &&
-                        currentTodosFarmer.length !== 0 ? (
-                        <LoadingSpinner status={4} />
-                      ) : (
-                        renderTodosFarmer
-                      )}
-                    </tbody>
-                  )}
-                  {currentTodosFarmer.length < currentTodosUpja.length && (
-                    <tbody>
-                      {currentTodosUpja.length === 0 && loading === true ? (
-                        <LoadingSpinner status={4} />
-                      ) : loading === false && currentTodosUpja.length === 0 ? (
-                        (
-                          <tr>
-                            <td
-                              style={{ backgroundColor: 'white' }}
-                              colSpan="17"
-                              className="text-center"
-                            >
-                              TIDAK ADA DATA
-                            </td>
-                          </tr>
-                        ) || <LoadingSpinner status={4} />
-                      ) : loading === true && currentTodosUpja.length !== 0 ? (
-                        <LoadingSpinner status={4} />
-                      ) : (
-                        renderTodosUpja
-                      )}
-                    </tbody>
-                  )}
+                  <thead>
+                    <tr>
+                      <th>Kota/Kab</th>
+                      <th>Kecamatan</th>
+                      <th>Desa</th>
+                      <th>Kepala UPJA</th>
+                      <th>UPJA</th>
+                      <th>E-Mail UPJA</th>
+                      <th>Kelas</th>
+                      <th>Badan Hukum</th>
+                      <th>Total Transaksi</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {TransactionAllTodos.length === 0 && loading === true ? (
+                      <LoadingSpinner status={4} />
+                    ) : loading === false &&
+                      TransactionAllTodos.length === 0 ? (
+                      (
+                        <tr>
+                          <td
+                            style={{ backgroundColor: 'white' }}
+                            colSpan="17"
+                            className="text-center"
+                          >
+                            TIDAK ADA DATA
+                          </td>
+                        </tr>
+                      ) || <LoadingSpinner status={4} />
+                    ) : loading === true && TransactionAllTodos.length !== 0 ? (
+                      <LoadingSpinner status={4} />
+                    ) : (
+                      renderTransactionAll
+                    )}
+                  </tbody>
                 </Table>
               </CardBody>
               {/* <CardBody>
@@ -1387,7 +1173,7 @@ class showTransaction extends React.Component {
           <ModalBody>
             <Table responsive striped>
               <tbody>
-                {renderType}
+                {/* {renderType} */}
                 {!typeTodos && (
                   <tr>
                     <td
@@ -1588,7 +1374,8 @@ class showTransaction extends React.Component {
                 ) : loadingPage === true && kotakabTodos.length !== 0 ? (
                   <LoadingSpinner status={4} />
                 ) : (
-                  renderKotakab
+                  // renderKotakab
+                  <Label>-</Label>
                 )}
               </tbody>
             </Table>
@@ -1626,7 +1413,8 @@ class showTransaction extends React.Component {
                 ) : loadingPage === true && kecamatanTodos.length !== 0 ? (
                   <LoadingSpinner status={4} />
                 ) : (
-                  renderKecamatan
+                  // renderKecamatan
+                  <Label>-</Label>
                 )}
               </tbody>
             </Table>
