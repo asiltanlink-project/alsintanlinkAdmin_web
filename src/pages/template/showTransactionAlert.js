@@ -347,17 +347,14 @@ class showTransaction extends React.Component {
       })
       .then(data => {
         var status = data.status;
-        var resultTransaction = data.result.transactions;
+        // var resultTransaction = data.result.transactions;
         var resultTransactionAll = data.result.transactions_all;
         var message = data.result.message;
         console.log('data jalan GetlistByPaging', data);
         if (status === 0) {
           this.showNotification(message, 'error');
         } else {
-          if (
-            resultTransaction.length === 0 ||
-            resultTransactionAll.length === 0
-          ) {
+          if (resultTransactionAll.length === 0) {
             this.showNotification(
               `${'Data UPJA '} ${this.state.namaProvinsiSave.toLowerCase()} ${', tidak ditemukan!'} `,
               'error',
@@ -369,7 +366,7 @@ class showTransaction extends React.Component {
           } else {
             this.showNotification('Data ditemukan!', 'info');
             this.setState({
-              resultTransaction: resultTransaction,
+              // resultTransaction: resultTransaction,
               resultTransactionAll: resultTransactionAll,
               loading: false,
             });
@@ -459,6 +456,7 @@ class showTransaction extends React.Component {
   // Send Alert
   sendAlert() {
     const urlA = myUrl.url_sendUpjaAlert;
+    var token = window.localStorage.getItem('tokenCookies');
     // console.log('jalan kecamatan', urlA);
     this.setState({ loadingPage: true });
     var payload = {};
@@ -467,7 +465,7 @@ class showTransaction extends React.Component {
       json: true,
       headers: {
         'Content-Type': 'application/json;charset=UTF-8',
-        Authorization: window.localStorage.getItem('tokenCookies'),
+        Authorization: `${'Bearer'} ${token}`,
       },
       body: JSON.stringify(payload),
     };
@@ -478,16 +476,17 @@ class showTransaction extends React.Component {
         }
       })
       .then(data => {
-        // console.log('data Kecamatan', data.result);
+        // console.log('data Alert', data);
         if (data.status === 0) {
-          this.showNotification('Data tidak ditemukan!', 'error');
+          this.showNotification(data.result.message, 'error');
           this.setState({
             loadingPage: false,
           });
         } else {
-          this.showNotification(data.result.message, 'error');
+          this.showNotification(data.result.message, 'info');
           this.setState({
             loadingPage: false,
+            modal_nested_parent_list: false
           });
         }
       })

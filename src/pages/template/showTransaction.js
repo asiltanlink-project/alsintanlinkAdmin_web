@@ -1031,8 +1031,6 @@ class showTransaction extends React.Component {
         return (
           <tr key={i}>
             <th scope="row">{todo.upja_id}</th>
-            <td>{todo.village}</td>
-            <td>{todo.leader_name}</td>
             {todo.upja_name !== '' && (
               <td style={{ width: '10%', textAlign: 'left' }}>
                 <Link to={`/showTransaction/upja/${todo.upja_id}`}>
@@ -1051,6 +1049,9 @@ class showTransaction extends React.Component {
                 </Link>
               </td>
             )}
+            <td>{todo.village}</td>
+            <td>{todo.leader_name}</td>
+
             {(todo.class === 'Pemula' || todo.class === '1') && (
               <td>
                 <Badge color="success">Pemula </Badge>
@@ -1361,9 +1362,9 @@ class showTransaction extends React.Component {
                     <thead>
                       <tr>
                         <th>ID</th>
-                        <th>Desa</th>
-                        <th>Kepala Desa</th>
                         <th>UPJA</th>
+                        <th>Desa</th>
+                        <th>Kepala UPJA</th>
                         <th>Kelas</th>
                       </tr>
                     </thead>
