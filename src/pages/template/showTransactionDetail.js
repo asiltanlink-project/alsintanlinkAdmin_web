@@ -964,9 +964,7 @@ class showTransactionDetail extends React.Component {
             )}
             <td>{todo.order_time}</td>
             <td>{todo.delivery_time}</td>
-            <td>
-              <Badge color="success">{todo.status}</Badge>
-            </td>
+            <td>{todo.status}</td>
           </tr>
         );
       });
@@ -1018,9 +1016,7 @@ class showTransactionDetail extends React.Component {
             )}
             <td>{todo.order_time}</td>
             <td>{todo.delivery_time}</td>
-            <td>
-              <Badge color="success">{todo.status}</Badge>
-            </td>
+            <td>{todo.status}</td>
           </tr>
         );
       });
@@ -1030,6 +1026,7 @@ class showTransactionDetail extends React.Component {
       currentTodosTransaction.map((todo, i) => {
         return (
           <tr key={i}>
+            {/* {console.log("TOTAL ALSIN", todo)} */}
             {todo.alsin_type_name !== '' && (
               <td style={{ textAlign: 'left' }}>
                 {
@@ -1062,7 +1059,7 @@ class showTransactionDetail extends React.Component {
                 }
               </td>
             )}
-            <td>{todo.total_alsin}</td>
+            <td>{todo.alsin_item_total}</td>
           </tr>
         );
       });
@@ -1099,15 +1096,7 @@ class showTransactionDetail extends React.Component {
               </td>
             )}
             <td>{todo.cost}</td>
-            <td>
-              <Label
-                style={{
-                  fontWeight: 'bold',
-                }}
-              >
-                <Badge color="success">{todo.status}</Badge>
-              </Label>
-            </td>
+            <td>{todo.status}</td>
           </tr>
         );
       });
@@ -1164,15 +1153,7 @@ class showTransactionDetail extends React.Component {
                 }
               </td>
             )}
-            <td>
-              <Label
-                style={{
-                  fontWeight: 'bold',
-                }}
-              >
-                <Badge color="success">{todo.status}</Badge>
-              </Label>
-            </td>
+            <td>{todo.status}</td>
           </tr>
         );
       });
@@ -1188,9 +1169,7 @@ class showTransactionDetail extends React.Component {
             <td>{formatter.format(todo.total_cost)}</td>
             <td>{todo.order_time}</td>
             <td>{todo.delivery_time}</td>
-            <td>
-              <Badge color="success">{todo.status}</Badge>
-            </td>
+            <td>{todo.status}</td>
           </tr>
         );
       });
