@@ -56,6 +56,7 @@ class showTransactionDetail extends React.Component {
       resultTransactionAlsin: [],
       resultTransaction: [],
       resultTransactionAlsinItem: [],
+      resultOtherService: [],
       currentPage: 1,
       currentPages: 1,
       realCurrentPage: 1,
@@ -516,10 +517,11 @@ class showTransactionDetail extends React.Component {
         }
       })
       .then(data => {
-        // console.log('DATA TRANSAKSI', data);
+        console.log('DATA TRANSAKSI', data.result.other_service);
         var status = data.status;
         var resultTransaction = data.result.transaction;
         var resultTransactionAlsin = data.result.alsins;
+        var resultOtherService = data.result.other_service;
         var message = data.result.message;
         // console.log('data jalan GetlistByPaging upja', data);
         if (status === 0) {
@@ -529,13 +531,21 @@ class showTransactionDetail extends React.Component {
           });
         } else {
           this.showNotification('Data ditemukan!', 'info');
+          console.log('DATA TRANSAKSI 2', resultOtherService.reparations);
           this.setState(
             {
               resultTransaction: [resultTransaction],
               resultTransactionAlsin: resultTransactionAlsin,
+              resultReparation: resultOtherService.reparations,
+              resultRiceSeeds: resultOtherService.rice_seeds,
+              resultRices: resultOtherService.rices,
+              resultRMUS: resultOtherService.rmus,
+              resultSparePart: resultOtherService.spare_parts,
+              resultTrainings: resultOtherService.trainings,
+
               loadingPageTransaction: false,
             },
-            // () => console.log('DATA TRANSAKSI', data),
+            // () => console.log('DATA TRANSAKSI', this.state.resultReparation),
           );
         }
       })
@@ -599,7 +609,7 @@ class showTransactionDetail extends React.Component {
         }
       })
       .then(data => {
-        // console.log('DATA TRANSAKSI ALSIN ITEM', data);
+        console.log('DATA TRANSAKSI ALSIN ITEM', data);
         var status = data.status;
         var resultTransactionAlsinItem = data.result.alsin_items;
         var message = data.result.message;
@@ -1027,6 +1037,52 @@ class showTransactionDetail extends React.Component {
         return (
           <tr key={i}>
             {/* {console.log("TOTAL ALSIN", todo)} */}
+            {todo.alsin_type_name !== '' && (
+              <td style={{ textAlign: 'left' }}>
+                {
+                  <Label
+                    style={{
+                      fontWeight: 'bold',
+                      cursor: 'pointer',
+                      textDecoration: 'underline',
+                      color: '#009688',
+                    }}
+                    onClick={() =>
+                      this.setModalDetailTransaksiAlsin({ ...todo })
+                    }
+                  >
+                    {todo.alsin_type_name}
+                  </Label>
+                }
+              </td>
+            )}
+            {todo.alsin_type_name === '' && (
+              <td style={{ textAlign: 'left' }}>
+                {
+                  <Label
+                    style={{
+                      fontWeight: 'bold',
+                    }}
+                  >
+                    -
+                  </Label>
+                }
+              </td>
+            )}
+            <td>{todo.alsin_item_total}</td>
+          </tr>
+        );
+      });
+
+    {
+      console.log('TOTAL REPARATION', this.state.resultReparation);
+    }
+    const renderTodosReparation =
+      this.state.resultReparation &&
+      this.state.resultReparation.map((todo, i) => {
+        return (
+          <tr key={i}>
+            {console.log('TOTAL REPARATION', todo)}
             {todo.alsin_type_name !== '' && (
               <td style={{ textAlign: 'left' }}>
                 {
@@ -1999,6 +2055,86 @@ class showTransactionDetail extends React.Component {
             List Transaksi
           </ModalHeader>
           <ModalBody>
+            <FormGroup>
+              <Form>
+                <Row>
+                  <Col>
+                    <Label>UPJA</Label>
+                    <Input
+                      disabled={true}
+                      placeholder="UPJA..."
+                      value={
+                        this.state.resultTransaction[0] &&
+                        this.state.resultTransaction[0].upja_name
+                      }
+                    ></Input>
+                  </Col>
+                  <Col>
+                    <Label>Status</Label>
+                    <Input
+                      disabled={true}
+                      placeholder="Status..."
+                      value={
+                        this.state.resultTransaction[0] &&
+                        this.state.resultTransaction[0].status
+                      }
+                    ></Input>
+                  </Col>
+                </Row>
+                <Row>
+                  <Col>
+                    <Label>Harga Transport</Label>
+                    <Input
+                      disabled={true}
+                      placeholder="Harga Transport..."
+                      value={
+                        this.state.resultTransaction[0] &&
+                        formatter.format(
+                          this.state.resultTransaction[0].transport_cost,
+                        )
+                      }
+                    ></Input>
+                  </Col>
+                  <Col>
+                    <Label>Total Harga</Label>
+                    <Input
+                      disabled={true}
+                      placeholder="Total Harga..."
+                      value={
+                        this.state.resultTransaction[0] &&
+                        formatter.format(
+                          this.state.resultTransaction[0].total_cost,
+                        )
+                      }
+                    ></Input>
+                  </Col>
+                </Row>
+                <Row>
+                  <Col>
+                    <Label>Waktu Order</Label>
+                    <Input
+                      disabled={true}
+                      placeholder="Waktu Order..."
+                      value={
+                        this.state.resultTransaction[0] &&
+                        this.state.resultTransaction[0].order_time
+                      }
+                    ></Input>
+                  </Col>
+                  <Col>
+                    <Label>Waktu Kirim</Label>
+                    <Input
+                      disabled={true}
+                      placeholder="Waktu Kirim..."
+                      value={
+                        this.state.resultTransaction[0] &&
+                        this.state.resultTransaction[0].delivery_time
+                      }
+                    ></Input>
+                  </Col>
+                </Row>
+              </Form>
+            </FormGroup>
             <Table responsive striped>
               <thead>
                 <tr>
@@ -2028,6 +2164,36 @@ class showTransactionDetail extends React.Component {
                   <LoadingSpinner status={4} />
                 ) : (
                   renderTodosTransaction
+                )}
+              </tbody>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Cost</th>
+                </tr>
+              </thead>
+              <tbody>
+                {currentTodosTransaction.length === 0 &&
+                loadingPageTransaction === true ? (
+                  <LoadingSpinner status={4} />
+                ) : loadingPageTransaction === false &&
+                  currentTodosTransaction.length === 0 ? (
+                  (
+                    <tr>
+                      <td
+                        style={{ backgroundColor: 'white' }}
+                        colSpan="17"
+                        className="text-center"
+                      >
+                        TIDAK ADA DATA
+                      </td>
+                    </tr>
+                  ) || <LoadingSpinner status={4} />
+                ) : loadingPageTransaction === true &&
+                  currentTodosTransaction.length !== 0 ? (
+                  <LoadingSpinner status={4} />
+                ) : (
+                  renderTodosReparation
                 )}
               </tbody>
             </Table>
