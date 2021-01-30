@@ -481,7 +481,7 @@ class showTransactionDetail extends React.Component {
       '?transaction_order_id=' +
       transaction_order_id;
     var token = window.localStorage.getItem('tokenCookies');
-    // console.log('URL GET LIST TRANSACTION', url);
+    console.log('URL GET LIST TRANSACTION', url);
 
     this.setState(
       { loadingPageTransaction: true },
@@ -517,13 +517,13 @@ class showTransactionDetail extends React.Component {
         }
       })
       .then(data => {
-        console.log('DATA TRANSAKSI', data.result.other_service);
+        console.log('DATA TRANSAKSI', data.result);
         var status = data.status;
         var resultTransaction = data.result.transaction;
         var resultTransactionAlsin = data.result.alsins;
-        var resultOtherService = data.result.other_service;
+        // var resultOtherService = data.result.other_service;
         var message = data.result.message;
-        // console.log('data jalan GetlistByPaging upja', data);
+        console.log('data jalan GetlistByPaging upja', data);
         if (status === 0) {
           this.showNotification(message, 'error');
           this.setState({
@@ -531,17 +531,16 @@ class showTransactionDetail extends React.Component {
           });
         } else {
           this.showNotification('Data ditemukan!', 'info');
-          console.log('DATA TRANSAKSI 2', resultOtherService.reparations);
           this.setState(
             {
               resultTransaction: [resultTransaction],
               resultTransactionAlsin: resultTransactionAlsin,
-              resultReparation: resultOtherService.reparations,
-              resultRiceSeeds: resultOtherService.rice_seeds,
-              resultRices: resultOtherService.rices,
-              resultRMUS: resultOtherService.rmus,
-              resultSparePart: resultOtherService.spare_parts,
-              resultTrainings: resultOtherService.trainings,
+              // resultReparation: resultOtherService.reparations,
+              // resultRiceSeeds: resultOtherService.rice_seeds,
+              // resultRices: resultOtherService.rices,
+              // resultRMUS: resultOtherService.rmus,
+              // resultSparePart: resultOtherService.spare_parts,
+              // resultTrainings: resultOtherService.trainings,
 
               loadingPageTransaction: false,
             },
@@ -550,7 +549,7 @@ class showTransactionDetail extends React.Component {
         }
       })
       .catch(err => {
-        // console.log('ERRORNYA', err);
+        console.log('ERRORNYA', err);
         this.showNotification('Error ke server!', 'error');
         this.setState({
           loadingPageTransaction: false,
@@ -559,21 +558,26 @@ class showTransactionDetail extends React.Component {
   }
 
   getDetailTransactionAlsin(currPage, currLimit) {
-    // console.log(
-    //   'this.state.detailTransactionAlsinItem',
-    //   this.state.detailTransactionAlsinItem,
-    // );
-    var transaction_order_id = this.state.detailTransaction
-      .transaction_order_id;
+    console.log(
+      'this.state.detailTransactionAlsinItem',
+      this.state.detailTransactionAlsinItem,
+      '2',
+      this.state.detailTransaction,
+    );
+    var transaction_order_type_id = this.state.detailTransactionAlsinItem
+      .transaction_order_type_id;
     var alsin_type_id = this.state.detailTransactionAlsinItem.alsin_type_id;
+    var alsin_other = this.state.detailTransactionAlsinItem.alsin_other;
     const url =
-      myUrl.url_getDetailTransactionAlsinItem +
-      '?transaction_order_id=' +
-      transaction_order_id +
+      myUrl.url_getDetailTransactionItem +
+      '?transaction_order_type_id=' +
+      transaction_order_type_id +
       '&alsin_type_id=' +
-      alsin_type_id;
+      alsin_type_id +
+      '&alsin_other=' +
+      alsin_other;
     var token = window.localStorage.getItem('tokenCookies');
-    // console.log('URL GET LIST TRANSACTION ALSIN ITEM', url);
+    console.log('URL GET LIST TRANSACTION ALSIN ITEM', url);
 
     this.setState(
       { loadingPageTransactionAlsinItem: true },
@@ -919,6 +923,10 @@ class showTransactionDetail extends React.Component {
     const currentTodosTransaction = this.state.resultTransactionAlsin;
     const currentTodosTransactionAlsinItem = this.state
       .resultTransactionAlsinItem;
+
+    {
+      console.log('ISINYAA', currentTodosTransactionAlsinItem);
+    }
     const provinsiTodos = this.state.resultProvinsi;
     const kotakabTodos = this.state.resultKotaKab;
     const kecamatanTodos = this.state.resultKecamatan;
@@ -935,7 +943,7 @@ class showTransactionDetail extends React.Component {
       currentTodosFarmerTransaction.map((todo, i) => {
         return (
           <tr key={i}>
-            {todo.upja_id !== '' && (
+            {/* {todo.upja_id !== '' && (
               <td style={{ textAlign: 'left' }}>
                 {
                   <Label
@@ -951,7 +959,8 @@ class showTransactionDetail extends React.Component {
                   </Label>
                 }
               </td>
-            )}
+            )} */}
+            <td>{todo.upja_id}</td>
             <td>{formatter.format(todo.transport_cost)}</td>
             <td>{formatter.format(todo.total_cost)}</td>
             {todo.upja_name !== '' && (
@@ -987,7 +996,7 @@ class showTransactionDetail extends React.Component {
       currentTodosUpjaTransaction.map((todo, i) => {
         return (
           <tr key={i}>
-            {todo.farmer_id !== '' && (
+            {/* {todo.farmer_id !== '' && (
               <td style={{ textAlign: 'left' }}>
                 {
                   <Label
@@ -1003,7 +1012,8 @@ class showTransactionDetail extends React.Component {
                   </Label>
                 }
               </td>
-            )}
+            )} */}
+            <td> {todo.farmer_id}</td>
             <td>{formatter.format(todo.transport_cost)}</td>
             <td>{formatter.format(todo.total_cost)}</td>
             {todo.farmer_name !== '' && (
@@ -1036,7 +1046,7 @@ class showTransactionDetail extends React.Component {
       currentTodosTransaction.map((todo, i) => {
         return (
           <tr key={i}>
-            {/* {console.log("TOTAL ALSIN", todo)} */}
+            {/* {console.log('TOTAL ALSIN', todo)} */}
             {todo.alsin_type_name !== '' && (
               <td style={{ textAlign: 'left' }}>
                 {
@@ -1069,7 +1079,7 @@ class showTransactionDetail extends React.Component {
                 }
               </td>
             )}
-            <td>{todo.alsin_item_total}</td>
+            {/* <td>{todo.alsin_item_total}</td> */}
           </tr>
         );
       });
@@ -1125,7 +1135,7 @@ class showTransactionDetail extends React.Component {
       currentTodosTransactionAlsinItem.map((todo, i) => {
         return (
           <tr key={i}>
-            {todo.vechile_code !== null && (
+            {/* {todo.vechile_code !== null && (
               <td style={{ textAlign: 'left' }}>
                 {
                   <Label
@@ -1150,9 +1160,24 @@ class showTransactionDetail extends React.Component {
                   </Label>
                 }
               </td>
-            )}
-            <td>{todo.cost}</td>
-            <td>{todo.status}</td>
+            )} */}
+            {todo.name !== '' && <td>{todo.nama}</td>}
+            {todo.total_member !== '' && <td>{todo.total_member}</td>}
+            {todo.land_area !== '' && <td>{todo.land_area} Hektar</td>}
+            {todo.packaging !== '' && <td>{todo.packaging} Kg</td>}
+            {todo.total_item !== '' && <td>{todo.total_item}</td>}
+            {todo.weight !== '' && <td>{todo.weight} Kg</td>}
+            {todo.cost !== '' && <td>{formatter.format(todo.cost)}</td>}
+
+            {<td>{todo.nama}</td>}
+            {<td>{todo.total_member}</td>}
+            {<td>{todo.land_area} Hektar</td>}
+            {<td>{todo.packaging} Kg</td>}
+            {<td>{todo.total_item}</td>}
+            {<td>{todo.weight} Kg</td>}
+            {<td>{formatter.format(todo.cost)}</td>}
+
+            {/* <td>{todo.status}</td> */}
           </tr>
         );
       });
@@ -2046,6 +2071,7 @@ class showTransactionDetail extends React.Component {
 
         {/* Modal Transaction */}
         <Modal
+          size="xl"
           onExit={this.handleCloseDomisili}
           isOpen={this.state.modal_nested_parent_list_transaksi}
           toggle={this.toggle('nested_parent_list_transaksi')}
@@ -2139,7 +2165,6 @@ class showTransactionDetail extends React.Component {
               <thead>
                 <tr>
                   <th>Alsin</th>
-                  <th>Total Alsin</th>
                 </tr>
               </thead>
               <tbody>
@@ -2166,7 +2191,7 @@ class showTransactionDetail extends React.Component {
                   renderTodosTransaction
                 )}
               </tbody>
-              <thead>
+              {/* <thead>
                 <tr>
                   <th>Name</th>
                   <th>Cost</th>
@@ -2195,7 +2220,7 @@ class showTransactionDetail extends React.Component {
                 ) : (
                   renderTodosReparation
                 )}
-              </tbody>
+              </tbody> */}
             </Table>
           </ModalBody>
         </Modal>
@@ -2217,9 +2242,44 @@ class showTransactionDetail extends React.Component {
             <Table responsive striped>
               <thead>
                 <tr>
-                  <th>No. Reg Alsin</th>
-                  <th>Harga</th>
-                  <th>Status</th>
+                  {/* {console.log(
+                    'currentTodosTransactionAlsinItem',
+                    currentTodosTransactionAlsinItem,
+                  )} */}
+                  {/* {currentTodosTransactionAlsinItem &&
+                    currentTodosTransactionAlsinItem !== undefined &&
+                    currentTodosTransactionAlsinItem &&
+                    currentTodosTransactionAlsinItem[0].name !== '' && (
+                      <th>Nama</th>
+                    )}
+                  {currentTodosTransactionAlsinItem &&
+                    currentTodosTransactionAlsinItem[0].total_member !== '' && (
+                      <th>Total Member</th>
+                    )}
+                  {currentTodosTransactionAlsinItem &&
+                    currentTodosTransactionAlsinItem[0].land_area !== '' && (
+                      <th>Luas Lahan</th>
+                    )}
+                  {currentTodosTransactionAlsinItem &&
+                    currentTodosTransactionAlsinItem[0].packaging !== '' && (
+                      <th>Packaging</th>
+                    )}
+                  {currentTodosTransactionAlsinItem &&
+                    currentTodosTransactionAlsinItem[0].total_item !== '' && (
+                      <th>Total Item</th>
+                    )}
+                  {currentTodosTransactionAlsinItem &&
+                    currentTodosTransactionAlsinItem[0].total_rice !== '' && (
+                      <th>Total Bibit</th>
+                    )}
+                  {currentTodosTransactionAlsinItem &&
+                    currentTodosTransactionAlsinItem[0].weight !== '' && (
+                      <th>Berat</th>
+                    )}
+                  {currentTodosTransactionAlsinItem &&
+                    currentTodosTransactionAlsinItem[0].cost !== '' && (
+                      <th>Harga</th>
+                    )} */}
                 </tr>
               </thead>
               <tbody>

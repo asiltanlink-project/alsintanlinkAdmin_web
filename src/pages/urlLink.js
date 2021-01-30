@@ -17,7 +17,7 @@ var url_getDetailAlsinItem =
   'https://alsintanlink.com/api/admin/show_detail_alsin_item';
 var url_getDetailTransaction =
   'https://alsintanlink.com/api/admin/show_detail_transaction';
-var url_getDetailTransactionAlsinItem =
+var url_getDetailTransactionItem =
   'https://alsintanlink.com/api/admin/show_detail_transaction_alsin';
 var url_getAllUpjaTransaction =
   'https://alsintanlink.com/api/admin/show_all_upja_traction';
@@ -33,7 +33,7 @@ export {
   url_getDetailAlsin,
   url_getDetailAlsinItem,
   url_getDetailTransaction,
-  url_getDetailTransactionAlsinItem,
+  url_getDetailTransactionItem,
   url_getProvince,
   url_getCity,
   url_getDistrict,
