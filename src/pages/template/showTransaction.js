@@ -159,14 +159,24 @@ class showTransaction extends React.Component {
   };
 
   saveDomisili() {
-    this.setState({
-      pilihProvinsi: this.state.pilihProvinsi,
-      pilihKotaKab: this.state.pilihKotaKab,
-      pilihKecamatan: this.state.pilihKecamatan,
-      domisiliDisabled: true,
-      typeDisabled: true,
-      modal_nested_parent_list_domisili: false,
-    });
+    this.setState(
+      {
+        pilihProvinsi: this.state.pilihProvinsi,
+        pilihKotaKab: this.state.pilihKotaKab,
+        pilihKecamatan: this.state.pilihKecamatan,
+        domisiliDisabled: true,
+        typeDisabled: true,
+        modal_nested_parent_list_domisili: false,
+      },
+      () => {
+        window.localStorage.setItem('kecamatanID', this.state.pilihKecamatan);
+        window.localStorage.setItem('type', this.state.pilihType);
+        window.localStorage.setItem('namaProvinsi', this.state.namaProvinsi);
+        window.localStorage.setItem('namaKotaKab', this.state.namaKotaKab);
+        window.localStorage.setItem('namaKecamatan', this.state.namaKecamatan);
+        window.localStorage.setItem('namaType', this.state.namaType);
+      },
+    );
   }
 
   getListbyPaging(currPage, currLimit) {
@@ -238,6 +248,7 @@ class showTransaction extends React.Component {
     const url = myUrl.url_getAllData + 'show_farmer?district_id=' + kecamatanID;
     var token = window.localStorage.getItem('tokenCookies');
     // console.log('URL GET LIST', url);
+    console.log('MASUK FARMER');
 
     this.setState({ loading: true });
     // console.log("offset", offset, "currLimit", currLimit);
@@ -314,6 +325,7 @@ class showTransaction extends React.Component {
     const url = myUrl.url_getAllData + 'show_upja?district_id=' + kecamatanID;
     var token = window.localStorage.getItem('tokenCookies');
     // console.log('URL GET LIST', url);
+    console.log('MASUK UPJA');
 
     this.setState({ loading: true });
     // console.log("offset", offset, "currLimit", currLimit);
@@ -493,6 +505,35 @@ class showTransaction extends React.Component {
     var token = window.localStorage.getItem('tokenCookies');
     if (token === '' || token === null || token === undefined) {
       window.location.replace('/login');
+    }
+    var type = window.localStorage.getItem('type');
+    var kecamatanID = window.localStorage.getItem('kecamatanID');
+    var namaProvinsi = window.localStorage.getItem('namaProvinsi');
+    var namaKotaKab = window.localStorage.getItem('namaKotaKab');
+    var namaKecamatan = window.localStorage.getItem('namaKecamatan');
+    // console.log(
+    //   'TYPE?',
+    //   type,
+    //   'KecamatanID?',
+    //   kecamatanID,
+    //   'namaProvinsi',
+    //   namaProvinsi,
+    //   'namaKota',
+    //   namaKotaKab,
+    //   'namaKecamtan',
+    //   namaKecamatan,
+    // );
+    if (type !== '' && kecamatanID !== '') {
+      this.setState(
+        {
+          pilihKecamatan: kecamatanID,
+          pilihType: type,
+          namaProvinsiSave: namaProvinsi,
+          namaKotaKabSave: namaKotaKab,
+          namaKecamatanSave: namaKecamatan,
+        },
+        () => this.findData(),
+      );
     }
     this.getProvinsi(this.state.currentPages, this.state.todosPerPages);
   }
@@ -731,6 +772,7 @@ class showTransaction extends React.Component {
     // console.log('KLIK FIND DATA');
     var buttonSearch = document.getElementById('buttonSearch');
     buttonSearch.disabled = true;
+
     this.setState(
       {
         namaProvinsiSave: this.state.namaProvinsi,
@@ -1264,11 +1306,13 @@ class showTransaction extends React.Component {
                           style={{ paddingBottom: 0, marginBottom: 0 }}
                         >
                           :&nbsp;
-                          {this.state.namaTypeSave === undefined ? (
+                          {this.state.namaTypeSave === undefined &&
+                          window.localStorage.getItem('type') === undefined ? (
                             <Label style={{ fontWeight: 'bold' }}>-</Label>
                           ) : (
                             <Label style={{ fontWeight: 'bold' }}>
-                              {this.state.namaTypeSave}
+                              {this.state.namaTypeSave ||
+                                window.localStorage.getItem('namaType')}
                             </Label>
                           )}
                         </Col>
@@ -1285,20 +1329,27 @@ class showTransaction extends React.Component {
                           <Label style={{ fontWeight: 'bold' }}>Alamat</Label>
                         </Col>
                       )}
-                      {(currentTodosFarmer.length !== 0 ||
-                        currentTodosUpja.length !== 0) && (
+                      {(currentTodosUpja.length !== 0 ||
+                        currentTodosFarmer.length !== 0) && (
                         <Col
                           sm={10}
                           style={{ paddingBottom: 0, marginBottom: 0 }}
                         >
                           :&nbsp;
-                          {this.state.namaProvinsiSave === undefined ? (
+                          {this.state.namaProvinsiSave === undefined &&
+                          window.localStorage.getItem('namaProvinsi') ===
+                            undefined ? (
                             <Label style={{ fontWeight: 'bold' }}>-</Label>
                           ) : (
                             <Label style={{ fontWeight: 'bold' }}>
-                              {this.state.namaProvinsiSave},&nbsp;
-                              {this.state.namaKotaKabSave},&nbsp;
-                              {this.state.namaKecamatanSave}
+                              {this.state.namaProvinsiSave ||
+                                window.localStorage.getItem('namaProvinsi')}
+                              ,&nbsp;
+                              {this.state.namaKotaKabSave ||
+                                window.localStorage.getItem('namaKotaKab')}
+                              ,&nbsp;
+                              {this.state.namaKecamatanSave ||
+                                window.localStorage.getItem('namaKecamatan')}
                             </Label>
                           )}
                         </Col>

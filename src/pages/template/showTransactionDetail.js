@@ -943,7 +943,7 @@ class showTransactionDetail extends React.Component {
       currentTodosFarmerTransaction.map((todo, i) => {
         return (
           <tr key={i}>
-            {/* {todo.upja_id !== '' && (
+            {todo.upja_id !== '' && (
               <td style={{ textAlign: 'left' }}>
                 {
                   <Label
@@ -959,7 +959,7 @@ class showTransactionDetail extends React.Component {
                   </Label>
                 }
               </td>
-            )} */}
+            )}
             <td>{todo.upja_id}</td>
             <td>{formatter.format(todo.transport_cost)}</td>
             <td>{formatter.format(todo.total_cost)}</td>
@@ -996,7 +996,7 @@ class showTransactionDetail extends React.Component {
       currentTodosUpjaTransaction.map((todo, i) => {
         return (
           <tr key={i}>
-            {/* {todo.farmer_id !== '' && (
+            {todo.farmer_id !== '' && (
               <td style={{ textAlign: 'left' }}>
                 {
                   <Label
@@ -1012,8 +1012,8 @@ class showTransactionDetail extends React.Component {
                   </Label>
                 }
               </td>
-            )} */}
-            <td> {todo.farmer_id}</td>
+            )}
+            {/* <td> {todo.farmer_id}</td> */}
             <td>{formatter.format(todo.transport_cost)}</td>
             <td>{formatter.format(todo.total_cost)}</td>
             {todo.farmer_name !== '' && (
@@ -1046,7 +1046,7 @@ class showTransactionDetail extends React.Component {
       currentTodosTransaction.map((todo, i) => {
         return (
           <tr key={i}>
-            {/* {console.log('TOTAL ALSIN', todo)} */}
+            {console.log('TOTAL ALSIN', todo)}
             {todo.alsin_type_name !== '' && (
               <td style={{ textAlign: 'left' }}>
                 {
@@ -1187,7 +1187,7 @@ class showTransactionDetail extends React.Component {
       currentTodosUpjaAlsin.map((todo, i) => {
         return (
           <tr key={i}>
-            {todo.alsin_type_name !== '' && (
+            {/* {todo.alsin_type_name !== '' && (
               <td style={{ textAlign: 'left' }}>
                 {
                   <Label
@@ -1203,11 +1203,12 @@ class showTransactionDetail extends React.Component {
                   </Label>
                 }
               </td>
-            )}
-            <td>{formatter.format(todo.cost)}</td>
+            )} */}
+            <td> {todo.alsin_type_name}</td>
+            {/* <td>{formatter.format(todo.cost)}</td>
             <td>{todo.available}</td>
             <td>{todo.not_available}</td>
-            <td>{todo.total_item}</td>
+            <td>{todo.total_item}</td> */}
           </tr>
         );
       });
@@ -1518,11 +1519,12 @@ class showTransactionDetail extends React.Component {
                         style={{
                           float: 'right',
                           color: 'white',
-                          width: '120px',
+                          width: '150px',
                         }}
                         onClick={this.toggle('nested_parent_list')}
                       >
-                        Detail Alsin
+                        {/* Detail Alsin */}
+                        Service/Alsin
                       </Button>
                     )}
                   </Col>
@@ -1625,24 +1627,27 @@ class showTransactionDetail extends React.Component {
         {/* KHUSUS MODAL */}
         {/* Modal Detail Alsin */}
         <Modal
-          size="xl"
+          // size="xl"
+          size="sm"
           onExit={this.handleClose}
           isOpen={this.state.modal_nested_parent_list}
           toggle={this.toggle('nested_parent_list')}
           className={this.props.className}
         >
           <ModalHeader toggle={this.toggle('nested_parent_list')}>
-            Detail Alsin List
+            {/* Detail Alsin List */}
+            Other Service/Alsin List
           </ModalHeader>
           <ModalBody>
             <Table responsive striped>
               <thead>
                 <tr>
-                  <th>Alsin</th>
-                  <th>Harga</th>
+                  {/* <th>Alsin</th> */}
+                  <th>Other Service/Alsin</th>
+                  {/* <th>Harga</th>
                   <th>Tersedia</th>
-                  <th>Tidak Tersedia</th>
-                  <th>Total Item</th>
+                  <th>Sedang Digunakan</th>
+                  <th>Total Item</th> */}
                 </tr>
               </thead>
               <tbody>
@@ -1830,7 +1835,7 @@ class showTransactionDetail extends React.Component {
                   <Row>
                     <Col sm={4}>
                       <Label style={{ marginTop: '8px', fontWeight: 'bold' }}>
-                        Tidak Tersedia
+                        Sedang Digunakan
                       </Label>
                     </Col>
                     <Col sm={8}>
