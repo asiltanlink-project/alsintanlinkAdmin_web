@@ -418,7 +418,7 @@ class showTransaction extends React.Component {
     var keyword = this.state.keywordList;
     var pilihStatus = this.state.pilihStatus;
     const urlA = myUrl.url_showAllTransaction + '?status=' + pilihStatus;
-    // console.log('jalan', urlA);
+    console.log('jalan', urlA);
     var token = window.localStorage.getItem('tokenCookies');
     this.setState({ loadingPage: true });
     const option = {
@@ -436,12 +436,12 @@ class showTransaction extends React.Component {
         }
       })
       .then(data => {
-        console.log('data transaksi', data.result.transactions.transactions);
+        console.log('data transaksi', data);
         if (data.status === 0) {
           this.showNotification('Data tidak ditemukan!', 'error');
         } else {
           this.setState({
-            resultTransactionStatus: data.result.transactions.transactions,
+            resultTransactionStatus: data.result.transactions,
             // maxPages: data.metadata.pages ? data.metadata.pages : 1,
             loading: false,
             loadingPage: false,

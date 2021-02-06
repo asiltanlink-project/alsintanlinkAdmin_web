@@ -49,6 +49,7 @@ class showTransactionDetail extends React.Component {
       resultFarmerTransaction: [],
       resultUpjaTransaction: [],
       resultUpjaAlsin: [],
+      resultUpjaOtherService: [],
       resultAlsin: [],
       resultAlsinItem: [],
       resultDetailAlsinItem: [],
@@ -57,6 +58,9 @@ class showTransactionDetail extends React.Component {
       resultTransaction: [],
       resultTransactionAlsinItem: [],
       resultOtherService: [],
+      resultAlsinItemOtherService: [],
+      resultTransactionAlsinOtherService: [],
+      resultTransactionAlsinItemOtherService: [],
       currentPage: 1,
       currentPages: 1,
       realCurrentPage: 1,
@@ -297,7 +301,7 @@ class showTransactionDetail extends React.Component {
         }
       })
       .then(data => {
-        // console.log('DATA UPJA', data);
+        console.log('DATA UPJA', data);
         var status = data.status;
         var resultUpja = data.result.upja;
         var resultTransaction = data.result.transactions;
@@ -314,6 +318,7 @@ class showTransactionDetail extends React.Component {
             resultUpja: [resultUpja],
             resultUpjaTransaction: resultTransaction,
             resultUpjaAlsin: resultAlsin,
+            resultUpjaOtherService: data.result.other_service,
             loadingPage: false,
           });
         }
@@ -390,6 +395,86 @@ class showTransactionDetail extends React.Component {
           this.setState({
             resultAlsin: [resultAlsin],
             resultAlsinItem: resultAlsinItem,
+            loadingPageAlsin: false,
+          });
+        }
+      })
+      .catch(err => {
+        // console.log('ERRORNYA', err);
+        this.showNotification('Error ke server!', 'error');
+        this.setState({
+          loadingPageAlsin: false,
+        });
+      });
+  }
+
+  getDetailOtherService(currPage, currLimit) {
+    var upja_id = this.state.upja_id;
+    // console.log('UPJA ID', upja_id);
+    var alsin_type_id = this.state.detailAlsin.alsin_type_id;
+    const url =
+      myUrl.url_getDetailAlsin +
+      '?upja_id=' +
+      upja_id +
+      '&alsin_type_id=' +
+      alsin_type_id;
+    var token = window.localStorage.getItem('tokenCookies');
+    console.log('URL GET LIST OTHER SERVICE', url);
+
+    this.setState(
+      { loadingPageAlsin: true },
+      this.toggle('nested_parent_detail_otherService'),
+    );
+    // this.setState(
+    //   { loadingPageAlsin: true },
+    //   this.toggle('nested_parent_detail_alsin'),
+    // );
+    // console.log("offset", offset, "currLimit", currLimit);
+
+    const option = {
+      method: 'GET',
+      json: true,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+        Authorization: `${'Bearer'} ${token}`,
+      },
+    };
+    // console.log('option', option);
+    fetch(url, option)
+      .then(response => {
+        // trace.stop();
+        if (response.ok) {
+          return response.json();
+        } else {
+          if (response.status === 401) {
+            this.showNotification('Username/Password salah!', 'error');
+          } else if (response.status === 500) {
+            this.showNotification('Internal Server Error', 'error');
+          } else {
+            this.showNotification('Response ke server gagal!', 'error');
+          }
+          this.setState({
+            loadingPageAlsin: false,
+          });
+        }
+      })
+      .then(data => {
+        console.log('DATA OTHER SERVICE', data);
+        var status = data.status;
+        var resultAlsinItem = data.result.alsin_items;
+        var resultAlsin = data.result.alsin;
+        var message = data.result.message;
+        // console.log('data jalan GetlistByPaging upja', data);
+        if (status === 0) {
+          this.showNotification(message, 'error');
+          this.setState({
+            loadingPageAlsin: false,
+          });
+        } else {
+          this.showNotification('Data ditemukan!', 'info');
+          this.setState({
+            resultAlsin: [resultAlsin],
+            resultAlsinItemOtherService: resultAlsinItem,
             loadingPageAlsin: false,
           });
         }
@@ -521,6 +606,7 @@ class showTransactionDetail extends React.Component {
         var status = data.status;
         var resultTransaction = data.result.transaction;
         var resultTransactionAlsin = data.result.alsins;
+        var resultTransactionAlsinOtherService = data.result.other_service;
         // var resultOtherService = data.result.other_service;
         var message = data.result.message;
         console.log('data jalan GetlistByPaging upja', data);
@@ -535,6 +621,7 @@ class showTransactionDetail extends React.Component {
             {
               resultTransaction: [resultTransaction],
               resultTransactionAlsin: resultTransactionAlsin,
+              resultTransactionAlsinOtherService: resultTransactionAlsinOtherService,
               // resultReparation: resultOtherService.reparations,
               // resultRiceSeeds: resultOtherService.rice_seeds,
               // resultRices: resultOtherService.rices,
@@ -628,6 +715,92 @@ class showTransactionDetail extends React.Component {
           this.setState(
             {
               resultTransactionAlsinItem: resultTransactionAlsinItem,
+              loadingPageTransactionAlsinItem: false,
+            },
+            // () => console.log('DATA TRANSAKSI', data),
+          );
+        }
+      })
+      .catch(err => {
+        // console.log('ERRORNYA', err);
+        this.showNotification('Error ke server!', 'error');
+        this.setState({
+          loadingPageTransactionAlsinItem: false,
+        });
+      });
+  }
+
+  getDetailTransactionAlsinOtherService(currPage, currLimit) {
+    console.log(
+      'this.state.detailTransactionAlsinItem',
+      this.state.detailTransactionAlsinItem,
+      '2',
+      this.state.detailTransaction,
+    );
+    var transaction_order_type_id = this.state.detailTransactionAlsinItem
+      .transaction_order_type_id;
+    var alsin_type_id = this.state.detailTransactionAlsinItem.alsin_type_id;
+    var alsin_other = this.state.detailTransactionAlsinItem.alsin_other;
+    const url =
+      myUrl.url_getDetailTransactionItem +
+      '?transaction_order_type_id=' +
+      transaction_order_type_id +
+      '&alsin_type_id=' +
+      alsin_type_id +
+      '&alsin_other=' +
+      alsin_other;
+    var token = window.localStorage.getItem('tokenCookies');
+    console.log('URL GET LIST TRANSACTION ALSIN ITEM', url);
+
+    this.setState(
+      { loadingPageTransactionAlsinItem: true },
+      this.toggle('nested_parent_list_transaksi_alsinItemOtherService'),
+    );
+    // console.log("offset", offset, "currLimit", currLimit);
+
+    const option = {
+      method: 'GET',
+      json: true,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+        Authorization: `${'Bearer'} ${token}`,
+      },
+    };
+    // console.log('option', option);
+    fetch(url, option)
+      .then(response => {
+        // trace.stop();
+        if (response.ok) {
+          return response.json();
+        } else {
+          if (response.status === 401) {
+            this.showNotification('Username/Password salah!', 'error');
+          } else if (response.status === 500) {
+            this.showNotification('Internal Server Error', 'error');
+          } else {
+            this.showNotification('Response ke server gagal!', 'error');
+          }
+          this.setState({
+            loadingPageTransactionAlsinItem: false,
+          });
+        }
+      })
+      .then(data => {
+        console.log('DATA TRANSAKSI ALSIN ITEM', data);
+        var status = data.status;
+        var resultTransactionAlsinItem = data.result.alsin_items;
+        var message = data.result.message;
+        // console.log('data jalan GetlistByPaging upja', data);
+        if (status === 0) {
+          this.showNotification(message, 'error');
+          this.setState({
+            loadingPageTransactionAlsinItem: false,
+          });
+        } else {
+          this.showNotification('Data ditemukan!', 'info');
+          this.setState(
+            {
+              resultTransactionAlsinItemOtherService: resultTransactionAlsinItem,
               loadingPageTransactionAlsinItem: false,
             },
             // () => console.log('DATA TRANSAKSI', data),
@@ -827,6 +1000,16 @@ class showTransactionDetail extends React.Component {
     );
   }
 
+  setModalDetailOtherService(todo) {
+    this.setState(
+      {
+        detailAlsin: todo,
+        // namaEcommerce: '',
+      },
+      () => this.getDetailOtherService(),
+    );
+  }
+
   setModalDetailAlsinItem(todo) {
     this.setState(
       {
@@ -853,6 +1036,16 @@ class showTransactionDetail extends React.Component {
         // namaEcommerce: '',
       },
       () => this.getDetailTransactionAlsin(),
+    );
+  }
+
+  setModalDetailTransaksiAlsinOtherService(todo) {
+    this.setState(
+      {
+        detailTransactionAlsinItem: todo,
+        // namaEcommerce: '',
+      },
+      () => this.getDetailTransactionAlsinOtherService(),
     );
   }
 
@@ -917,16 +1110,20 @@ class showTransactionDetail extends React.Component {
     const currentTodosFarmerTransaction = this.state.resultFarmerTransaction;
     const currentTodosUpjaTransaction = this.state.resultUpjaTransaction;
     const currentTodosUpjaAlsin = this.state.resultUpjaAlsin;
+    const currentTodosUpjaOtherService = this.state.resultUpjaOtherService;
     const currentTodosAlsinItem = this.state.resultAlsinItem;
+    const currentTodosAlsinItemOtherService = this.state
+      .resultAlsinItemOtherService;
     const currentTodosDetailAlsinItem = this.state
       .resultDetailTransactionAlsinItem;
     const currentTodosTransaction = this.state.resultTransactionAlsin;
+    const currentTodosTransactionOtherService = this.state
+      .resultTransactionAlsinOtherService;
     const currentTodosTransactionAlsinItem = this.state
       .resultTransactionAlsinItem;
+    const currentTodosTransactionAlsinItemOtherService = this.state
+      .resultTransactionAlsinItemOtherService;
 
-    {
-      console.log('ISINYAA', currentTodosTransactionAlsinItem);
-    }
     const provinsiTodos = this.state.resultProvinsi;
     const kotakabTodos = this.state.resultKotaKab;
     const kecamatanTodos = this.state.resultKecamatan;
@@ -960,7 +1157,7 @@ class showTransactionDetail extends React.Component {
                 }
               </td>
             )}
-            <td>{todo.upja_id}</td>
+            {/* <td>{todo.upja_id}</td> */}
             <td>{formatter.format(todo.transport_cost)}</td>
             <td>{formatter.format(todo.total_cost)}</td>
             {todo.upja_name !== '' && (
@@ -996,6 +1193,7 @@ class showTransactionDetail extends React.Component {
       currentTodosUpjaTransaction.map((todo, i) => {
         return (
           <tr key={i}>
+            {/* {console.log("TODOS TRANSAKSI",todo)} */}
             {todo.farmer_id !== '' && (
               <td style={{ textAlign: 'left' }}>
                 {
@@ -1087,13 +1285,16 @@ class showTransactionDetail extends React.Component {
     {
       console.log('TOTAL REPARATION', this.state.resultReparation);
     }
-    const renderTodosReparation =
-      this.state.resultReparation &&
-      this.state.resultReparation.map((todo, i) => {
+    const renderTodosTransactionOtherService =
+      this.state.resultTransactionAlsinOtherService &&
+      this.state.resultTransactionAlsinOtherService.map((todo, i) => {
         return (
           <tr key={i}>
             {console.log('TOTAL REPARATION', todo)}
-            {todo.alsin_type_name !== '' && (
+            {(todo.alsin_type_id === 8 || todo.alsin_type_id === 10) && (
+              <td>{todo.alsin_type_name}</td>
+            )}
+            {todo.alsin_type_id !== 8 && todo.alsin_type_id !== 10 && (
               <td style={{ textAlign: 'left' }}>
                 {
                   <Label
@@ -1104,7 +1305,7 @@ class showTransactionDetail extends React.Component {
                       color: '#009688',
                     }}
                     onClick={() =>
-                      this.setModalDetailTransaksiAlsin({ ...todo })
+                      this.setModalDetailTransaksiAlsinOtherService({ ...todo })
                     }
                   >
                     {todo.alsin_type_name}
@@ -1135,47 +1336,23 @@ class showTransactionDetail extends React.Component {
       currentTodosTransactionAlsinItem.map((todo, i) => {
         return (
           <tr key={i}>
-            {/* {todo.vechile_code !== null && (
-              <td style={{ textAlign: 'left' }}>
-                {
-                  <Label
-                    style={{
-                      fontWeight: 'bold',
-                    }}
-                  >
-                    {todo.vechile_code}
-                  </Label>
-                }
-              </td>
-            )}
-            {todo.vechile_code === null && (
-              <td style={{ textAlign: 'left' }}>
-                {
-                  <Label
-                    style={{
-                      fontWeight: 'bold',
-                    }}
-                  >
-                    -
-                  </Label>
-                }
-              </td>
-            )} */}
-            {todo.name !== '' && <td>{todo.nama}</td>}
-            {todo.total_member !== '' && <td>{todo.total_member}</td>}
-            {todo.land_area !== '' && <td>{todo.land_area} Hektar</td>}
-            {todo.packaging !== '' && <td>{todo.packaging} Kg</td>}
-            {todo.total_item !== '' && <td>{todo.total_item}</td>}
-            {todo.weight !== '' && <td>{todo.weight} Kg</td>}
-            {todo.cost !== '' && <td>{formatter.format(todo.cost)}</td>}
+            {<td>{todo.vechile_code}</td>}
+            {<td>{todo.description}</td>}
+            {<td>{todo.status} </td>}
 
-            {<td>{todo.nama}</td>}
-            {<td>{todo.total_member}</td>}
-            {<td>{todo.land_area} Hektar</td>}
-            {<td>{todo.packaging} Kg</td>}
-            {<td>{todo.total_item}</td>}
-            {<td>{todo.weight} Kg</td>}
-            {<td>{formatter.format(todo.cost)}</td>}
+            {/* <td>{todo.status}</td> */}
+          </tr>
+        );
+      });
+
+    const renderTodosTransactionAlsinItemOtherService =
+      currentTodosTransactionAlsinItemOtherService &&
+      currentTodosTransactionAlsinItemOtherService.map((todo, i) => {
+        return (
+          <tr key={i}>
+            {todo.alsin_type_id !== 8 && todo.alsin_type_id !== 10 && (
+              <td>{todo.name}</td>
+            )}
 
             {/* <td>{todo.status}</td> */}
           </tr>
@@ -1187,7 +1364,8 @@ class showTransactionDetail extends React.Component {
       currentTodosUpjaAlsin.map((todo, i) => {
         return (
           <tr key={i}>
-            {/* {todo.alsin_type_name !== '' && (
+            {/* {console.log("TODO",todo)} */}
+            {todo.alsin_type_name !== '' && (
               <td style={{ textAlign: 'left' }}>
                 {
                   <Label
@@ -1203,11 +1381,48 @@ class showTransactionDetail extends React.Component {
                   </Label>
                 }
               </td>
-            )} */}
-            <td> {todo.alsin_type_name}</td>
-            {/* <td>{formatter.format(todo.cost)}</td>
+            )}
+            {/* <td> {todo.alsin_type_name}</td> */}
+            {/* <td>{formatter.format(todo.cost)}</td> */}
             <td>{todo.available}</td>
             <td>{todo.not_available}</td>
+            <td>{todo.rusak}</td>
+            <td>{todo.total_item}</td>
+          </tr>
+        );
+      });
+
+    const renderTodosUpjaOtherService =
+      currentTodosUpjaOtherService &&
+      currentTodosUpjaOtherService.map((todo, i) => {
+        return (
+          <tr key={i}>
+            {/* {console.log("TODO",todo)} */}
+            {(todo.alsin_type_id === 8 || todo.alsin_type_id === 10) && (
+              <td style={{ textAlign: 'left' }}>{todo.alsin_type_name}</td>
+            )}
+            {todo.alsin_type_id !== 8 && todo.alsin_type_id !== 10 && (
+              <td style={{ textAlign: 'left' }}>
+                {
+                  <Label
+                    style={{
+                      fontWeight: 'bold',
+                      cursor: 'pointer',
+                      textDecoration: 'underline',
+                      color: '#009688',
+                    }}
+                    onClick={() => this.setModalDetailOtherService({ ...todo })}
+                  >
+                    {todo.alsin_type_name}
+                  </Label>
+                }
+              </td>
+            )}
+            {/* <td> {todo.alsin_type_name}</td> */}
+            {/* <td>{formatter.format(todo.cost)}</td> */}
+            {/* <td>{todo.available}</td>
+            <td>{todo.not_available}</td>
+            <td>{todo.rusak}</td>
             <td>{todo.total_item}</td> */}
           </tr>
         );
@@ -1218,24 +1433,53 @@ class showTransactionDetail extends React.Component {
       currentTodosAlsinItem.map((todo, i) => {
         return (
           <tr key={i}>
-            {todo.vechile_code !== '' && (
-              <td style={{ textAlign: 'left' }}>
-                {
-                  <Label
-                    style={{
-                      fontWeight: 'bold',
-                      cursor: 'pointer',
-                      textDecoration: 'underline',
-                      color: '#009688',
-                    }}
-                    onClick={() => this.setModalDetailAlsinItem({ ...todo })}
-                  >
-                    {todo.vechile_code}
-                  </Label>
-                }
-              </td>
-            )}
+            {console.log('TODO DETAIL', todo)}
+            <td style={{ textAlign: 'left' }}>
+              {
+                <Label
+                  style={{
+                    fontWeight: 'bold',
+                    cursor: 'pointer',
+                    textDecoration: 'underline',
+                    color: '#009688',
+                  }}
+                  onClick={() => this.setModalDetailAlsinItem({ ...todo })}
+                >
+                  {todo.alsin_item_id}
+                </Label>
+              }
+            </td>
+            <td>{todo.vechile_code}</td>
+            <td>{todo.description}</td>
             <td>{todo.status}</td>
+          </tr>
+        );
+      });
+
+    const renderTodosAlsinItemOtherService =
+      currentTodosAlsinItemOtherService &&
+      currentTodosAlsinItemOtherService.map((todo, i) => {
+        return (
+          <tr key={i}>
+            {console.log('TODO DETAIL', todo)}
+            {/* <td style={{ textAlign: 'left' }}>
+              {
+                <Label
+                  style={{
+                    fontWeight: 'bold',
+                    cursor: 'pointer',
+                    textDecoration: 'underline',
+                    color: '#009688',
+                  }}
+                  onClick={() => this.setModalDetailAlsinItem({ ...todo })}
+                >
+                  {todo.alsin_item_id}
+                </Label>
+              }
+            </td> */}
+            <td>{todo.name}</td>
+            {/* <td>{todo.description}</td>
+              <td>{todo.status}</td> */}
           </tr>
         );
       });
@@ -1466,6 +1710,9 @@ class showTransactionDetail extends React.Component {
                               ,&nbsp;
                               {currentTodosFarmer[0] &&
                                 currentTodosFarmer[0].district}
+                              ,&nbsp;
+                              {currentTodosFarmer[0] &&
+                                currentTodosFarmer[0].village}
                             </Label>
                           )}
                         </Col>
@@ -1514,18 +1761,35 @@ class showTransactionDetail extends React.Component {
                     </Button>
 
                     {window.location.pathname.includes('upja') && (
-                      <Button
-                        color="orange"
-                        style={{
-                          float: 'right',
-                          color: 'white',
-                          width: '150px',
-                        }}
-                        onClick={this.toggle('nested_parent_list')}
-                      >
-                        {/* Detail Alsin */}
-                        Service/Alsin
-                      </Button>
+                      <div>
+                        <Button
+                          color="orange"
+                          style={{
+                            float: 'right',
+                            color: 'white',
+                            width: '120px',
+                            marginLeft: '1%',
+                          }}
+                          onClick={this.toggle('nested_parent_list')}
+                        >
+                          {/* Detail Alsin */}
+                          Alsin
+                        </Button>
+                        <Button
+                          color="info"
+                          style={{
+                            float: 'right',
+                            color: 'white',
+                            width: '120px',
+                          }}
+                          onClick={this.toggle(
+                            'nested_parent_list_OtherService',
+                          )}
+                        >
+                          {/* Detail Alsin */}
+                          Service
+                        </Button>
+                      </div>
                     )}
                   </Col>
                 </Row>
@@ -1627,8 +1891,8 @@ class showTransactionDetail extends React.Component {
         {/* KHUSUS MODAL */}
         {/* Modal Detail Alsin */}
         <Modal
-          // size="xl"
-          size="sm"
+          size="xl"
+          // size="sm"
           onExit={this.handleClose}
           isOpen={this.state.modal_nested_parent_list}
           toggle={this.toggle('nested_parent_list')}
@@ -1636,18 +1900,19 @@ class showTransactionDetail extends React.Component {
         >
           <ModalHeader toggle={this.toggle('nested_parent_list')}>
             {/* Detail Alsin List */}
-            Other Service/Alsin List
+            Alsin List
           </ModalHeader>
           <ModalBody>
             <Table responsive striped>
               <thead>
                 <tr>
                   {/* <th>Alsin</th> */}
-                  <th>Other Service/Alsin</th>
-                  {/* <th>Harga</th>
+                  <th>Alsin</th>
+                  {/* <th>Harga</th> */}
                   <th>Tersedia</th>
                   <th>Sedang Digunakan</th>
-                  <th>Total Item</th> */}
+                  <th>Rusak</th>
+                  <th>Total Item</th>
                 </tr>
               </thead>
               <tbody>
@@ -1677,6 +1942,61 @@ class showTransactionDetail extends React.Component {
           </ModalBody>
         </Modal>
         {/* Modal Detail Alsin */}
+
+        {/* Modal Detail Suku Cadang */}
+        <Modal
+          size="xl"
+          // size="sm"
+          onExit={this.handleClose}
+          isOpen={this.state.modal_nested_parent_list_OtherService}
+          toggle={this.toggle('nested_parent_list_OtherService')}
+          className={this.props.className}
+        >
+          <ModalHeader toggle={this.toggle('nested_parent_list_OtherService')}>
+            {/* Detail Alsin List */}
+            List Service Lainnya
+          </ModalHeader>
+          <ModalBody>
+            <Table responsive striped>
+              <thead>
+                <tr>
+                  {/* <th>Alsin</th> */}
+                  <th>Service Lainnya</th>
+                  {/* <th>Harga</th> */}
+                  {/* <th>Tersedia</th>
+                  <th>Sedang Digunakan</th>
+                  <th>Rusak</th>
+                  <th>Total Item</th> */}
+                </tr>
+              </thead>
+              <tbody>
+                {currentTodosUpjaOtherService.length === 0 &&
+                loadingPage === true ? (
+                  <LoadingSpinner status={4} />
+                ) : loadingPage === false &&
+                  currentTodosUpjaOtherService.length === 0 ? (
+                  (
+                    <tr>
+                      <td
+                        style={{ backgroundColor: 'white' }}
+                        colSpan="17"
+                        className="text-center"
+                      >
+                        TIDAK ADA DATA
+                      </td>
+                    </tr>
+                  ) || <LoadingSpinner status={4} />
+                ) : loadingPage === true &&
+                  currentTodosUpjaOtherService.length !== 0 ? (
+                  <LoadingSpinner status={4} />
+                ) : (
+                  renderTodosUpjaOtherService
+                )}
+              </tbody>
+            </Table>
+          </ModalBody>
+        </Modal>
+        {/* Modal Detail Suku Cadang */}
 
         {/* Modal Detail Alsin List */}
         <Modal
@@ -1750,7 +2070,7 @@ class showTransactionDetail extends React.Component {
                   <Row>
                     <Col sm={4}>
                       <Label style={{ marginTop: '8px', fontWeight: 'bold' }}>
-                        Harga
+                        Rusak
                       </Label>
                     </Col>
                     <Col sm={8}>
@@ -1770,7 +2090,7 @@ class showTransactionDetail extends React.Component {
                             :&nbsp;
                             {formatter.format(
                               this.state.resultAlsin[0] &&
-                                this.state.resultAlsin[0].cost,
+                                this.state.resultAlsin[0].rusak,
                             )}
                           </Label>
                         )}
@@ -1867,8 +2187,9 @@ class showTransactionDetail extends React.Component {
             <Table responsive striped>
               <thead>
                 <tr>
-                  {/* <th>Alsin ID</th> */}
+                  <th>ID</th>
                   <th>No. Reg Alsin</th>
+                  <th>Deskripsi</th>
                   <th>Status</th>
                 </tr>
               </thead>
@@ -1900,6 +2221,55 @@ class showTransactionDetail extends React.Component {
           </ModalFooter>
         </Modal>
         {/* Modal Detail Alsin List */}
+
+        {/* Modal Detail Other Service List */}
+        <Modal
+          size="sm"
+          onExit={this.handleCloseDomisili}
+          isOpen={this.state.modal_nested_parent_detail_otherService}
+          toggle={this.toggle('nested_parent_detail_otherService')}
+          className={this.props.className}
+        >
+          <ModalHeader
+            toggle={this.toggle('nested_parent_detail_otherService')}
+          >
+            Detail Servis Lainnya
+          </ModalHeader>
+          <ModalFooter>
+            <Table responsive striped>
+              <thead>
+                <tr>
+                  <th>Nama</th>
+                </tr>
+              </thead>
+              <tbody>
+                {currentTodosAlsinItemOtherService.length === 0 &&
+                loadingPageAlsin === true ? (
+                  <LoadingSpinner status={4} />
+                ) : loadingPageAlsin === false &&
+                  currentTodosAlsinItemOtherService.length === 0 ? (
+                  (
+                    <tr>
+                      <td
+                        style={{ backgroundColor: 'white' }}
+                        colSpan="17"
+                        className="text-center"
+                      >
+                        TIDAK ADA DATA
+                      </td>
+                    </tr>
+                  ) || <LoadingSpinner status={4} />
+                ) : loadingPageAlsin === true &&
+                  currentTodosAlsinItemOtherService.length !== 0 ? (
+                  <LoadingSpinner status={4} />
+                ) : (
+                  renderTodosAlsinItemOtherService
+                )}
+              </tbody>
+            </Table>
+          </ModalFooter>
+        </Modal>
+        {/* Modal Detail Other Service List */}
 
         {/* Modal Detail Alsin Item List */}
         <Modal
@@ -1967,6 +2337,33 @@ class showTransactionDetail extends React.Component {
                             {this.state.resultDetailAlsinItem[0] &&
                               this.state.resultDetailAlsinItem[0]
                                 .alsin_type_name}
+                          </Label>
+                        )}
+                    </Col>
+                  </Row>
+                  <Row>
+                    <Col sm={4}>
+                      <Label style={{ marginTop: '8px', fontWeight: 'bold' }}>
+                        Deskripsi
+                      </Label>
+                    </Col>
+                    <Col sm={8}>
+                      {this.state.resultDetailAlsinItem &&
+                        this.state.resultDetailAlsinItem.length === 0 && (
+                          <Label
+                            style={{ marginTop: '8px', fontWeight: 'bold' }}
+                          >
+                            :&nbsp; -
+                          </Label>
+                        )}
+                      {this.state.resultDetailAlsinItem &&
+                        this.state.resultDetailAlsinItem.length !== 0 && (
+                          <Label
+                            style={{ marginTop: '8px', fontWeight: 'bold' }}
+                          >
+                            :&nbsp;
+                            {this.state.resultDetailAlsinItem[0] &&
+                              this.state.resultDetailAlsinItem[0].description}
                           </Label>
                         )}
                     </Col>
@@ -2086,7 +2483,7 @@ class showTransactionDetail extends React.Component {
             List Transaksi
           </ModalHeader>
           <ModalBody>
-            <FormGroup>
+            {/* <FormGroup>
               <Form>
                 <Row>
                   <Col>
@@ -2165,7 +2562,7 @@ class showTransactionDetail extends React.Component {
                   </Col>
                 </Row>
               </Form>
-            </FormGroup>
+            </FormGroup> */}
             <Table responsive striped>
               <thead>
                 <tr>
@@ -2196,18 +2593,19 @@ class showTransactionDetail extends React.Component {
                   renderTodosTransaction
                 )}
               </tbody>
-              {/* <thead>
+            </Table>
+            <Table responsive striped>
+              <thead>
                 <tr>
-                  <th>Name</th>
-                  <th>Cost</th>
+                  <th>Service Lainnya</th>
                 </tr>
               </thead>
               <tbody>
-                {currentTodosTransaction.length === 0 &&
+                {currentTodosTransactionOtherService.length === 0 &&
                 loadingPageTransaction === true ? (
                   <LoadingSpinner status={4} />
                 ) : loadingPageTransaction === false &&
-                  currentTodosTransaction.length === 0 ? (
+                  currentTodosTransactionOtherService.length === 0 ? (
                   (
                     <tr>
                       <td
@@ -2220,12 +2618,12 @@ class showTransactionDetail extends React.Component {
                     </tr>
                   ) || <LoadingSpinner status={4} />
                 ) : loadingPageTransaction === true &&
-                  currentTodosTransaction.length !== 0 ? (
+                  currentTodosTransactionOtherService.length !== 0 ? (
                   <LoadingSpinner status={4} />
                 ) : (
-                  renderTodosReparation
+                  renderTodosTransactionOtherService
                 )}
-              </tbody> */}
+              </tbody>
             </Table>
           </ModalBody>
         </Modal>
@@ -2247,44 +2645,9 @@ class showTransactionDetail extends React.Component {
             <Table responsive striped>
               <thead>
                 <tr>
-                  {/* {console.log(
-                    'currentTodosTransactionAlsinItem',
-                    currentTodosTransactionAlsinItem,
-                  )} */}
-                  {/* {currentTodosTransactionAlsinItem &&
-                    currentTodosTransactionAlsinItem !== undefined &&
-                    currentTodosTransactionAlsinItem &&
-                    currentTodosTransactionAlsinItem[0].name !== '' && (
-                      <th>Nama</th>
-                    )}
-                  {currentTodosTransactionAlsinItem &&
-                    currentTodosTransactionAlsinItem[0].total_member !== '' && (
-                      <th>Total Member</th>
-                    )}
-                  {currentTodosTransactionAlsinItem &&
-                    currentTodosTransactionAlsinItem[0].land_area !== '' && (
-                      <th>Luas Lahan</th>
-                    )}
-                  {currentTodosTransactionAlsinItem &&
-                    currentTodosTransactionAlsinItem[0].packaging !== '' && (
-                      <th>Packaging</th>
-                    )}
-                  {currentTodosTransactionAlsinItem &&
-                    currentTodosTransactionAlsinItem[0].total_item !== '' && (
-                      <th>Total Item</th>
-                    )}
-                  {currentTodosTransactionAlsinItem &&
-                    currentTodosTransactionAlsinItem[0].total_rice !== '' && (
-                      <th>Total Bibit</th>
-                    )}
-                  {currentTodosTransactionAlsinItem &&
-                    currentTodosTransactionAlsinItem[0].weight !== '' && (
-                      <th>Berat</th>
-                    )}
-                  {currentTodosTransactionAlsinItem &&
-                    currentTodosTransactionAlsinItem[0].cost !== '' && (
-                      <th>Harga</th>
-                    )} */}
+                  <th>Kode Kendaraan</th>
+                  <th>Deskripsi</th>
+                  <th>Status</th>
                 </tr>
               </thead>
               <tbody>
@@ -2315,6 +2678,60 @@ class showTransactionDetail extends React.Component {
           </ModalBody>
         </Modal>
         {/* Modal Transaction Alsin Item*/}
+
+        {/* Modal Transaction Alsin Item Other Service */}
+        <Modal
+          onExit={this.handleCloseDomisili}
+          isOpen={
+            this.state.modal_nested_parent_list_transaksi_alsinItemOtherService
+          }
+          toggle={this.toggle(
+            'nested_parent_list_transaksi_alsinItemOtherService',
+          )}
+          className={this.props.className}
+        >
+          <ModalHeader
+            toggle={this.toggle(
+              'nested_parent_list_transaksi_alsinItemOtherService',
+            )}
+          >
+            List Transaksi Item Service lainnya
+          </ModalHeader>
+          <ModalBody>
+            <Table responsive striped>
+              <thead>
+                <tr>
+                  <th>Nama</th>
+                </tr>
+              </thead>
+              <tbody>
+                {currentTodosTransactionAlsinItemOtherService.length === 0 &&
+                loadingPageTransactionAlsinItem === true ? (
+                  <LoadingSpinner status={4} />
+                ) : loadingPageTransactionAlsinItem === false &&
+                  currentTodosTransactionAlsinItemOtherService.length === 0 ? (
+                  (
+                    <tr>
+                      <td
+                        style={{ backgroundColor: 'white' }}
+                        colSpan="17"
+                        className="text-center"
+                      >
+                        TIDAK ADA DATA
+                      </td>
+                    </tr>
+                  ) || <LoadingSpinner status={4} />
+                ) : loadingPageTransactionAlsinItem === true &&
+                  currentTodosTransactionAlsinItemOtherService.length !== 0 ? (
+                  <LoadingSpinner status={4} />
+                ) : (
+                  renderTodosTransactionAlsinItemOtherService
+                )}
+              </tbody>
+            </Table>
+          </ModalBody>
+        </Modal>
+        {/* Modal Transaction Alsin Item Other Service*/}
 
         {/* Modal List Kecamatan */}
         <Modal

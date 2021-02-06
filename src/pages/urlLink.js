@@ -24,6 +24,7 @@ var url_getAllUpjaTransaction =
 var url_sendUpjaAlert = 'http://alsintanlink.com/api/admin/send_upja_alert';
 var url_showAllTransaction =
   'https://alsintanlink.com/api/admin/show_all_transaction';
+  var url_getVillage ="https://alsintanlink.com/api/location/village"
 
 export {
   url_login,
@@ -40,4 +41,5 @@ export {
   url_getAllUpjaTransaction,
   url_sendUpjaAlert,
   url_showAllTransaction,
+  url_getVillage
 };

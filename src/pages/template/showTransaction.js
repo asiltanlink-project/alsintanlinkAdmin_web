@@ -30,6 +30,7 @@ import {
   MdList,
   MdAdd,
   MdAddAlert,
+  MdFileUpload,
 } from 'react-icons/md';
 import { MdLoyalty, MdRefresh } from 'react-icons/md';
 import NotificationSystem from 'react-notification-system';
@@ -39,6 +40,7 @@ import * as firebase from 'firebase/app';
 import { Scrollbar } from 'react-scrollbars-custom';
 import LoadingSpinner from 'pages/LoadingSpinner.js';
 import { BrowserRouter as Router, Route, Link } from 'react-router-dom';
+import axios from 'axios';
 class showTransaction extends React.Component {
   constructor(props) {
     super(props);
@@ -66,11 +68,13 @@ class showTransaction extends React.Component {
       resultProvinsi: [],
       resultKotaKab: [],
       resultKecamatan: [],
+      resultDesa: [],
       loadingPage: false,
       pilihType: '',
       pilihProvinsi: '',
       pilihKotaKab: '',
       pilihKecamatan: '',
+      pilihDesa: '',
       lastID: 0,
       namaPeriode: '',
       ecommerceID: '',
@@ -83,6 +87,7 @@ class showTransaction extends React.Component {
       endDate: '',
       resetInfo: false,
       statusInfo: false,
+      excelInfo: false,
       alertInfo: false,
       resultType: [
         {
@@ -101,6 +106,8 @@ class showTransaction extends React.Component {
       ecommerceDetail: [],
       dynamicHeightEcommerce: '0px',
       dynamicHeightPelapak: '0px',
+
+      selectedFile: null,
     };
   }
 
@@ -164,17 +171,20 @@ class showTransaction extends React.Component {
         pilihProvinsi: this.state.pilihProvinsi,
         pilihKotaKab: this.state.pilihKotaKab,
         pilihKecamatan: this.state.pilihKecamatan,
+        pilihDesa: this.state.pilihDesa,
         domisiliDisabled: true,
         typeDisabled: true,
         modal_nested_parent_list_domisili: false,
       },
       () => {
         window.localStorage.setItem('kecamatanID', this.state.pilihKecamatan);
+        window.localStorage.setItem('desaID', this.state.pilihDesa);
         window.localStorage.setItem('type', this.state.pilihType);
         window.localStorage.setItem('namaProvinsi', this.state.namaProvinsi);
         window.localStorage.setItem('namaKotaKab', this.state.namaKotaKab);
         window.localStorage.setItem('namaKecamatan', this.state.namaKecamatan);
         window.localStorage.setItem('namaType', this.state.namaType);
+        window.localStorage.setItem('namaDesa', this.state.namaDesa);
       },
     );
   }
@@ -242,10 +252,87 @@ class showTransaction extends React.Component {
       });
   }
 
+  // upload Excel
+  uploadExcel(currPage, currLimit) {
+    var villageID = this.state.pilihDesa;
+    const url = myUrl.url_getAllData + 'show_farmer?village_id=' + villageID;
+    var token = window.localStorage.getItem('tokenCookies');
+    // console.log('URL GET LIST', url);
+    console.log('MASUK FARMER');
+
+    this.setState({ loading: true });
+
+    // console.log("offset", offset, "currLimit", currLimit);
+
+    const option = {
+      method: 'GET',
+      json: true,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+        Authorization: `${'Bearer'} ${token}`,
+      },
+    };
+    // console.log('option', option);
+    fetch(url, option)
+      .then(response => {
+        // trace.stop();
+        if (response.ok) {
+          return response.json();
+        } else {
+          if (response.status === 401) {
+            this.showNotification('Username/Password salah!', 'error');
+          } else if (response.status === 500) {
+            this.showNotification('Internal Server Error', 'error');
+          } else {
+            this.showNotification('Response ke server gagal!', 'error');
+          }
+          this.setState({
+            loading: false,
+          });
+        }
+      })
+      .then(data => {
+        var status = data.status;
+        var result = data.result.farmers;
+        var message = data.result.message;
+        // console.log('data jalan GetlistByPaging', data);
+        // console.log('message GetlistByPaging', message);
+        if (status === 0) {
+          this.showNotification(message, 'error');
+        } else {
+          if (result.length === 0) {
+            this.showNotification(
+              `${'Data'} ${
+                this.state.namaTypeSave
+              } ${', '} ${this.state.namaProvinsiSave.toLowerCase()} ${'-'} ${this.state.namaKotaKabSave.toLowerCase()} ${'-'} ${this.state.namaKecamatanSave.toLowerCase()} ${', tidak ditemukan!'} `,
+              'error',
+            );
+            this.setState({
+              // resultFarmer: [{}],
+              loading: false,
+            });
+          } else {
+            this.showNotification('Data ditemukan!', 'info');
+            this.setState({
+              resultFarmer: result,
+              loading: false,
+            });
+          }
+        }
+      })
+      .catch(err => {
+        // console.log('ERRORNYA', err);
+        this.showNotification('Error ke server!', 'error');
+        this.setState({
+          loading: false,
+        });
+      });
+  }
+
   // get data farmer
   getListbyPagingFarmer(currPage, currLimit) {
-    var kecamatanID = this.state.pilihKecamatan;
-    const url = myUrl.url_getAllData + 'show_farmer?district_id=' + kecamatanID;
+    var villageID = this.state.pilihDesa;
+    const url = myUrl.url_getAllData + 'show_farmer?village_id=' + villageID;
     var token = window.localStorage.getItem('tokenCookies');
     // console.log('URL GET LIST', url);
     console.log('MASUK FARMER');
@@ -321,8 +408,8 @@ class showTransaction extends React.Component {
   // get data Upja
   getListbyPagingUpja(currPage, currLimit) {
     // const trace = perf.trace('getBundling');
-    var kecamatanID = this.state.pilihKecamatan;
-    const url = myUrl.url_getAllData + 'show_upja?district_id=' + kecamatanID;
+    var villageID = this.state.pilihDesa;
+    const url = myUrl.url_getAllData + 'show_upja?village_id=' + villageID;
     var token = window.localStorage.getItem('tokenCookies');
     // console.log('URL GET LIST', url);
     console.log('MASUK UPJA');
@@ -501,6 +588,107 @@ class showTransaction extends React.Component {
       });
   }
 
+  // Get Desa
+  getDesa(currPage, currLimit) {
+    var offset = (currPage - 1) * currLimit;
+    var keyword = this.state.keywordList;
+    const urlA =
+      myUrl.url_getVillage + '?district_id=' + this.state.pilihKecamatan;
+    console.log('jalan Desa', urlA);
+    this.setState({ loadingPage: true });
+    const option = {
+      method: 'GET',
+      json: true,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+        Authorization: window.localStorage.getItem('tokenCookies'),
+      },
+    };
+    fetch(urlA, option)
+      .then(response => {
+        if (response.ok) {
+          return response.json();
+        }
+      })
+      .then(data => {
+        console.log('data desa', data.result);
+        if (data.status === 0) {
+          this.showNotification('Data tidak ditemukan!', 'error');
+        } else {
+          this.setState({
+            resultDesa: data.result.villages,
+            // maxPages: data.metadata.pages ? data.metadata.pages : 1,
+            loading: false,
+            loadingPage: false,
+          });
+        }
+      });
+  }
+
+  // On file select (from the pop up)
+  onFileChange = event => {
+    // Update the state
+    this.setState({ selectedFile: event.target.files[0] });
+  };
+
+  // On file upload (click the upload button)
+  onFileUpload = () => {
+    // Create an object of formData
+    const formData = new FormData();
+
+    // Update the formData object
+    formData.append(
+      'myFile',
+      this.state.selectedFile,
+      this.state.selectedFile.name,
+    );
+
+    // Details of the uploaded file
+    console.log("FILE YANG DIUPLOAD",this.state.selectedFile);
+    // console.log("FILE YANG DIUPLOAD Detail ",formData);
+
+    // Request made to the backend api
+    // Send formData object
+    axios.post('api/uploadfile', formData);
+  };
+
+  // File content to be displayed after
+  // file upload is complete
+  fileData = () => {
+    if (this.state.selectedFile) {
+      return (
+        <div>
+          <br></br>
+          <Label style={{ color: 'black', fontWeight: 'bold' }}>
+            Detail File
+          </Label>
+          <p>File Name: {this.state.selectedFile.name}</p>
+          <p>File Type: {this.state.selectedFile.type}</p>
+          {/* <p>
+            Last Modified:{' '}
+            {this.state.selectedFile.lastModifiedDate.toDateString()}
+          </p> */}
+        </div>
+      );
+    } else {
+      return (
+        <div>
+          <br />
+          <Label style={{ color: 'red', fontSize: '0.8em' }}>
+            *Pilih file Excel sebelum Upload!
+          </Label>
+        </div>
+      );
+    }
+  };
+
+  batalSimpanFile() {
+    this.setState(
+      { selectedFile: null },
+      this.toggle('nested_parent_list_uploadExcel'),
+    );
+  }
+
   componentDidMount() {
     var token = window.localStorage.getItem('tokenCookies');
     if (token === '' || token === null || token === undefined) {
@@ -511,6 +699,8 @@ class showTransaction extends React.Component {
     var namaProvinsi = window.localStorage.getItem('namaProvinsi');
     var namaKotaKab = window.localStorage.getItem('namaKotaKab');
     var namaKecamatan = window.localStorage.getItem('namaKecamatan');
+    var namaDesa = window.localStorage.getItem('namaDesa');
+    var desaID = window.localStorage.getItem('desaID');
     // console.log(
     //   'TYPE?',
     //   type,
@@ -523,14 +713,17 @@ class showTransaction extends React.Component {
     //   'namaKecamtan',
     //   namaKecamatan,
     // );
-    if (type !== '' && kecamatanID !== '') {
+    if (type !== '' && desaID !== '') {
+      console.log('MASUK');
       this.setState(
         {
           pilihKecamatan: kecamatanID,
+          pilihDesa: desaID,
           pilihType: type,
           namaProvinsiSave: namaProvinsi,
           namaKotaKabSave: namaKotaKab,
           namaKecamatanSave: namaKecamatan,
+          namaDesaSave: namaDesa,
         },
         () => this.findData(),
       );
@@ -592,10 +785,29 @@ class showTransaction extends React.Component {
         keywordList: '',
         domisiliDisabled: false,
       },
-      () => this.getProvinsi(this.state.currentPages, this.state.todosPerPages),
+      () => this.getDesa(this.state.currentPages, this.state.todosPerPages),
     );
   };
   // untuk pilih Kecamatan
+
+  // untuk pilih Desa
+  setDesa = event => {
+    var nama = this.state.resultDesa.find(function (element) {
+      return element.id === parseInt(event.target.value);
+    });
+
+    this.setState(
+      {
+        pilihDesa: event.target.value,
+        namaDesa: nama.name,
+        modal_nested_parent_list_desa: false,
+        keywordList: '',
+        domisiliDisabled: false,
+      },
+      () => this.getProvinsi(this.state.currentPages, this.state.todosPerPages),
+    );
+  };
+  // untuk pilih Desa
 
   // untuk pilih Type
   setType = event => {
@@ -886,6 +1098,20 @@ class showTransaction extends React.Component {
     );
   }
 
+  setModalDesa() {
+    var buttonSearch = document.getElementById('buttonSearch');
+    buttonSearch.disabled = false;
+    this.setState(
+      {
+        periodeDisabled: false,
+        typeDisabled: true,
+        domisiliDisabled: true,
+        // namaEcommerce: '',
+      },
+      this.toggle('nested_parent_list_desa'),
+    );
+  }
+
   firstPage() {
     this.setState(
       {
@@ -940,6 +1166,7 @@ class showTransaction extends React.Component {
     const provinsiTodos = this.state.resultProvinsi;
     const kotakabTodos = this.state.resultKotaKab;
     const kecamatanTodos = this.state.resultKecamatan;
+    const desaTodos = this.state.resultDesa;
     const typeTodos = this.state.resultType;
     const isEnabledSaveDomisili = this.canBeSubmittedDomisili();
     const isSearch = this.SearchAllList();
@@ -1020,6 +1247,26 @@ class showTransaction extends React.Component {
                 style={{ margin: '0px', fontSize: '15px' }}
                 value={todo.id}
                 onClick={this.setKecamatan}
+              >
+                Pilih
+              </Button>
+            </td>
+          </tr>
+        );
+      });
+
+    const renderDesa =
+      desaTodos &&
+      desaTodos.map((todo, i) => {
+        return (
+          <tr key={i}>
+            <td>{todo.name}</td>
+            <td style={{ textAlign: 'right' }}>
+              <Button
+                color="primary"
+                style={{ margin: '0px', fontSize: '15px' }}
+                value={todo.id}
+                onClick={this.setDesa}
               >
                 Pilih
               </Button>
@@ -1171,7 +1418,7 @@ class showTransaction extends React.Component {
                       value={
                         // this.state.namaProvinsi
                         // this.state.namaKotaKab
-                        this.state.namaKecamatan
+                        this.state.namaDesa
                       }
                       // onChange={event => this.setEcommerce(event)}
                     ></Input>
@@ -1207,6 +1454,24 @@ class showTransaction extends React.Component {
                     >
                       Halaman untuk melihat transaksi secara keseluruhan
                       berdasarkan Status
+                    </Tooltip>
+                    <Button
+                      id="excelInfo"
+                      color="primary"
+                      style={{ float: 'right' }}
+                      onClick={this.toggle('nested_parent_list_uploadExcel')}
+                    >
+                      <MdFileUpload />
+                    </Button>
+                    <Tooltip
+                      placement="bottom"
+                      isOpen={this.state.excelInfo}
+                      target="excelInfo"
+                      toggle={() =>
+                        this.setState({ excelInfo: !this.state.excelInfo })
+                      }
+                    >
+                      Halaman untuk mengupload Suku cadang dalam Bentuk Excel
                     </Tooltip>
                     <Button
                       id="alertInfo"
@@ -1350,6 +1615,9 @@ class showTransaction extends React.Component {
                               ,&nbsp;
                               {this.state.namaKecamatanSave ||
                                 window.localStorage.getItem('namaKecamatan')}
+                              ,&nbsp;
+                              {this.state.namaDesaSave ||
+                                window.localStorage.getItem('namaDesa')}
                             </Label>
                           )}
                         </Col>
@@ -1520,6 +1788,39 @@ class showTransaction extends React.Component {
         </Row>
 
         {/* KHUSUS MODAL */}
+        {/* Modal upload Excel */}
+        <Modal
+          onExit={this.handleClose}
+          isOpen={this.state.modal_nested_parent_list_uploadExcel}
+          toggle={this.toggle('nested_parent_list_uploadExcel')}
+          className={this.props.className}
+        >
+          <ModalHeader >
+            Upload Excel
+          </ModalHeader>
+          <ModalBody>
+            <FormGroup>
+              <div>
+                <div>
+                  <Input type="file" onChange={this.onFileChange} />
+                  {/* <Button onClick={this.onFileUpload}>Upload!</Button> */}
+                </div>
+                {this.fileData()}
+              </div>
+            </FormGroup>
+          </ModalBody>
+          <ModalFooter>
+            {/* <Button color="primary" onClick={() => this.uploadExcel()}>
+              Simpan Excel
+            </Button> */}
+            <Button color="primary" onClick={this.onFileUpload}>
+              Simpan Excel
+            </Button>
+            <Button onClick={() => this.batalSimpanFile()}>Batal</Button>
+          </ModalFooter>
+        </Modal>
+        {/* Modal Upload Excel */}
+
         {/* Modal List Type */}
         <Modal
           onExit={this.handleClose}
@@ -1563,8 +1864,8 @@ class showTransaction extends React.Component {
             <Row>
               <Col>
                 <Label style={{ fontSize: '0.6em' }}>
-                  *NB: Harap isi sesuai alur Provinsi - Kota/Kab - Kecamatan
-                  untuk mendapatkan Data
+                  *NB: Harap isi sesuai alur Provinsi - Kota/Kab - Kecamatan -
+                  Desa untuk mendapatkan Data
                 </Label>
               </Col>
             </Row>
@@ -1644,6 +1945,33 @@ class showTransaction extends React.Component {
                   />
                   <InputGroupAddon addonType="append">
                     <Button onClick={() => this.setModalKecamatan()}>
+                      <MdList />
+                    </Button>
+                  </InputGroupAddon>
+                </InputGroup>
+              </Col>
+            </Row>
+            <Row>
+              <Col sm={3}>
+                <Label
+                  style={{
+                    fontWeight: 'bold',
+                    marginTop: '8px',
+                  }}
+                >
+                  Desa:&nbsp;
+                </Label>
+              </Col>
+              <Col sm={9}>
+                <InputGroup style={{ float: 'right' }}>
+                  <Input
+                    disabled
+                    placeholder="Pilih Desa"
+                    style={{ fontWeight: 'bold' }}
+                    value={this.state.namaDesa}
+                  />
+                  <InputGroupAddon addonType="append">
+                    <Button onClick={() => this.setModalDesa()}>
                       <MdList />
                     </Button>
                   </InputGroupAddon>
@@ -1779,6 +2107,44 @@ class showTransaction extends React.Component {
           </ModalBody>
         </Modal>
         {/* Modal List Kecamatan */}
+
+        {/* Modal List Desa */}
+        <Modal
+          onExit={this.handleCloseDomisili}
+          isOpen={this.state.modal_nested_parent_list_desa}
+          toggle={this.toggle('nested_parent_list_desa')}
+          className={this.props.className}
+        >
+          <ModalHeader toggle={this.toggle('nested_parent_list_desa')}>
+            List Kecamatan
+          </ModalHeader>
+          <ModalBody>
+            <Table responsive striped>
+              <tbody>
+                {desaTodos.length === 0 && loadingPage === true ? (
+                  <LoadingSpinner status={4} />
+                ) : loadingPage === false && desaTodos.length === 0 ? (
+                  (
+                    <tr>
+                      <td
+                        style={{ backgroundColor: 'white' }}
+                        colSpan="17"
+                        className="text-center"
+                      >
+                        TIDAK ADA DATA
+                      </td>
+                    </tr>
+                  ) || <LoadingSpinner status={4} />
+                ) : loadingPage === true && desaTodos.length !== 0 ? (
+                  <LoadingSpinner status={4} />
+                ) : (
+                  renderDesa
+                )}
+              </tbody>
+            </Table>
+          </ModalBody>
+        </Modal>
+        {/* Modal List Desa */}
         {/* KHUSUS MODAL */}
       </Page>
     );
