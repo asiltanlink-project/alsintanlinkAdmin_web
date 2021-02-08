@@ -128,6 +128,13 @@ class showTransaction extends React.Component {
       ecommerceDetail: [],
       dynamicHeightEcommerce: '0px',
       dynamicHeightPelapak: '0px',
+
+
+      resultAlsinItemOtherService: [],
+      resultTransactionAlsinOtherService: [],
+      resultTransactionAlsinItemOtherService: [],
+      resultTransactionAlsin: [],
+      resultTransactionAlsinItem: [],
     };
   }
 
@@ -257,6 +264,294 @@ class showTransaction extends React.Component {
           loading: false,
         });
       });
+  }
+
+  getDetailTransaction(currPage, currLimit) {
+    var transaction_order_id = this.state.detailTransaction
+      .transaction_order_id;
+    const url =
+      myUrl.url_getDetailTransaction +
+      '?transaction_order_id=' +
+      transaction_order_id;
+    var token = window.localStorage.getItem('tokenCookies');
+    console.log('URL GET LIST TRANSACTION', url);
+
+    this.setState(
+      { loadingPageTransaction: true },
+      this.toggle('nested_parent_list_transaksi'),
+    );
+    // console.log("offset", offset, "currLimit", currLimit);
+
+    const option = {
+      method: 'GET',
+      json: true,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+        Authorization: `${'Bearer'} ${token}`,
+      },
+    };
+    // console.log('option', option);
+    fetch(url, option)
+      .then(response => {
+        // trace.stop();
+        if (response.ok) {
+          return response.json();
+        } else {
+          if (response.status === 401) {
+            this.showNotification('Username/Password salah!', 'error');
+          } else if (response.status === 500) {
+            this.showNotification('Internal Server Error', 'error');
+          } else {
+            this.showNotification('Response ke server gagal!', 'error');
+          }
+          this.setState({
+            loadingPageTransaction: false,
+          });
+        }
+      })
+      .then(data => {
+        console.log('DATA TRANSAKSI', data.result);
+        var status = data.status;
+        var resultTransaction = data.result.transaction;
+        var resultTransactionAlsin = data.result.alsins;
+        var resultTransactionAlsinOtherService = data.result.other_service;
+        // var resultOtherService = data.result.other_service;
+        var message = data.result.message;
+        console.log('data jalan GetlistByPaging upja', data);
+        if (status === 0) {
+          this.showNotification(message, 'error');
+          this.setState({
+            loadingPageTransaction: false,
+          });
+        } else {
+          this.showNotification('Data ditemukan!', 'info');
+          this.setState(
+            {
+              resultTransaction: [resultTransaction],
+              resultTransactionAlsin: resultTransactionAlsin,
+              resultTransactionAlsinOtherService: resultTransactionAlsinOtherService,
+              // resultReparation: resultOtherService.reparations,
+              // resultRiceSeeds: resultOtherService.rice_seeds,
+              // resultRices: resultOtherService.rices,
+              // resultRMUS: resultOtherService.rmus,
+              // resultSparePart: resultOtherService.spare_parts,
+              // resultTrainings: resultOtherService.trainings,
+
+              loadingPageTransaction: false,
+            },
+            // () => console.log('DATA TRANSAKSI', this.state.resultReparation),
+          );
+        }
+      })
+      .catch(err => {
+        console.log('ERRORNYA', err);
+        this.showNotification('Error ke server!', 'error');
+        this.setState({
+          loadingPageTransaction: false,
+        });
+      });
+  }
+
+  getDetailTransactionAlsin(currPage, currLimit) {
+    console.log(
+      'this.state.detailTransactionAlsinItem',
+      this.state.detailTransactionAlsinItem,
+      '2',
+      this.state.detailTransaction,
+    );
+    var transaction_order_type_id = this.state.detailTransactionAlsinItem
+      .transaction_order_type_id;
+    var alsin_type_id = this.state.detailTransactionAlsinItem.alsin_type_id;
+    var alsin_other = this.state.detailTransactionAlsinItem.alsin_other;
+    const url =
+      myUrl.url_getDetailTransactionItem +
+      '?transaction_order_type_id=' +
+      transaction_order_type_id +
+      '&alsin_type_id=' +
+      alsin_type_id +
+      '&alsin_other=' +
+      alsin_other;
+    var token = window.localStorage.getItem('tokenCookies');
+    console.log('URL GET LIST TRANSACTION ALSIN ITEM', url);
+
+    this.setState(
+      { loadingPageTransactionAlsinItem: true },
+      this.toggle('nested_parent_list_transaksi_alsinItem'),
+    );
+    // console.log("offset", offset, "currLimit", currLimit);
+
+    const option = {
+      method: 'GET',
+      json: true,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+        Authorization: `${'Bearer'} ${token}`,
+      },
+    };
+    // console.log('option', option);
+    fetch(url, option)
+      .then(response => {
+        // trace.stop();
+        if (response.ok) {
+          return response.json();
+        } else {
+          if (response.status === 401) {
+            this.showNotification('Username/Password salah!', 'error');
+          } else if (response.status === 500) {
+            this.showNotification('Internal Server Error', 'error');
+          } else {
+            this.showNotification('Response ke server gagal!', 'error');
+          }
+          this.setState({
+            loadingPageTransactionAlsinItem: false,
+          });
+        }
+      })
+      .then(data => {
+        console.log('DATA TRANSAKSI ALSIN ITEM', data);
+        var status = data.status;
+        var resultTransactionAlsinItem = data.result.alsin_items;
+        var message = data.result.message;
+        // console.log('data jalan GetlistByPaging upja', data);
+        if (status === 0) {
+          this.showNotification(message, 'error');
+          this.setState({
+            loadingPageTransactionAlsinItem: false,
+          });
+        } else {
+          this.showNotification('Data ditemukan!', 'info');
+          this.setState(
+            {
+              resultTransactionAlsinItem: resultTransactionAlsinItem,
+              loadingPageTransactionAlsinItem: false,
+            },
+            // () => console.log('DATA TRANSAKSI', data),
+          );
+        }
+      })
+      .catch(err => {
+        // console.log('ERRORNYA', err);
+        this.showNotification('Error ke server!', 'error');
+        this.setState({
+          loadingPageTransactionAlsinItem: false,
+        });
+      });
+  }
+
+  getDetailTransactionAlsinOtherService(currPage, currLimit) {
+    console.log(
+      'this.state.detailTransactionAlsinItem',
+      this.state.detailTransactionAlsinItem,
+      '2',
+      this.state.detailTransaction,
+    );
+    var transaction_order_type_id = this.state.detailTransactionAlsinItem
+      .transaction_order_type_id;
+    var alsin_type_id = this.state.detailTransactionAlsinItem.alsin_type_id;
+    var alsin_other = this.state.detailTransactionAlsinItem.alsin_other;
+    const url =
+      myUrl.url_getDetailTransactionItem +
+      '?transaction_order_type_id=' +
+      transaction_order_type_id +
+      '&alsin_type_id=' +
+      alsin_type_id +
+      '&alsin_other=' +
+      alsin_other;
+    var token = window.localStorage.getItem('tokenCookies');
+    console.log('URL GET LIST TRANSACTION ALSIN ITEM', url);
+
+    this.setState(
+      { loadingPageTransactionAlsinItem: true },
+      this.toggle('nested_parent_list_transaksi_alsinItemOtherService'),
+    );
+    // console.log("offset", offset, "currLimit", currLimit);
+
+    const option = {
+      method: 'GET',
+      json: true,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+        Authorization: `${'Bearer'} ${token}`,
+      },
+    };
+    // console.log('option', option);
+    fetch(url, option)
+      .then(response => {
+        // trace.stop();
+        if (response.ok) {
+          return response.json();
+        } else {
+          if (response.status === 401) {
+            this.showNotification('Username/Password salah!', 'error');
+          } else if (response.status === 500) {
+            this.showNotification('Internal Server Error', 'error');
+          } else {
+            this.showNotification('Response ke server gagal!', 'error');
+          }
+          this.setState({
+            loadingPageTransactionAlsinItem: false,
+          });
+        }
+      })
+      .then(data => {
+        console.log('DATA TRANSAKSI ALSIN ITEM', data);
+        var status = data.status;
+        var resultTransactionAlsinItem = data.result.alsin_items;
+        var message = data.result.message;
+        // console.log('data jalan GetlistByPaging upja', data);
+        if (status === 0) {
+          this.showNotification(message, 'error');
+          this.setState({
+            loadingPageTransactionAlsinItem: false,
+          });
+        } else {
+          this.showNotification('Data ditemukan!', 'info');
+          this.setState(
+            {
+              resultTransactionAlsinItemOtherService: resultTransactionAlsinItem,
+              loadingPageTransactionAlsinItem: false,
+            },
+            // () => console.log('DATA TRANSAKSI', data),
+          );
+        }
+      })
+      .catch(err => {
+        // console.log('ERRORNYA', err);
+        this.showNotification('Error ke server!', 'error');
+        this.setState({
+          loadingPageTransactionAlsinItem: false,
+        });
+      });
+  }
+
+  setModalDetailTransaction(todo) {
+    this.setState(
+      {
+        detailTransaction: todo,
+        // namaEcommerce: '',
+      },
+      () => this.getDetailTransaction(),
+    );
+  }
+
+  setModalDetailTransaksiAlsin(todo) {
+    this.setState(
+      {
+        detailTransactionAlsinItem: todo,
+        // namaEcommerce: '',
+      },
+      () => this.getDetailTransactionAlsin(),
+    );
+  }
+
+  setModalDetailTransaksiAlsinOtherService(todo) {
+    this.setState(
+      {
+        detailTransactionAlsinItem: todo,
+        // namaEcommerce: '',
+      },
+      () => this.getDetailTransactionAlsinOtherService(),
+    );
   }
 
   // get data farmer
@@ -874,7 +1169,12 @@ class showTransaction extends React.Component {
   }
 
   render() {
-    const { loading, loadingPage } = this.state;
+    const {
+      loading,
+      loadingPage,
+      loadingPageTransaction,
+      loadingPageTransactionAlsinItem,
+    } = this.state;
     const currentTodosFarmer = this.state.resultFarmer;
     const currentTodosUpja = this.state.resultUpja;
     const provinsiTodos = this.state.resultProvinsi;
@@ -886,6 +1186,14 @@ class showTransaction extends React.Component {
     const isEnabledSaveDomisili = this.canBeSubmittedDomisili();
     const isSearch = this.SearchAllList();
 
+    const currentTodosTransaction = this.state.resultTransactionAlsin;
+    const currentTodosTransactionOtherService = this.state
+      .resultTransactionAlsinOtherService;
+    const currentTodosTransactionAlsinItem = this.state
+      .resultTransactionAlsinItem;
+    const currentTodosTransactionAlsinItemOtherService = this.state
+      .resultTransactionAlsinItemOtherService;
+
     var formatter = new Intl.NumberFormat('id-ID', {
       currency: 'IDR',
     });
@@ -895,7 +1203,23 @@ class showTransaction extends React.Component {
       TransactionAllTodos.map((todo, i) => {
         return (
           <tr key={i}>
-            <td>{todo.status}</td>
+            {/* {console.log("TODOS ISINYA", todo)} */}
+            <td style={{ textAlign: 'left' }}>
+                {
+                  <Label
+                    style={{
+                      fontWeight: 'bold',
+                      cursor: 'pointer',
+                      textDecoration: 'underline',
+                      color: '#009688',
+                    }}
+                    onClick={() => this.setModalDetailTransaction({ ...todo })}
+                  >
+                    {todo.status}
+                  </Label>
+                }
+              </td>
+            {/* <td>{todo.status}</td> */}
             <td>{todo.upja_name}</td>
             <td>{todo.order_time}</td>
             <td>{todo.delivery_time}</td>
@@ -921,6 +1245,126 @@ class showTransaction extends React.Component {
                 Pilih
               </Button>
             </td>
+          </tr>
+        );
+      });
+
+      const renderTodosTransaction =
+      currentTodosTransaction &&
+      currentTodosTransaction.map((todo, i) => {
+        return (
+          <tr key={i}>
+            {console.log('TOTAL ALSIN', todo)}
+            {todo.alsin_type_name !== '' && (
+              <td style={{ textAlign: 'left' }}>
+                {
+                  <Label
+                    style={{
+                      fontWeight: 'bold',
+                      cursor: 'pointer',
+                      textDecoration: 'underline',
+                      color: '#009688',
+                    }}
+                    onClick={() =>
+                      this.setModalDetailTransaksiAlsin({ ...todo })
+                    }
+                  >
+                    {todo.alsin_type_name}
+                  </Label>
+                }
+              </td>
+            )}
+            {todo.alsin_type_name === '' && (
+              <td style={{ textAlign: 'left' }}>
+                {
+                  <Label
+                    style={{
+                      fontWeight: 'bold',
+                    }}
+                  >
+                    -
+                  </Label>
+                }
+              </td>
+            )}
+            {/* <td>{todo.alsin_item_total}</td> */}
+          </tr>
+        );
+      });
+
+    {
+      console.log('TOTAL REPARATION', this.state.resultReparation);
+    }
+    const renderTodosTransactionOtherService =
+      this.state.resultTransactionAlsinOtherService &&
+      this.state.resultTransactionAlsinOtherService.map((todo, i) => {
+        return (
+          <tr key={i}>
+            {console.log('TOTAL REPARATION', todo)}
+            {(todo.alsin_type_id === 8 || todo.alsin_type_id === 10) && (
+              <td>{todo.alsin_type_name}</td>
+            )}
+            {todo.alsin_type_id !== 8 && todo.alsin_type_id !== 10 && (
+              <td style={{ textAlign: 'left' }}>
+                {
+                  <Label
+                    style={{
+                      fontWeight: 'bold',
+                      cursor: 'pointer',
+                      textDecoration: 'underline',
+                      color: '#009688',
+                    }}
+                    onClick={() =>
+                      this.setModalDetailTransaksiAlsinOtherService({ ...todo })
+                    }
+                  >
+                    {todo.alsin_type_name}
+                  </Label>
+                }
+              </td>
+            )}
+            {todo.alsin_type_name === '' && (
+              <td style={{ textAlign: 'left' }}>
+                {
+                  <Label
+                    style={{
+                      fontWeight: 'bold',
+                    }}
+                  >
+                    -
+                  </Label>
+                }
+              </td>
+            )}
+            <td>{todo.alsin_item_total}</td>
+          </tr>
+        );
+      });
+
+      const renderTodosTransactionAlsinItem =
+      currentTodosTransactionAlsinItem &&
+      currentTodosTransactionAlsinItem.map((todo, i) => {
+        return (
+          <tr key={i}>
+            {<td>{todo.vechile_code}</td>}
+            {<td>{todo.description}</td>}
+            {<td>{todo.status} </td>}
+
+            {/* <td>{todo.status}</td> */}
+          </tr>
+        );
+      });
+
+    const renderTodosTransactionAlsinItemOtherService =
+      currentTodosTransactionAlsinItemOtherService &&
+      currentTodosTransactionAlsinItemOtherService.map((todo, i) => {
+        return (
+          <tr key={i}>
+            {todo.alsin_type_id !== 8 && todo.alsin_type_id !== 10 && (
+              <td>{todo.name}</td>
+            )}
+
+            {/* <td>{todo.status}</td> */}
           </tr>
         );
       });
@@ -1361,6 +1805,188 @@ class showTransaction extends React.Component {
           </ModalBody>
         </Modal>
         {/* Modal List Kecamatan */}
+
+        {/* Modal Transaction */}
+        <Modal
+          size="xl"
+          onExit={this.handleCloseDomisili}
+          isOpen={this.state.modal_nested_parent_list_transaksi}
+          toggle={this.toggle('nested_parent_list_transaksi')}
+          className={this.props.className}
+        >
+          <ModalHeader toggle={this.toggle('nested_parent_list_transaksi')}>
+            List Transaksi
+          </ModalHeader>
+          <ModalBody>
+            <Table responsive striped>
+              <thead>
+                <tr>
+                  <th>Alsin</th>
+                </tr>
+              </thead>
+              <tbody>
+                {currentTodosTransaction.length === 0 &&
+                loadingPageTransaction === true ? (
+                  <LoadingSpinner status={4} />
+                ) : loadingPageTransaction === false &&
+                  currentTodosTransaction.length === 0 ? (
+                  (
+                    <tr>
+                      <td
+                        style={{ backgroundColor: 'white' }}
+                        colSpan="17"
+                        className="text-center"
+                      >
+                        TIDAK ADA DATA
+                      </td>
+                    </tr>
+                  ) || <LoadingSpinner status={4} />
+                ) : loadingPageTransaction === true &&
+                  currentTodosTransaction.length !== 0 ? (
+                  <LoadingSpinner status={4} />
+                ) : (
+                  renderTodosTransaction
+                )}
+              </tbody>
+            </Table>
+            <Table responsive striped>
+              <thead>
+                <tr>
+                  <th>Service Lainnya</th>
+                </tr>
+              </thead>
+              <tbody>
+                {currentTodosTransactionOtherService.length === 0 &&
+                loadingPageTransaction === true ? (
+                  <LoadingSpinner status={4} />
+                ) : loadingPageTransaction === false &&
+                  currentTodosTransactionOtherService.length === 0 ? (
+                  (
+                    <tr>
+                      <td
+                        style={{ backgroundColor: 'white' }}
+                        colSpan="17"
+                        className="text-center"
+                      >
+                        TIDAK ADA DATA
+                      </td>
+                    </tr>
+                  ) || <LoadingSpinner status={4} />
+                ) : loadingPageTransaction === true &&
+                  currentTodosTransactionOtherService.length !== 0 ? (
+                  <LoadingSpinner status={4} />
+                ) : (
+                  renderTodosTransactionOtherService
+                )}
+              </tbody>
+            </Table>
+          </ModalBody>
+        </Modal>
+        {/* Modal Transaction */}
+
+        {/* Modal Transaction Alsin Item */}
+        <Modal
+          onExit={this.handleCloseDomisili}
+          isOpen={this.state.modal_nested_parent_list_transaksi_alsinItem}
+          toggle={this.toggle('nested_parent_list_transaksi_alsinItem')}
+          className={this.props.className}
+        >
+          <ModalHeader
+            toggle={this.toggle('nested_parent_list_transaksi_alsinItem')}
+          >
+            List Transaksi Item
+          </ModalHeader>
+          <ModalBody>
+            <Table responsive striped>
+              <thead>
+                <tr>
+                  <th>Kode Kendaraan</th>
+                  <th>Deskripsi</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {currentTodosTransactionAlsinItem.length === 0 &&
+                loadingPageTransactionAlsinItem === true ? (
+                  <LoadingSpinner status={4} />
+                ) : loadingPageTransactionAlsinItem === false &&
+                  currentTodosTransactionAlsinItem.length === 0 ? (
+                  (
+                    <tr>
+                      <td
+                        style={{ backgroundColor: 'white' }}
+                        colSpan="17"
+                        className="text-center"
+                      >
+                        TIDAK ADA DATA
+                      </td>
+                    </tr>
+                  ) || <LoadingSpinner status={4} />
+                ) : loadingPageTransactionAlsinItem === true &&
+                  currentTodosTransactionAlsinItem.length !== 0 ? (
+                  <LoadingSpinner status={4} />
+                ) : (
+                  renderTodosTransactionAlsinItem
+                )}
+              </tbody>
+            </Table>
+          </ModalBody>
+        </Modal>
+        {/* Modal Transaction Alsin Item*/}
+
+        {/* Modal Transaction Alsin Item Other Service */}
+        <Modal
+          onExit={this.handleCloseDomisili}
+          isOpen={
+            this.state.modal_nested_parent_list_transaksi_alsinItemOtherService
+          }
+          toggle={this.toggle(
+            'nested_parent_list_transaksi_alsinItemOtherService',
+          )}
+          className={this.props.className}
+        >
+          <ModalHeader
+            toggle={this.toggle(
+              'nested_parent_list_transaksi_alsinItemOtherService',
+            )}
+          >
+            List Transaksi Item Service lainnya
+          </ModalHeader>
+          <ModalBody>
+            <Table responsive striped>
+              <thead>
+                <tr>
+                  <th>Nama</th>
+                </tr>
+              </thead>
+              <tbody>
+                {currentTodosTransactionAlsinItemOtherService.length === 0 &&
+                loadingPageTransactionAlsinItem === true ? (
+                  <LoadingSpinner status={4} />
+                ) : loadingPageTransactionAlsinItem === false &&
+                  currentTodosTransactionAlsinItemOtherService.length === 0 ? (
+                  (
+                    <tr>
+                      <td
+                        style={{ backgroundColor: 'white' }}
+                        colSpan="17"
+                        className="text-center"
+                      >
+                        TIDAK ADA DATA
+                      </td>
+                    </tr>
+                  ) || <LoadingSpinner status={4} />
+                ) : loadingPageTransactionAlsinItem === true &&
+                  currentTodosTransactionAlsinItemOtherService.length !== 0 ? (
+                  <LoadingSpinner status={4} />
+                ) : (
+                  renderTodosTransactionAlsinItemOtherService
+                )}
+              </tbody>
+            </Table>
+          </ModalBody>
+        </Modal>
+        {/* Modal Transaction Alsin Item Other Service*/}
         {/* KHUSUS MODAL */}
       </Page>
     );
