@@ -692,9 +692,6 @@ class showTransaction extends React.Component {
 
   componentDidMount() {
     var token = window.localStorage.getItem('tokenCookies');
-    if (token === '' || token === null || token === undefined) {
-      window.location.replace('/login');
-    }
     var type = window.localStorage.getItem('type');
     var kecamatanID = window.localStorage.getItem('kecamatanID');
     var namaProvinsi = window.localStorage.getItem('namaProvinsi');
@@ -702,34 +699,26 @@ class showTransaction extends React.Component {
     var namaKecamatan = window.localStorage.getItem('namaKecamatan');
     var namaDesa = window.localStorage.getItem('namaDesa');
     var desaID = window.localStorage.getItem('desaID');
-    // console.log(
-    //   'TYPE?',
-    //   type,
-    //   'KecamatanID?',
-    //   kecamatanID,
-    //   'namaProvinsi',
-    //   namaProvinsi,
-    //   'namaKota',
-    //   namaKotaKab,
-    //   'namaKecamtan',
-    //   namaKecamatan,
-    // );
-    if (type !== null && desaID !== null) {
-      console.log('MASUK');
-      this.setState(
-        {
-          pilihKecamatan: kecamatanID,
-          pilihDesa: desaID,
-          pilihType: type,
-          namaProvinsiSave: namaProvinsi,
-          namaKotaKabSave: namaKotaKab,
-          namaKecamatanSave: namaKecamatan,
-          namaDesaSave: namaDesa,
-        },
-        () => this.findData(),
-      );
+    if (token === '' || token === null || token === undefined) {
+      window.location.replace('/login');
+    } else {
+      if (type !== null && desaID !== null) {
+        console.log('MASUK');
+        this.setState(
+          {
+            pilihKecamatan: kecamatanID,
+            pilihDesa: desaID,
+            pilihType: type,
+            namaProvinsiSave: namaProvinsi,
+            namaKotaKabSave: namaKotaKab,
+            namaKecamatanSave: namaKecamatan,
+            namaDesaSave: namaDesa,
+          },
+          () => this.findData(),
+        );
+      }
+      this.getProvinsi(this.state.currentPages, this.state.todosPerPages);
     }
-    this.getProvinsi(this.state.currentPages, this.state.todosPerPages);
   }
 
   // untuk pilih Provinsi
