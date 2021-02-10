@@ -36,7 +36,12 @@ const showTransactionAlert = React.lazy(() =>
 const showTransactionStatus = React.lazy(() =>
   import('pages/template/showTransactionStatus'),
 );
-
+const showTransactionSparePart = React.lazy(() =>
+  import('pages/template/showTransactionSparePart'),
+);
+const showTransactionSparePartDetail = React.lazy(() =>
+  import('pages/template/showTransactionSparePartDetail'),
+);
 
 const getBasename = () => {
   return `/${process.env.PUBLIC_URL.split('/').pop()}`;
@@ -93,6 +98,19 @@ class App extends React.Component {
                   path="/showtransactionStatus"
                   component={showTransactionStatus}
                 />
+                <Route
+                  exact
+                  setTitle={this.setTitle}
+                  path="/showTransactionSparePart"
+                  component={showTransactionSparePart}
+                />
+                 <Route
+                  exact
+                  setTitle={this.setTitle}
+                  path="/showTransactionSparePart/spare_part_type_id=:spare_part_type_id"
+                  component={showTransactionSparePartDetail}
+                />
+
                 <Route
                   exact
                   setTitle={this.setTitle}

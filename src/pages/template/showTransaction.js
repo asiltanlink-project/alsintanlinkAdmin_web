@@ -31,6 +31,7 @@ import {
   MdAdd,
   MdAddAlert,
   MdFileUpload,
+  MdBuild,
 } from 'react-icons/md';
 import { MdLoyalty, MdRefresh } from 'react-icons/md';
 import NotificationSystem from 'react-notification-system';
@@ -644,7 +645,7 @@ class showTransaction extends React.Component {
     );
 
     // Details of the uploaded file
-    console.log("FILE YANG DIUPLOAD",this.state.selectedFile);
+    console.log('FILE YANG DIUPLOAD', this.state.selectedFile);
     // console.log("FILE YANG DIUPLOAD Detail ",formData);
 
     // Request made to the backend api
@@ -713,7 +714,7 @@ class showTransaction extends React.Component {
     //   'namaKecamtan',
     //   namaKecamatan,
     // );
-    if (type !== '' && desaID !== '') {
+    if (type !== null && desaID !== null) {
       console.log('MASUK');
       this.setState(
         {
@@ -1459,9 +1460,12 @@ class showTransaction extends React.Component {
                       id="excelInfo"
                       color="primary"
                       style={{ float: 'right' }}
-                      onClick={this.toggle('nested_parent_list_uploadExcel')}
+                      // onClick={this.toggle('nested_parent_list_uploadExcel')}
+                      onClick={() =>
+                        this.props.history.push('/showTransactionSparePart')
+                      }
                     >
-                      <MdFileUpload />
+                      <MdBuild />
                     </Button>
                     <Tooltip
                       placement="bottom"
@@ -1471,7 +1475,7 @@ class showTransaction extends React.Component {
                         this.setState({ excelInfo: !this.state.excelInfo })
                       }
                     >
-                      Halaman untuk mengupload Suku cadang dalam Bentuk Excel
+                      Halaman untuk Mengecek SparePart
                     </Tooltip>
                     <Button
                       id="alertInfo"
@@ -1795,9 +1799,7 @@ class showTransaction extends React.Component {
           toggle={this.toggle('nested_parent_list_uploadExcel')}
           className={this.props.className}
         >
-          <ModalHeader >
-            Upload Excel
-          </ModalHeader>
+          <ModalHeader>Upload Excel</ModalHeader>
           <ModalBody>
             <FormGroup>
               <div>
