@@ -1,6 +1,5 @@
 import Page from 'components/Page';
 import React from 'react';
-import imageNotFound from 'assets/img/imageNotFound.jpg';
 import {
   Button,
   Card,
@@ -14,22 +13,13 @@ import {
   ModalHeader,
   ButtonGroup,
   CardHeader,
-  Label
+  Label,
 } from 'reactstrap';
-import {
-  MdSearch,
-  MdAutorenew,
-  MdEdit,
-  MdDelete,
-  MdList,
-  MdAdd,
-  MdHome,
-} from 'react-icons/md';
+import { MdAutorenew, MdDelete } from 'react-icons/md';
 import { MdLoyalty } from 'react-icons/md';
 import NotificationSystem from 'react-notification-system';
 import { NOTIFICATION_SYSTEM_STYLE } from 'utils/constants';
 import * as myUrl from 'pages/urlLink.js';
-import * as firebase from 'firebase/app';
 import LoadingSpinner from 'pages/LoadingSpinner.js';
 
 class showTransactionSparePartDetail extends React.Component {
@@ -60,7 +50,7 @@ class showTransactionSparePartDetail extends React.Component {
   };
 
   // get data Spare Part
-  getListbyPagingSparePart(currPage, currLimit) {
+  getListbyPagingSparePart(currPage) {
     var spare_part_type_id = this.state.spare_part_type_id;
     const url =
       myUrl.url_showSparePart + spare_part_type_id + '&page=' + currPage;
@@ -68,7 +58,6 @@ class showTransactionSparePartDetail extends React.Component {
     // console.log('URL GET LIST', url);
 
     this.setState({ loadingPage: true });
-    // console.log("offset", offset, "currLimit", currLimit);
 
     const option = {
       method: 'GET',
@@ -78,10 +67,8 @@ class showTransactionSparePartDetail extends React.Component {
         Authorization: `${'Bearer'} ${token}`,
       },
     };
-    // console.log('option', option);
     fetch(url, option)
       .then(response => {
-        // trace.stop();
         if (response.ok) {
           return response.json();
         } else {
@@ -134,7 +121,6 @@ class showTransactionSparePartDetail extends React.Component {
   }
 
   toggle = (modalType, todo) => () => {
-    // console.log('TERPANGGIL');
     if (!modalType) {
       return this.setState({
         modal: !this.state.modal,
@@ -170,7 +156,6 @@ class showTransactionSparePartDetail extends React.Component {
   enterPressedSearch = event => {
     var code = event.keyCode || event.which;
     if (code === 13) {
-      // this.showNotification('Sedang Mencari data', 'info');
       event.preventDefault();
       this.setState(
         {
@@ -415,7 +400,6 @@ class showTransactionSparePartDetail extends React.Component {
     var url = myUrl.url_deleteSparePart;
     const deleteDataHeader = first_param;
     var token = window.localStorage.getItem('tokenCookies');
-    // console.log('DATA HEADER', deleteDataHeader);
     this.setState({ loading: true });
 
     var payload = {
@@ -435,7 +419,6 @@ class showTransactionSparePartDetail extends React.Component {
     };
     fetch(url, option)
       .then(response => {
-        // trace.stop();
         if (response.ok) {
           return response.json();
         } else {
@@ -470,7 +453,6 @@ class showTransactionSparePartDetail extends React.Component {
             },
             () => this.getListbyPagingSparePart(),
           );
-          // firebase.analytics().logEvent('menghapus Data');
         }
       })
       .catch(err => {
