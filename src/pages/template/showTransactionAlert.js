@@ -114,11 +114,7 @@ class showTransaction extends React.Component {
           realCurrentPage: currPage + flag,
         },
         () => {
-          this.getListbyPaging(
-            this.state.currentPage,
-            this.state.todosPerPage,
-            this.state.keyword,
-          );
+          this.getListbyPagingTransaksi(this.state.currentPage);
         },
       );
     }
@@ -135,11 +131,7 @@ class showTransaction extends React.Component {
           realCurrentPage: 1,
         },
         () => {
-          this.getListbyPaging(
-            this.state.currentPage,
-            this.state.todosPerPage,
-            this.state.keyword,
-          );
+          this.getListbyPagingTransaksi(this.state.currentPage);
         },
       );
     }
@@ -311,7 +303,12 @@ class showTransaction extends React.Component {
   getListbyPagingTransaksi(currPage, currLimit) {
     // const trace = perf.trace('getBundling');
     var province_id = this.state.pilihProvinsi;
-    const url = myUrl.url_getAllUpjaTransaction + '?provinces=' + province_id;
+    const url =
+      myUrl.url_getAllUpjaTransaction +
+      '?provinces=' +
+      province_id +
+      '&page=' +
+      currPage;
     var token = window.localStorage.getItem('tokenCookies');
     // console.log('URL GET LIST', url);
 
@@ -367,7 +364,8 @@ class showTransaction extends React.Component {
             this.showNotification('Data ditemukan!', 'info');
             this.setState({
               // resultTransaction: resultTransaction,
-              resultTransactionAll: resultTransactionAll,
+              resultTransactionAll: resultTransactionAll.data,
+              maxPage: data.result.max_page,
               loading: false,
             });
           }
@@ -486,7 +484,7 @@ class showTransaction extends React.Component {
           this.showNotification(data.result.message, 'info');
           this.setState({
             loadingPage: false,
-            modal_nested_parent_list: false
+            modal_nested_parent_list: false,
           });
         }
       })
@@ -732,7 +730,7 @@ class showTransaction extends React.Component {
           {
             namaProvinsi: '',
           },
-          () => this.getListbyPagingTransaksi(),
+          () => this.getListbyPagingTransaksi(this.state.currentPage),
         ),
     );
   }
@@ -1021,33 +1019,6 @@ class showTransaction extends React.Component {
                 </Col>
               </CardHeader>
 
-              {/* <CardHeader className="d-flex justify-content-between">
-                <Col sm={5} style={{ paddingLeft: 0 }}>
-                  <Form
-                    inline
-                    className="cr-search-form"
-                    onSubmit={e => e.preventDefault()}
-                  >
-                    <MdSearch
-                      size="20"
-                      className="cr-search-form__icon-search text-secondary"
-                    />
-                    <Input
-                      autoComplete="off"
-                      type="search"
-                      className="cr-search-form__input"
-                      placeholder="Cari..."
-                      id="search"
-                      onChange={evt => this.updateSearchValue(evt)}
-                      onKeyPress={event => this.enterPressedSearch(event, true)}
-                    />
-                  </Form>
-                </Col>
-                <Col
-                  sm={7}
-                  style={{ textAlign: 'right', paddingRight: 0 }}
-                ></Col>
-              </CardHeader> */}
               <CardBody>
                 <Row style={{ paddingBottom: 0, marginBottom: 0 }}>
                   <Col>
@@ -1074,17 +1045,36 @@ class showTransaction extends React.Component {
 
                 <Table responsive striped id="tableUtama">
                   <thead>
-                    <tr>
-                      <th>Kota/Kab</th>
-                      <th>Kecamatan</th>
-                      <th>Desa</th>
-                      <th>Kepala UPJA</th>
-                      <th>UPJA</th>
-                      <th>E-Mail UPJA</th>
-                      <th>Kelas</th>
-                      <th>Badan Hukum</th>
-                      <th>Total Transaksi</th>
-                    </tr>
+                    {
+                      <tr>
+                        <td
+                          colSpan="10"
+                          className="text-right"
+                          style={{ border: 'none' }}
+                        >
+                          <Label style={{ width: '50%', textAlign: 'right' }}>
+                            {' '}
+                            {'Halaman : ' +
+                              this.state.realCurrentPage +
+                              ' / ' +
+                              this.state.maxPage}
+                          </Label>
+                        </td>
+                      </tr>
+                    }
+                    {
+                      <tr>
+                        <th>Kota/Kab</th>
+                        <th>Kecamatan</th>
+                        <th>Desa</th>
+                        <th>Kepala UPJA</th>
+                        <th>UPJA</th>
+                        <th>E-Mail UPJA</th>
+                        <th>Kelas</th>
+                        <th>Badan Hukum</th>
+                        <th>Total Transaksi</th>
+                      </tr>
+                    }
                   </thead>
                   <tbody>
                     {TransactionAllTodos.length === 0 && loading === true ? (
@@ -1110,51 +1100,69 @@ class showTransaction extends React.Component {
                   </tbody>
                 </Table>
               </CardBody>
-              {/* <CardBody>
+              <CardBody>
                 <Row>
-                  <Col>
-                    <Button
-                      name="firstPageHeader"
-                      value={1}
-                      // onClick={e =>
-                      //   this.paginationButton(e, 0, this.state.lastID)
-                      // }
-                      onClick={() => this.actionPage('firstPageHeader')}
-                      disabled={
-                        this.state.result.length === 0 ||
-                        this.state.result !== null
-                      }
-                    >
-                      First &#10092;&#10092;
-                    </Button>
-                    <ButtonGroup style={{ float: 'right' }}>
-                      <Button
-                        name="prevPageHeader"
-                        style={{ float: 'right' }}
-                        onClick={() => this.actionPage('prevPageHeader')}
-                        disabled={
-                          this.state.result.length === 0 ||
-                          this.state.result !== null
-                        }
-                      >
-                        Prev &#10092;
-                      </Button>
-                      <Button
-                        name="nextPageHeader"
-                        // value={this.state.currentPage}
-                        style={{ float: 'right' }}
-                        onClick={() => this.actionPage('nextPageHeader')}
-                        disabled={
-                          this.state.result.length === 0 ||
-                          this.state.result !== null
-                        }
-                      >
-                        Next &#10093;
-                      </Button>
-                    </ButtonGroup>
+                  <Col md="9" sm="12" xs="12"></Col>
+                  <Col md="3" sm="12" xs="12">
+                    <Card className="mb-3s">
+                      <ButtonGroup>
+                        <Button
+                          name="FirstButton"
+                          value={1}
+                          onClick={e =>
+                            this.paginationButton(e, 0, this.state.maxPage)
+                          }
+                        >
+                          &#10092;&#10092;
+                        </Button>
+                        <Button
+                          name="PrevButton"
+                          value={this.state.currentPage}
+                          onClick={e =>
+                            this.paginationButton(e, -1, this.state.maxPage)
+                          }
+                        >
+                          &#10092;
+                        </Button>
+                        <input
+                          type="text"
+                          placeholder="Page"
+                          disabled={true}
+                          outline="none"
+                          value={this.state.currentPage}
+                          onChange={e =>
+                            this.setState({ currentPage: e.target.value })
+                          }
+                          onKeyPress={e => this.enterPressedPage(e)}
+                          style={{
+                            height: '38px',
+                            width: '75px',
+                            textAlign: 'center',
+                          }}
+                        />
+                        <Button
+                          name="NextButton"
+                          value={this.state.currentPage}
+                          onClick={e =>
+                            this.paginationButton(e, 1, this.state.maxPage)
+                          }
+                        >
+                          &#10093;
+                        </Button>
+                        <Button
+                          name="LastButton"
+                          value={this.state.maxPage}
+                          onClick={e =>
+                            this.paginationButton(e, 0, this.state.maxPage)
+                          }
+                        >
+                          &#10093;&#10093;
+                        </Button>
+                      </ButtonGroup>
+                    </Card>
                   </Col>
                 </Row>
-              </CardBody> */}
+              </CardBody>
             </Card>
           </Col>
         </Row>

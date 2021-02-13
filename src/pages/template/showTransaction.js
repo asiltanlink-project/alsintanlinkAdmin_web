@@ -114,6 +114,8 @@ class showTransaction extends React.Component {
 
   //set Current Page
   paginationButton(event, flag, maxPage = 0) {
+    var show_type = this.state.pilihType;
+
     var currPage = Number(event.target.value);
     if (currPage + flag > 0 && currPage + flag <= maxPage) {
       this.setState(
@@ -122,11 +124,11 @@ class showTransaction extends React.Component {
           realCurrentPage: currPage + flag,
         },
         () => {
-          this.getListbyPaging(
-            this.state.currentPage,
-            this.state.todosPerPage,
-            this.state.keyword,
-          );
+          if (show_type === 'show_farmer') {
+            this.getListbyPagingFarmer(this.state.currentPage);
+          } else {
+            this.getListbyPagingUpja(this.state.currentPage);
+          }
         },
       );
     }
@@ -333,7 +335,12 @@ class showTransaction extends React.Component {
   // get data farmer
   getListbyPagingFarmer(currPage, currLimit) {
     var villageID = this.state.pilihDesa;
-    const url = myUrl.url_getAllData + 'show_farmer?village_id=' + villageID;
+    const url =
+      myUrl.url_getAllData +
+      'show_farmer?village_id=' +
+      villageID +
+      '&page=' +
+      currPage;
     var token = window.localStorage.getItem('tokenCookies');
     // console.log('URL GET LIST', url);
     console.log('MASUK FARMER');
@@ -391,8 +398,9 @@ class showTransaction extends React.Component {
           } else {
             this.showNotification('Data ditemukan!', 'info');
             this.setState({
-              resultFarmer: result,
+              resultFarmer: result.data,
               loading: false,
+              maxPage: data.result.max_page,
             });
           }
         }
@@ -410,7 +418,12 @@ class showTransaction extends React.Component {
   getListbyPagingUpja(currPage, currLimit) {
     // const trace = perf.trace('getBundling');
     var villageID = this.state.pilihDesa;
-    const url = myUrl.url_getAllData + 'show_upja?village_id=' + villageID;
+    const url =
+      myUrl.url_getAllData +
+      'show_upja?village_id=' +
+      villageID +
+      '&page=' +
+      currPage;
     var token = window.localStorage.getItem('tokenCookies');
     // console.log('URL GET LIST', url);
     console.log('MASUK UPJA');
@@ -467,8 +480,9 @@ class showTransaction extends React.Component {
           } else {
             this.showNotification('Data ditemukan!', 'info');
             this.setState({
-              resultUpja: result,
+              resultUpja: result.data,
               loading: false,
+              maxPage: data.result.max_page,
             });
           }
         }
@@ -1006,9 +1020,9 @@ class showTransaction extends React.Component {
   findUpjaFarmer() {
     var show_type = this.state.pilihType;
     if (show_type === 'show_farmer') {
-      this.getListbyPagingFarmer();
+      this.getListbyPagingFarmer(this.state.currentPage);
     } else {
-      this.getListbyPagingUpja();
+      this.getListbyPagingUpja(this.state.currentPage);
     }
   }
 
@@ -1662,23 +1676,61 @@ class showTransaction extends React.Component {
                 <Table responsive striped id="tableUtama">
                   {currentTodosFarmer.length > currentTodosUpja.length && (
                     <thead>
-                      <tr>
-                        <th>ID</th>
-                        <th>Nama Petani</th>
-                        <th>No. Telepon</th>
-                        <th>Status</th>
-                      </tr>
+                      {
+                        <tr>
+                          <td
+                            colSpan="6"
+                            className="text-right"
+                            style={{ border: 'none' }}
+                          >
+                            <Label style={{ width: '50%', textAlign: 'right' }}>
+                              {' '}
+                              {'Halaman : ' +
+                                this.state.realCurrentPage +
+                                ' / ' +
+                                this.state.maxPage}
+                            </Label>
+                          </td>
+                        </tr>
+                      }
+                      {
+                        <tr>
+                          <th>ID</th>
+                          <th>Nama Petani</th>
+                          <th>No. Telepon</th>
+                          <th>Status</th>
+                        </tr>
+                      }
                     </thead>
                   )}
                   {currentTodosFarmer.length < currentTodosUpja.length && (
                     <thead>
-                      <tr>
-                        <th>ID</th>
-                        <th>UPJA</th>
-                        <th>Desa</th>
-                        <th>Kepala UPJA</th>
-                        <th>Kelas</th>
-                      </tr>
+                      {
+                        <tr>
+                          <td
+                            colSpan="6"
+                            className="text-right"
+                            style={{ border: 'none' }}
+                          >
+                            <Label style={{ width: '50%', textAlign: 'right' }}>
+                              {' '}
+                              {'Halaman : ' +
+                                this.state.realCurrentPage +
+                                ' / ' +
+                                this.state.maxPage}
+                            </Label>
+                          </td>
+                        </tr>
+                      }
+                      {
+                        <tr>
+                          <th>ID</th>
+                          <th>UPJA</th>
+                          <th>Desa</th>
+                          <th>Kepala UPJA</th>
+                          <th>Kelas</th>
+                        </tr>
+                      }
                     </thead>
                   )}
                   {currentTodosFarmer.length > currentTodosUpja.length && (
@@ -1731,51 +1783,69 @@ class showTransaction extends React.Component {
                   )}
                 </Table>
               </CardBody>
-              {/* <CardBody>
+              <CardBody>
                 <Row>
-                  <Col>
-                    <Button
-                      name="firstPageHeader"
-                      value={1}
-                      // onClick={e =>
-                      //   this.paginationButton(e, 0, this.state.lastID)
-                      // }
-                      onClick={() => this.actionPage('firstPageHeader')}
-                      disabled={
-                        this.state.result.length === 0 ||
-                        this.state.result !== null
-                      }
-                    >
-                      First &#10092;&#10092;
-                    </Button>
-                    <ButtonGroup style={{ float: 'right' }}>
-                      <Button
-                        name="prevPageHeader"
-                        style={{ float: 'right' }}
-                        onClick={() => this.actionPage('prevPageHeader')}
-                        disabled={
-                          this.state.result.length === 0 ||
-                          this.state.result !== null
-                        }
-                      >
-                        Prev &#10092;
-                      </Button>
-                      <Button
-                        name="nextPageHeader"
-                        // value={this.state.currentPage}
-                        style={{ float: 'right' }}
-                        onClick={() => this.actionPage('nextPageHeader')}
-                        disabled={
-                          this.state.result.length === 0 ||
-                          this.state.result !== null
-                        }
-                      >
-                        Next &#10093;
-                      </Button>
-                    </ButtonGroup>
+                  <Col md="9" sm="12" xs="12"></Col>
+                  <Col md="3" sm="12" xs="12">
+                    <Card className="mb-3s">
+                      <ButtonGroup>
+                        <Button
+                          name="FirstButton"
+                          value={1}
+                          onClick={e =>
+                            this.paginationButton(e, 0, this.state.maxPage)
+                          }
+                        >
+                          &#10092;&#10092;
+                        </Button>
+                        <Button
+                          name="PrevButton"
+                          value={this.state.currentPage}
+                          onClick={e =>
+                            this.paginationButton(e, -1, this.state.maxPage)
+                          }
+                        >
+                          &#10092;
+                        </Button>
+                        <input
+                          type="text"
+                          placeholder="Page"
+                          disabled={true}
+                          outline="none"
+                          value={this.state.currentPage}
+                          onChange={e =>
+                            this.setState({ currentPage: e.target.value })
+                          }
+                          onKeyPress={e => this.enterPressedPage(e)}
+                          style={{
+                            height: '38px',
+                            width: '75px',
+                            textAlign: 'center',
+                          }}
+                        />
+                        <Button
+                          name="NextButton"
+                          value={this.state.currentPage}
+                          onClick={e =>
+                            this.paginationButton(e, 1, this.state.maxPage)
+                          }
+                        >
+                          &#10093;
+                        </Button>
+                        <Button
+                          name="LastButton"
+                          value={this.state.maxPage}
+                          onClick={e =>
+                            this.paginationButton(e, 0, this.state.maxPage)
+                          }
+                        >
+                          &#10093;&#10093;
+                        </Button>
+                      </ButtonGroup>
+                    </Card>
                   </Col>
                 </Row>
-              </CardBody> */}
+              </CardBody>
             </Card>
           </Col>
         </Row>

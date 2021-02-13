@@ -129,7 +129,6 @@ class showTransaction extends React.Component {
       dynamicHeightEcommerce: '0px',
       dynamicHeightPelapak: '0px',
 
-
       resultAlsinItemOtherService: [],
       resultTransactionAlsinOtherService: [],
       resultTransactionAlsinItemOtherService: [],
@@ -148,11 +147,7 @@ class showTransaction extends React.Component {
           realCurrentPage: currPage + flag,
         },
         () => {
-          this.getListbyPaging(
-            this.state.currentPage,
-            this.state.todosPerPage,
-            this.state.keyword,
-          );
+          this.getStatus(this.state.currentPage);
         },
       );
     }
@@ -712,7 +707,12 @@ class showTransaction extends React.Component {
     var offset = (currPage - 1) * currLimit;
     var keyword = this.state.keywordList;
     var pilihStatus = this.state.pilihStatus;
-    const urlA = myUrl.url_showAllTransaction + '?status=' + pilihStatus;
+    const urlA =
+      myUrl.url_showAllTransaction +
+      '?status=' +
+      pilihStatus +
+      '&page=' +
+      currPage;
     console.log('jalan', urlA);
     var token = window.localStorage.getItem('tokenCookies');
     this.setState({ loadingPage: true });
@@ -736,8 +736,8 @@ class showTransaction extends React.Component {
           this.showNotification('Data tidak ditemukan!', 'error');
         } else {
           this.setState({
-            resultTransactionStatus: data.result.transactions,
-            // maxPages: data.metadata.pages ? data.metadata.pages : 1,
+            resultTransactionStatus: data.result.transactions.data,
+            maxPage: data.result.max_page,
             loading: false,
             loadingPage: false,
           });
@@ -829,7 +829,7 @@ class showTransaction extends React.Component {
     if (token === '' || token === null || token === undefined) {
       window.location.replace('/login');
     }
-    this.getStatus(this.state.currentPages, this.state.todosPerPages);
+    this.getStatus(this.state.currentPage);
   }
 
   // untuk pilih Provinsi
@@ -1000,9 +1000,9 @@ class showTransaction extends React.Component {
         {
           modal: !this.state.modal,
           keywordList: '',
-          realCurrentPages: 1,
-          maxPages: 1,
-          currentPages: 1,
+          realCurrentPage: 1,
+          maxPage: 1,
+          currentPage: 1,
           ecommerceIDtemp: this.state.ecommerceID,
         },
         // () => this.getProvinsi(1, this.state.todosPerPages),
@@ -1013,9 +1013,9 @@ class showTransaction extends React.Component {
       {
         [`modal_${modalType}`]: !this.state[`modal_${modalType}`],
         keywordList: '',
-        realCurrentPages: 1,
-        maxPages: 1,
-        currentPages: 1,
+        realCurrentPage: 1,
+        maxPage: 1,
+        currentPage: 1,
       },
       // () => this.getProvinsi(1, this.state.todosPerPages),
     );
@@ -1205,20 +1205,20 @@ class showTransaction extends React.Component {
           <tr key={i}>
             {/* {console.log("TODOS ISINYA", todo)} */}
             <td style={{ textAlign: 'left' }}>
-                {
-                  <Label
-                    style={{
-                      fontWeight: 'bold',
-                      cursor: 'pointer',
-                      textDecoration: 'underline',
-                      color: '#009688',
-                    }}
-                    onClick={() => this.setModalDetailTransaction({ ...todo })}
-                  >
-                    {todo.status}
-                  </Label>
-                }
-              </td>
+              {
+                <Label
+                  style={{
+                    fontWeight: 'bold',
+                    cursor: 'pointer',
+                    textDecoration: 'underline',
+                    color: '#009688',
+                  }}
+                  onClick={() => this.setModalDetailTransaction({ ...todo })}
+                >
+                  {todo.status}
+                </Label>
+              }
+            </td>
             {/* <td>{todo.status}</td> */}
             <td>{todo.upja_name}</td>
             <td>{todo.order_time}</td>
@@ -1249,7 +1249,7 @@ class showTransaction extends React.Component {
         );
       });
 
-      const renderTodosTransaction =
+    const renderTodosTransaction =
       currentTodosTransaction &&
       currentTodosTransaction.map((todo, i) => {
         return (
@@ -1341,7 +1341,7 @@ class showTransaction extends React.Component {
         );
       });
 
-      const renderTodosTransactionAlsinItem =
+    const renderTodosTransactionAlsinItem =
       currentTodosTransactionAlsinItem &&
       currentTodosTransactionAlsinItem.map((todo, i) => {
         return (
@@ -1463,14 +1463,33 @@ class showTransaction extends React.Component {
               <CardBody>
                 <Table responsive striped id="tableUtama">
                   <thead>
-                    <tr>
-                      <th>Status</th>
-                      <th>UPJA</th>
-                      <th>Waktu Pesan</th>
-                      <th>Waktu Kirim</th>
-                      <th>Harga Transport</th>
-                      <th>Total Harga</th>
-                    </tr>
+                    {
+                      <tr>
+                        <td
+                          colSpan="10"
+                          className="text-right"
+                          style={{ border: 'none' }}
+                        >
+                          <Label style={{ width: '50%', textAlign: 'right' }}>
+                            {' '}
+                            {'Halaman : ' +
+                              this.state.realCurrentPage +
+                              ' / ' +
+                              this.state.maxPage}
+                          </Label>
+                        </td>
+                      </tr>
+                    }
+                    {
+                      <tr>
+                        <th>Status</th>
+                        <th>UPJA</th>
+                        <th>Waktu Pesan</th>
+                        <th>Waktu Kirim</th>
+                        <th>Harga Transport</th>
+                        <th>Total Harga</th>
+                      </tr>
+                    }
                   </thead>
                   <tbody>
                     {TransactionAllTodos.length === 0 && loading === true ? (
@@ -1496,51 +1515,69 @@ class showTransaction extends React.Component {
                   </tbody>
                 </Table>
               </CardBody>
-              {/* <CardBody>
+              <CardBody>
                 <Row>
-                  <Col>
-                    <Button
-                      name="firstPageHeader"
-                      value={1}
-                      // onClick={e =>
-                      //   this.paginationButton(e, 0, this.state.lastID)
-                      // }
-                      onClick={() => this.actionPage('firstPageHeader')}
-                      disabled={
-                        this.state.result.length === 0 ||
-                        this.state.result !== null
-                      }
-                    >
-                      First &#10092;&#10092;
-                    </Button>
-                    <ButtonGroup style={{ float: 'right' }}>
-                      <Button
-                        name="prevPageHeader"
-                        style={{ float: 'right' }}
-                        onClick={() => this.actionPage('prevPageHeader')}
-                        disabled={
-                          this.state.result.length === 0 ||
-                          this.state.result !== null
-                        }
-                      >
-                        Prev &#10092;
-                      </Button>
-                      <Button
-                        name="nextPageHeader"
-                        // value={this.state.currentPage}
-                        style={{ float: 'right' }}
-                        onClick={() => this.actionPage('nextPageHeader')}
-                        disabled={
-                          this.state.result.length === 0 ||
-                          this.state.result !== null
-                        }
-                      >
-                        Next &#10093;
-                      </Button>
-                    </ButtonGroup>
+                  <Col md="9" sm="12" xs="12"></Col>
+                  <Col md="3" sm="12" xs="12">
+                    <Card className="mb-3s">
+                      <ButtonGroup>
+                        <Button
+                          name="FirstButton"
+                          value={1}
+                          onClick={e =>
+                            this.paginationButton(e, 0, this.state.maxPage)
+                          }
+                        >
+                          &#10092;&#10092;
+                        </Button>
+                        <Button
+                          name="PrevButton"
+                          value={this.state.currentPage}
+                          onClick={e =>
+                            this.paginationButton(e, -1, this.state.maxPage)
+                          }
+                        >
+                          &#10092;
+                        </Button>
+                        <input
+                          type="text"
+                          placeholder="Page"
+                          disabled={true}
+                          outline="none"
+                          value={this.state.currentPage}
+                          onChange={e =>
+                            this.setState({ currentPage: e.target.value })
+                          }
+                          onKeyPress={e => this.enterPressedPage(e)}
+                          style={{
+                            height: '38px',
+                            width: '75px',
+                            textAlign: 'center',
+                          }}
+                        />
+                        <Button
+                          name="NextButton"
+                          value={this.state.currentPage}
+                          onClick={e =>
+                            this.paginationButton(e, 1, this.state.maxPage)
+                          }
+                        >
+                          &#10093;
+                        </Button>
+                        <Button
+                          name="LastButton"
+                          value={this.state.maxPage}
+                          onClick={e =>
+                            this.paginationButton(e, 0, this.state.maxPage)
+                          }
+                        >
+                          &#10093;&#10093;
+                        </Button>
+                      </ButtonGroup>
+                    </Card>
                   </Col>
                 </Row>
-              </CardBody> */}
+              </CardBody>
             </Card>
           </Col>
         </Row>

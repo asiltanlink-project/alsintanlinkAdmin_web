@@ -122,6 +122,18 @@ class showTransactionDetail extends React.Component {
 
       farmer_id: props.match.params.farmer_id,
       upja_id: props.match.params.upja_id,
+
+      currentPageAlsinItem: 1,
+      realCurrentPageAlsinItem: 1,
+      maxPageAlsinItem: 1,
+
+      currentPageSukuCadang: 1,
+      realCurrentPageSukuCadang: 1,
+      maxPageSukuCadang: 1,
+
+      currentPageTransactionAlsinItem: 1,
+      realCurrentPageTransactionAlsinItem: 1,
+      maxPageTransactionAlsinItem: 1,
     };
   }
 
@@ -135,10 +147,63 @@ class showTransactionDetail extends React.Component {
           realCurrentPage: currPage + flag,
         },
         () => {
-          this.getListbyPaging(
-            this.state.currentPage,
-            this.state.todosPerPage,
-            this.state.keyword,
+          if (window.location.pathname.includes('farmer')) {
+            this.getListbyPagingFarmer(this.state.currentPage);
+          } else {
+            this.getListbyPagingUpja(this.state.currentPage);
+          }
+        },
+      );
+    }
+  }
+
+  paginationButtonAlsinItem(event, flag, maxPageAlsinItem = 0) {
+    var currPage = Number(event.target.value);
+    if (currPage + flag > 0 && currPage + flag <= maxPageAlsinItem) {
+      this.setState(
+        {
+          currentPageAlsinItem: currPage + flag,
+          realCurrentPageAlsinItem: currPage + flag,
+        },
+        () => {
+          this.getDetailAlsinPagination(this.state.currentPageAlsinItem);
+        },
+      );
+    }
+  }
+
+  paginationButtonTransactionAlsinItem(
+    event,
+    flag,
+    maxPageTransactionAlsinItem = 0,
+  ) {
+    var currPage = Number(event.target.value);
+    if (currPage + flag > 0 && currPage + flag <= maxPageTransactionAlsinItem) {
+      this.setState(
+        {
+          currentPageTransactionAlsinItem: currPage + flag,
+          realCurrentPageTransactionAlsinItem: currPage + flag,
+        },
+        () => {
+          this.getDetailAlsinItemPagination(
+            this.state.currentPageTransactionAlsinItem,
+          );
+        },
+      );
+    }
+  }
+
+  paginationButtonSukuCadang(event, flag, maxPageSukuCadang = 0) {
+    var currPage = Number(event.target.value);
+    if (currPage + flag > 0 && currPage + flag <= maxPageSukuCadang) {
+      this.setState(
+        {
+          currentPageSukuCadang: currPage + flag,
+          realCurrentPageSukuCadang: currPage + flag,
+        },
+        () => {
+          this.getDetailOtherServicePagination(
+            this.state.currentPageSukuCadang,
           );
         },
       );
@@ -193,7 +258,12 @@ class showTransactionDetail extends React.Component {
   // get data farmer
   getListbyPagingFarmer(currPage, currLimit) {
     var farmer_id = this.state.farmer_id;
-    const url = myUrl.url_showDetailFarmer + '?farmer_id=' + farmer_id;
+    const url =
+      myUrl.url_showDetailFarmer +
+      '?farmer_id=' +
+      farmer_id +
+      '&page=' +
+      currPage;
     var token = window.localStorage.getItem('tokenCookies');
     // console.log('URL GET LIST', url);
 
@@ -230,7 +300,7 @@ class showTransactionDetail extends React.Component {
       .then(data => {
         var status = data.status;
         var resultFarmer = data.result.farmer;
-        var resultTransaction = data.result.transactions.transactions;
+        var resultTransaction = data.result.transactions.data;
         var message = data.result.message;
         console.log('data jalan GetlistByPaging farmer', data);
         if (status === 0) {
@@ -245,6 +315,7 @@ class showTransactionDetail extends React.Component {
               resultFarmer: [resultFarmer],
               resultFarmerTransaction: resultTransaction,
               loadingPage: false,
+              maxPage: data.result.max_page,
             },
             // () =>
             //   console.log(
@@ -255,7 +326,7 @@ class showTransactionDetail extends React.Component {
         }
       })
       .catch(err => {
-        // console.log('ERRORNYA', err);
+        console.log('ERRORNYA', err);
         this.showNotification('Error ke server!', 'error');
         this.setState({
           loadingPage: false,
@@ -266,7 +337,8 @@ class showTransactionDetail extends React.Component {
   // get data upja
   getListbyPagingUpja(currPage, currLimit) {
     var upja_id = this.state.upja_id;
-    const url = myUrl.url_showDetailUpja + '?upja_id=' + upja_id;
+    const url =
+      myUrl.url_showDetailUpja + '?upja_id=' + upja_id + '&page=' + currPage;
     var token = window.localStorage.getItem('tokenCookies');
     // console.log('URL GET LIST', url);
 
@@ -304,7 +376,7 @@ class showTransactionDetail extends React.Component {
         console.log('DATA UPJA', data);
         var status = data.status;
         var resultUpja = data.result.upja;
-        var resultTransaction = data.result.transactions;
+        var resultTransaction = data.result.transactions.data;
         var resultAlsin = data.result.alsins;
         var message = data.result.message;
         if (status === 0) {
@@ -320,6 +392,7 @@ class showTransactionDetail extends React.Component {
             resultUpjaAlsin: resultAlsin,
             resultUpjaOtherService: data.result.other_service,
             loadingPage: false,
+            maxPage: data.result.max_page,
           });
         }
       })
@@ -341,7 +414,9 @@ class showTransactionDetail extends React.Component {
       '?upja_id=' +
       upja_id +
       '&alsin_type_id=' +
-      alsin_type_id;
+      alsin_type_id +
+      '&page=' +
+      currPage;
     var token = window.localStorage.getItem('tokenCookies');
     // console.log('URL GET LIST ALSIN', url);
 
@@ -350,6 +425,7 @@ class showTransactionDetail extends React.Component {
       this.toggle('nested_parent_detail_alsin'),
     );
     // console.log("offset", offset, "currLimit", currLimit);
+    console.log('TRUE/FALSE?', this.toggle('nested_parent_detail_alsin'));
 
     const option = {
       method: 'GET',
@@ -394,7 +470,85 @@ class showTransactionDetail extends React.Component {
           this.showNotification('Data ditemukan!', 'info');
           this.setState({
             resultAlsin: [resultAlsin],
-            resultAlsinItem: resultAlsinItem,
+            resultAlsinItem: resultAlsinItem.data,
+            maxPageAlsinItem: data.result.max_page,
+            loadingPageAlsin: false,
+          });
+        }
+      })
+      .catch(err => {
+        // console.log('ERRORNYA', err);
+        this.showNotification('Error ke server!', 'error');
+        this.setState({
+          loadingPageAlsin: false,
+        });
+      });
+  }
+
+  getDetailAlsinPagination(currPage, currLimit) {
+    var upja_id = this.state.upja_id;
+    // console.log('UPJA ID', upja_id);
+    var alsin_type_id = this.state.detailAlsin.alsin_type_id;
+    const url =
+      myUrl.url_getDetailAlsin +
+      '?upja_id=' +
+      upja_id +
+      '&alsin_type_id=' +
+      alsin_type_id +
+      '&page=' +
+      currPage;
+    var token = window.localStorage.getItem('tokenCookies');
+    // console.log('URL GET LIST ALSIN', url);
+
+    this.setState({ loadingPageAlsin: true });
+    // console.log("offset", offset, "currLimit", currLimit);
+    console.log('TRUE/FALSE?', this.toggle('nested_parent_detail_alsin'));
+
+    const option = {
+      method: 'GET',
+      json: true,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+        Authorization: `${'Bearer'} ${token}`,
+      },
+    };
+    // console.log('option', option);
+    fetch(url, option)
+      .then(response => {
+        // trace.stop();
+        if (response.ok) {
+          return response.json();
+        } else {
+          if (response.status === 401) {
+            this.showNotification('Username/Password salah!', 'error');
+          } else if (response.status === 500) {
+            this.showNotification('Internal Server Error', 'error');
+          } else {
+            this.showNotification('Response ke server gagal!', 'error');
+          }
+          this.setState({
+            loadingPageAlsin: false,
+          });
+        }
+      })
+      .then(data => {
+        // console.log('DATA ALSIN', data);
+        var status = data.status;
+        var resultAlsinItem = data.result.alsin_items;
+        var resultAlsin = data.result.alsin;
+        var message = data.result.message;
+        // console.log('data jalan GetlistByPaging upja', data);
+        if (status === 0) {
+          this.showNotification(message, 'error');
+          this.setState({
+            loadingPageAlsin: false,
+          });
+        } else {
+          this.showNotification('Data ditemukan!', 'info');
+          this.setState({
+            resultAlsin: [resultAlsin],
+            resultAlsinItem: resultAlsinItem.data,
+            maxPageAlsinItem: data.result.max_page,
             loadingPageAlsin: false,
           });
         }
@@ -417,7 +571,9 @@ class showTransactionDetail extends React.Component {
       '?upja_id=' +
       upja_id +
       '&alsin_type_id=' +
-      alsin_type_id;
+      alsin_type_id +
+      '&page=' +
+      currPage;
     var token = window.localStorage.getItem('tokenCookies');
     console.log('URL GET LIST OTHER SERVICE', url);
 
@@ -474,8 +630,89 @@ class showTransactionDetail extends React.Component {
           this.showNotification('Data ditemukan!', 'info');
           this.setState({
             resultAlsin: [resultAlsin],
-            resultAlsinItemOtherService: resultAlsinItem,
+            resultAlsinItemOtherService: resultAlsinItem.data,
             loadingPageAlsin: false,
+            maxPageSukuCadang: data.result.max_page,
+          });
+        }
+      })
+      .catch(err => {
+        // console.log('ERRORNYA', err);
+        this.showNotification('Error ke server!', 'error');
+        this.setState({
+          loadingPageAlsin: false,
+        });
+      });
+  }
+
+  getDetailOtherServicePagination(currPage, currLimit) {
+    var upja_id = this.state.upja_id;
+    // console.log('UPJA ID', upja_id);
+    var alsin_type_id = this.state.detailAlsin.alsin_type_id;
+    const url =
+      myUrl.url_getDetailAlsin +
+      '?upja_id=' +
+      upja_id +
+      '&alsin_type_id=' +
+      alsin_type_id +
+      '&page=' +
+      currPage;
+    var token = window.localStorage.getItem('tokenCookies');
+    console.log('URL GET LIST OTHER SERVICE', url);
+
+    this.setState({ loadingPageAlsin: true });
+    // this.setState(
+    //   { loadingPageAlsin: true },
+    //   this.toggle('nested_parent_detail_alsin'),
+    // );
+    // console.log("offset", offset, "currLimit", currLimit);
+
+    const option = {
+      method: 'GET',
+      json: true,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+        Authorization: `${'Bearer'} ${token}`,
+      },
+    };
+    // console.log('option', option);
+    fetch(url, option)
+      .then(response => {
+        // trace.stop();
+        if (response.ok) {
+          return response.json();
+        } else {
+          if (response.status === 401) {
+            this.showNotification('Username/Password salah!', 'error');
+          } else if (response.status === 500) {
+            this.showNotification('Internal Server Error', 'error');
+          } else {
+            this.showNotification('Response ke server gagal!', 'error');
+          }
+          this.setState({
+            loadingPageAlsin: false,
+          });
+        }
+      })
+      .then(data => {
+        console.log('DATA OTHER SERVICE', data);
+        var status = data.status;
+        var resultAlsinItem = data.result.alsin_items;
+        var resultAlsin = data.result.alsin;
+        var message = data.result.message;
+        // console.log('data jalan GetlistByPaging upja', data);
+        if (status === 0) {
+          this.showNotification(message, 'error');
+          this.setState({
+            loadingPageAlsin: false,
+          });
+        } else {
+          this.showNotification('Data ditemukan!', 'info');
+          this.setState({
+            resultAlsin: [resultAlsin],
+            resultAlsinItemOtherService: resultAlsinItem.data,
+            loadingPageAlsin: false,
+            maxPageSukuCadang: data.result.max_page,
           });
         }
       })
@@ -491,7 +728,11 @@ class showTransactionDetail extends React.Component {
   getDetailAlsinItem(currPage, currLimit) {
     var alsin_item_id = this.state.detailAlsinItem.alsin_item_id;
     const url =
-      myUrl.url_getDetailAlsinItem + '?alsin_item_id=' + alsin_item_id;
+      myUrl.url_getDetailAlsinItem +
+      '?alsin_item_id=' +
+      alsin_item_id +
+      '&page=' +
+      currPage;
     var token = window.localStorage.getItem('tokenCookies');
     // console.log('URL GET LIST ALSIN DETAIL', url);
 
@@ -544,7 +785,82 @@ class showTransactionDetail extends React.Component {
           this.showNotification('Data ditemukan!', 'info');
           this.setState({
             resultDetailAlsinItem: [resultDetailAlsinItem],
-            resultDetailTransactionAlsinItem: resultDetailTransactionAlsinItem,
+            resultDetailTransactionAlsinItem:
+              resultDetailTransactionAlsinItem.data,
+            maxPageTransactionAlsinItem: data.result.max_page,
+            loadingPageDetailAlsin: false,
+          });
+        }
+      })
+      .catch(err => {
+        // console.log('ERRORNYA', err);
+        this.showNotification('Error ke server!', 'error');
+        this.setState({
+          loadingPageDetailAlsin: false,
+        });
+      });
+  }
+
+  getDetailAlsinItemPagination(currPage, currLimit) {
+    var alsin_item_id = this.state.detailAlsinItem.alsin_item_id;
+    const url =
+      myUrl.url_getDetailAlsinItem +
+      '?alsin_item_id=' +
+      alsin_item_id +
+      '&page=' +
+      currPage;
+    var token = window.localStorage.getItem('tokenCookies');
+    // console.log('URL GET LIST ALSIN DETAIL', url);
+
+    this.setState({ loadingPageDetailAlsin: true });
+    // console.log("offset", offset, "currLimit", currLimit);
+
+    const option = {
+      method: 'GET',
+      json: true,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+        Authorization: `${'Bearer'} ${token}`,
+      },
+    };
+    // console.log('option', option);
+    fetch(url, option)
+      .then(response => {
+        // trace.stop();
+        if (response.ok) {
+          return response.json();
+        } else {
+          if (response.status === 401) {
+            this.showNotification('Username/Password salah!', 'error');
+          } else if (response.status === 500) {
+            this.showNotification('Internal Server Error', 'error');
+          } else {
+            this.showNotification('Response ke server gagal!', 'error');
+          }
+          this.setState({
+            loadingPageDetailAlsin: false,
+          });
+        }
+      })
+      .then(data => {
+        // console.log('DATA ALSIN DETAIL', data);
+        var status = data.status;
+        var resultDetailAlsinItem = data.result.alsin_items;
+        var resultDetailTransactionAlsinItem = data.result.transactions;
+        var message = data.result.message;
+        // console.log('data jalan GetlistByPaging upja', data);
+        if (status === 0) {
+          this.showNotification(message, 'error');
+          this.setState({
+            loadingPageDetailAlsin: false,
+          });
+        } else {
+          this.showNotification('Data ditemukan!', 'info');
+          this.setState({
+            resultDetailAlsinItem: [resultDetailAlsinItem],
+            resultDetailTransactionAlsinItem:
+              resultDetailTransactionAlsinItem.data,
+            maxPageTransactionAlsinItem: data.result.max_page,
             loadingPageDetailAlsin: false,
           });
         }
@@ -823,10 +1139,10 @@ class showTransactionDetail extends React.Component {
     }
     if (window.location.pathname.includes('farmer')) {
       // console.log('INCLUDES FARMER');
-      this.getListbyPagingFarmer();
+      this.getListbyPagingFarmer(this.state.currentPage);
     } else {
       // console.log('INCLUDES UPJA');
-      this.getListbyPagingUpja();
+      this.getListbyPagingUpja(this.state.currentPage);
     }
   }
 
@@ -925,6 +1241,15 @@ class showTransactionDetail extends React.Component {
           maxPages: 1,
           currentPages: 1,
           ecommerceIDtemp: this.state.ecommerceID,
+          realCurrentPageAlsinItem: 1,
+          currentPageAlsinItem: 1,
+          maxPageAlsinItem: 1,
+          realCurrentPageSukuCadang: 1,
+          currentPageSukuCadang: 1,
+          maxPageSukuCadang: 1,
+          realCurrentPageTransactionAlsinItem: 1,
+          currentPageTransactionAlsinItem: 1,
+          maxPageTransactionAlsinItem: 1,
         },
         // () => this.getProvinsi(1, this.state.todosPerPages),
       );
@@ -937,6 +1262,15 @@ class showTransactionDetail extends React.Component {
         realCurrentPages: 1,
         maxPages: 1,
         currentPages: 1,
+        realCurrentPageAlsinItem: 1,
+        currentPageAlsinItem: 1,
+        maxPageAlsinItem: 1,
+        realCurrentPageSukuCadang: 1,
+        currentPageSukuCadang: 1,
+        maxPageSukuCadang: 1,
+        realCurrentPageTransactionAlsinItem: 1,
+        currentPageTransactionAlsinItem: 1,
+        maxPageTransactionAlsinItem: 1,
       },
       // () => this.getProvinsi(1, this.state.todosPerPages),
     );
@@ -996,7 +1330,7 @@ class showTransactionDetail extends React.Component {
         detailAlsin: todo,
         // namaEcommerce: '',
       },
-      () => this.getDetailAlsin(),
+      () => this.getDetailAlsin(this.state.currentPageAlsinItem),
     );
   }
 
@@ -1006,7 +1340,7 @@ class showTransactionDetail extends React.Component {
         detailAlsin: todo,
         // namaEcommerce: '',
       },
-      () => this.getDetailOtherService(),
+      () => this.getDetailOtherService(this.state.currentPageSukuCadang),
     );
   }
 
@@ -1016,7 +1350,7 @@ class showTransactionDetail extends React.Component {
         detailAlsinItem: todo,
         // namaEcommerce: '',
       },
-      () => this.getDetailAlsinItem(),
+      () => this.getDetailAlsinItem(this.state.currentPageTransactionAlsinItem),
     );
   }
   setModalDetailTransaction(todo) {
@@ -1797,28 +2131,66 @@ class showTransactionDetail extends React.Component {
                 <Table responsive striped id="tableUtama">
                   {window.location.pathname.includes('farmer') && (
                     <thead>
-                      <tr>
-                        <th>Alsin ID</th>
-                        <th>Biaya Transport</th>
-                        <th>Total Biaya</th>
-                        <th>UPJA</th>
-                        <th>Waktu Order</th>
-                        <th>Waktu Kirim</th>
-                        <th>Status</th>
-                      </tr>
+                      {
+                        <tr>
+                          <td
+                            colSpan="10"
+                            className="text-right"
+                            style={{ border: 'none' }}
+                          >
+                            <Label style={{ width: '50%', textAlign: 'right' }}>
+                              {' '}
+                              {'Halaman : ' +
+                                this.state.realCurrentPage +
+                                ' / ' +
+                                this.state.maxPage}
+                            </Label>
+                          </td>
+                        </tr>
+                      }
+                      {
+                        <tr>
+                          <th>Alsin ID</th>
+                          <th>Biaya Transport</th>
+                          <th>Total Biaya</th>
+                          <th>UPJA</th>
+                          <th>Waktu Order</th>
+                          <th>Waktu Kirim</th>
+                          <th>Status</th>
+                        </tr>
+                      }
                     </thead>
                   )}
                   {window.location.pathname.includes('upja') && (
                     <thead>
-                      <tr>
-                        <th>Alsin ID</th>
-                        <th>Biaya Transport</th>
-                        <th>Total Biaya</th>
-                        <th>Farmer</th>
-                        <th>Waktu Order</th>
-                        <th>Waktu Kirim</th>
-                        <th>Status</th>
-                      </tr>
+                      {
+                        <tr>
+                          <td
+                            colSpan="10"
+                            className="text-right"
+                            style={{ border: 'none' }}
+                          >
+                            <Label style={{ width: '50%', textAlign: 'right' }}>
+                              {' '}
+                              {'Halaman : ' +
+                                this.state.realCurrentPage +
+                                ' / ' +
+                                this.state.maxPage}
+                            </Label>
+                          </td>
+                        </tr>
+                      }
+                      {
+                        <tr>
+                          <th>Alsin ID</th>
+                          <th>Biaya Transport</th>
+                          <th>Total Biaya</th>
+                          <th>Farmer</th>
+                          <th>Waktu Order</th>
+                          <th>Waktu Kirim</th>
+                          <th>Status</th>
+                        </tr>
+                      }
                     </thead>
                   )}
 
@@ -1883,6 +2255,69 @@ class showTransactionDetail extends React.Component {
                     </tbody>
                   )}
                 </Table>
+              </CardBody>
+              <CardBody>
+                <Row>
+                  <Col md="9" sm="12" xs="12"></Col>
+                  <Col md="3" sm="12" xs="12">
+                    <Card className="mb-3s">
+                      <ButtonGroup>
+                        <Button
+                          name="FirstButton"
+                          value={1}
+                          onClick={e =>
+                            this.paginationButton(e, 0, this.state.maxPage)
+                          }
+                        >
+                          &#10092;&#10092;
+                        </Button>
+                        <Button
+                          name="PrevButton"
+                          value={this.state.currentPage}
+                          onClick={e =>
+                            this.paginationButton(e, -1, this.state.maxPage)
+                          }
+                        >
+                          &#10092;
+                        </Button>
+                        <input
+                          type="text"
+                          placeholder="Page"
+                          disabled={true}
+                          outline="none"
+                          value={this.state.currentPage}
+                          onChange={e =>
+                            this.setState({ currentPage: e.target.value })
+                          }
+                          onKeyPress={e => this.enterPressedPage(e)}
+                          style={{
+                            height: '38px',
+                            width: '75px',
+                            textAlign: 'center',
+                          }}
+                        />
+                        <Button
+                          name="NextButton"
+                          value={this.state.currentPage}
+                          onClick={e =>
+                            this.paginationButton(e, 1, this.state.maxPage)
+                          }
+                        >
+                          &#10093;
+                        </Button>
+                        <Button
+                          name="LastButton"
+                          value={this.state.maxPage}
+                          onClick={e =>
+                            this.paginationButton(e, 0, this.state.maxPage)
+                          }
+                        >
+                          &#10093;&#10093;
+                        </Button>
+                      </ButtonGroup>
+                    </Card>
+                  </Col>
+                </Row>
               </CardBody>
             </Card>
           </Col>
@@ -2182,16 +2617,33 @@ class showTransactionDetail extends React.Component {
                 </Col>
               </Row>
             </Form>
-          </ModalBody>
-          <ModalFooter>
             <Table responsive striped>
               <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>No. Reg Alsin</th>
-                  <th>Deskripsi</th>
-                  <th>Status</th>
-                </tr>
+                {
+                  <tr>
+                    <td
+                      colSpan="6"
+                      className="text-right"
+                      style={{ border: 'none' }}
+                    >
+                      <Label style={{ width: '50%', textAlign: 'right' }}>
+                        {' '}
+                        {'Halaman : ' +
+                          this.state.realCurrentPageAlsinItem +
+                          ' / ' +
+                          this.state.maxPageAlsinItem}
+                      </Label>
+                    </td>
+                  </tr>
+                }
+                {
+                  <tr>
+                    <th>ID</th>
+                    <th>No. Reg Alsin</th>
+                    <th>Deskripsi</th>
+                    <th>Status</th>
+                  </tr>
+                }
               </thead>
               <tbody>
                 {currentTodosAlsinItem.length === 0 &&
@@ -2218,13 +2670,93 @@ class showTransactionDetail extends React.Component {
                 )}
               </tbody>
             </Table>
-          </ModalFooter>
+            <CardBody>
+              <Row>
+                <Col md="9" sm="12" xs="12"></Col>
+                <Col md="3" sm="12" xs="12">
+                  <Card className="mb-3s">
+                    <ButtonGroup>
+                      <Button
+                        name="FirstButton"
+                        value={1}
+                        onClick={e =>
+                          this.paginationButtonAlsinItem(
+                            e,
+                            0,
+                            this.state.maxPageAlsinItem,
+                          )
+                        }
+                      >
+                        &#10092;&#10092;
+                      </Button>
+                      <Button
+                        name="PrevButton"
+                        value={this.state.currentPageAlsinItem}
+                        onClick={e =>
+                          this.paginationButtonAlsinItem(
+                            e,
+                            -1,
+                            this.state.maxPageAlsinItem,
+                          )
+                        }
+                      >
+                        &#10092;
+                      </Button>
+                      <input
+                        type="text"
+                        placeholder="Page"
+                        disabled={true}
+                        outline="none"
+                        value={this.state.currentPageAlsinItem}
+                        onChange={e =>
+                          this.setState({
+                            currentPageAlsinItem: e.target.value,
+                          })
+                        }
+                        onKeyPress={e => this.enterPressedPage(e)}
+                        style={{
+                          height: '38px',
+                          width: '75px',
+                          textAlign: 'center',
+                        }}
+                      />
+                      <Button
+                        name="NextButton"
+                        value={this.state.currentPageAlsinItem}
+                        onClick={e =>
+                          this.paginationButtonAlsinItem(
+                            e,
+                            1,
+                            this.state.maxPageAlsinItem,
+                          )
+                        }
+                      >
+                        &#10093;
+                      </Button>
+                      <Button
+                        name="LastButton"
+                        value={this.state.maxPageAlsinItem}
+                        onClick={e =>
+                          this.paginationButtonAlsinItem(
+                            e,
+                            0,
+                            this.state.maxPageAlsinItem,
+                          )
+                        }
+                      >
+                        &#10093;&#10093;
+                      </Button>
+                    </ButtonGroup>
+                  </Card>
+                </Col>
+              </Row>
+            </CardBody>
+          </ModalBody>
         </Modal>
         {/* Modal Detail Alsin List */}
 
         {/* Modal Detail Other Service List */}
         <Modal
-          size="sm"
           onExit={this.handleCloseDomisili}
           isOpen={this.state.modal_nested_parent_detail_otherService}
           toggle={this.toggle('nested_parent_detail_otherService')}
@@ -2235,12 +2767,31 @@ class showTransactionDetail extends React.Component {
           >
             Detail Servis Lainnya
           </ModalHeader>
-          <ModalFooter>
+          <ModalBody>
             <Table responsive striped>
               <thead>
-                <tr>
-                  <th>Nama</th>
-                </tr>
+                {
+                  <tr>
+                    <td
+                      colSpan="6"
+                      className="text-right"
+                      style={{ border: 'none' }}
+                    >
+                      <Label style={{ width: '50%', textAlign: 'right' }}>
+                        {' '}
+                        {'Halaman : ' +
+                          this.state.realCurrentPageSukuCadang +
+                          ' / ' +
+                          this.state.maxPageSukuCadang}
+                      </Label>
+                    </td>
+                  </tr>
+                }
+                {
+                  <tr>
+                    <th>Nama</th>
+                  </tr>
+                }
               </thead>
               <tbody>
                 {currentTodosAlsinItemOtherService.length === 0 &&
@@ -2267,7 +2818,87 @@ class showTransactionDetail extends React.Component {
                 )}
               </tbody>
             </Table>
-          </ModalFooter>
+            <CardBody>
+              <Row>
+                <Col>
+                  <Card className="mb-3s">
+                    <ButtonGroup>
+                      <Button
+                        name="FirstButton"
+                        value={1}
+                        onClick={e =>
+                          this.paginationButtonSukuCadang(
+                            e,
+                            0,
+                            this.state.maxPageSukuCadang,
+                          )
+                        }
+                      >
+                        &#10092;&#10092;
+                      </Button>
+                      <Button
+                        name="PrevButton"
+                        value={this.state.currentPageSukuCadang}
+                        onClick={e =>
+                          this.paginationButtonSukuCadang(
+                            e,
+                            -1,
+                            this.state.maxPageSukuCadang,
+                          )
+                        }
+                      >
+                        &#10092;
+                      </Button>
+                      <input
+                        type="text"
+                        placeholder="Page"
+                        disabled={true}
+                        outline="none"
+                        value={this.state.currentPageSukuCadang}
+                        onChange={e =>
+                          this.setState({
+                            currentPageSukuCadang: e.target.value,
+                          })
+                        }
+                        onKeyPress={e => this.enterPressedPage(e)}
+                        style={{
+                          height: '38px',
+                          width: '75px',
+                          textAlign: 'center',
+                        }}
+                      />
+                      <Button
+                        name="NextButton"
+                        value={this.state.currentPageSukuCadang}
+                        onClick={e =>
+                          this.paginationButtonSukuCadang(
+                            e,
+                            1,
+                            this.state.maxPageSukuCadang,
+                          )
+                        }
+                      >
+                        &#10093;
+                      </Button>
+                      <Button
+                        name="LastButton"
+                        value={this.state.maxPageSukuCadang}
+                        onClick={e =>
+                          this.paginationButtonSukuCadang(
+                            e,
+                            0,
+                            this.state.maxPageSukuCadang,
+                          )
+                        }
+                      >
+                        &#10093;&#10093;
+                      </Button>
+                    </ButtonGroup>
+                  </Card>
+                </Col>
+              </Row>
+            </CardBody>
+          </ModalBody>
         </Modal>
         {/* Modal Detail Other Service List */}
 
@@ -2427,19 +3058,36 @@ class showTransactionDetail extends React.Component {
                 </Col>
               </Row>
             </Form>
-          </ModalBody>
-          <ModalFooter>
             <Table responsive striped>
               <thead>
-                <tr>
-                  <th>UPJA</th>
-                  <th>Farmer</th>
-                  <th>Biaya Transport</th>
-                  <th>Total Biaya</th>
-                  <th>Waktu Pesan</th>
-                  <th>Waktu Kirim</th>
-                  <th>Status</th>
-                </tr>
+                {
+                  <tr>
+                    <td
+                      colSpan="10"
+                      className="text-right"
+                      style={{ border: 'none' }}
+                    >
+                      <Label style={{ width: '50%', textAlign: 'right' }}>
+                        {' '}
+                        {'Halaman : ' +
+                          this.state.realCurrentPageTransactionAlsinItem +
+                          ' / ' +
+                          this.state.maxPageTransactionAlsinItem}
+                      </Label>
+                    </td>
+                  </tr>
+                }
+                {
+                  <tr>
+                    <th>UPJA</th>
+                    <th>Farmer</th>
+                    <th>Biaya Transport</th>
+                    <th>Total Biaya</th>
+                    <th>Waktu Pesan</th>
+                    <th>Waktu Kirim</th>
+                    <th>Status</th>
+                  </tr>
+                }
               </thead>
               <tbody>
                 {/* {console.log('DETAIL ALSIN ITEMS', currentTodosDetailAlsinItem)} */}
@@ -2467,7 +3115,88 @@ class showTransactionDetail extends React.Component {
                 )}
               </tbody>
             </Table>
-          </ModalFooter>
+            <CardBody>
+              <Row>
+                <Col md="9" sm="12" xs="12"></Col>
+                <Col md="3" sm="12" xs="12">
+                  <Card className="mb-3s">
+                    <ButtonGroup>
+                      <Button
+                        name="FirstButton"
+                        value={1}
+                        onClick={e =>
+                          this.paginationButtonTransactionAlsinItem(
+                            e,
+                            0,
+                            this.state.maxPageTransactionAlsinItem,
+                          )
+                        }
+                      >
+                        &#10092;&#10092;
+                      </Button>
+                      <Button
+                        name="PrevButton"
+                        value={this.state.currentPageTransactionAlsinItem}
+                        onClick={e =>
+                          this.paginationButtonTransactionAlsinItem(
+                            e,
+                            -1,
+                            this.state.maxPageTransactionAlsinItem,
+                          )
+                        }
+                      >
+                        &#10092;
+                      </Button>
+                      <input
+                        type="text"
+                        placeholder="Page"
+                        disabled={true}
+                        outline="none"
+                        value={this.state.currentPageTransactionAlsinItem}
+                        onChange={e =>
+                          this.setState({
+                            currentPageTransactionAlsinItem: e.target.value,
+                          })
+                        }
+                        onKeyPress={e => this.enterPressedPage(e)}
+                        style={{
+                          height: '38px',
+                          width: '75px',
+                          textAlign: 'center',
+                        }}
+                      />
+                      <Button
+                        name="NextButton"
+                        value={this.state.currentPageTransactionAlsinItem}
+                        onClick={e =>
+                          this.paginationButtonTransactionAlsinItem(
+                            e,
+                            1,
+                            this.state.maxPageTransactionAlsinItem,
+                          )
+                        }
+                      >
+                        &#10093;
+                      </Button>
+                      <Button
+                        name="LastButton"
+                        value={this.state.maxPageTransactionAlsinItem}
+                        onClick={e =>
+                          this.paginationButtonTransactionAlsinItem(
+                            e,
+                            0,
+                            this.state.maxPageTransactionAlsinItem,
+                          )
+                        }
+                      >
+                        &#10093;&#10093;
+                      </Button>
+                    </ButtonGroup>
+                  </Card>
+                </Col>
+              </Row>
+            </CardBody>
+          </ModalBody>
         </Modal>
         {/* Modal Detail Alsin Item List */}
 

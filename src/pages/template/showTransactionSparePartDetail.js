@@ -12,7 +12,9 @@ import {
   ModalBody,
   ModalFooter,
   ModalHeader,
-  ButtonGroup,CardHeader
+  ButtonGroup,
+  CardHeader,
+  Label
 } from 'reactstrap';
 import {
   MdSearch,
@@ -38,6 +40,9 @@ class showTransactionSparePartDetail extends React.Component {
       loading: false,
       loadingPage: true,
       spare_part_type_id: props.match.params.spare_part_type_id,
+      currentPage: 1,
+      realCurrentPage: 1,
+      maxPage: 1,
     };
   }
 
@@ -57,7 +62,8 @@ class showTransactionSparePartDetail extends React.Component {
   // get data Spare Part
   getListbyPagingSparePart(currPage, currLimit) {
     var spare_part_type_id = this.state.spare_part_type_id;
-    const url = myUrl.url_showSparePart + spare_part_type_id;
+    const url =
+      myUrl.url_showSparePart + spare_part_type_id + '&page=' + currPage;
     var token = window.localStorage.getItem('tokenCookies');
     // console.log('URL GET LIST', url);
 
@@ -104,7 +110,8 @@ class showTransactionSparePartDetail extends React.Component {
         } else {
           this.showNotification('Data ditemukan!', 'info');
           this.setState({
-            resultSparePart: resultSparePart,
+            resultSparePart: resultSparePart.data,
+            maxPage: data.result.max_page,
             loadingPage: false,
           });
         }
@@ -123,7 +130,7 @@ class showTransactionSparePartDetail extends React.Component {
     if (token === '' || token === null || token === undefined) {
       window.location.replace('/login');
     }
-    this.getListbyPagingSparePart();
+    this.getListbyPagingSparePart(this.state.currentPage);
   }
 
   toggle = (modalType, todo) => () => {
@@ -142,6 +149,39 @@ class showTransactionSparePartDetail extends React.Component {
 
   handleClose = () => {
     this.setState({ loading: false, loadingPage: false });
+  };
+
+  //set Current Page
+  paginationButton(event, flag, maxPage = 0) {
+    var currPage = Number(event.target.value);
+    if (currPage + flag > 0 && currPage + flag <= maxPage) {
+      this.setState(
+        {
+          currentPage: currPage + flag,
+          realCurrentPage: currPage + flag,
+        },
+        () => {
+          this.getListbyPagingSparePart(this.state.currentPage);
+        },
+      );
+    }
+  }
+
+  enterPressedSearch = event => {
+    var code = event.keyCode || event.which;
+    if (code === 13) {
+      // this.showNotification('Sedang Mencari data', 'info');
+      event.preventDefault();
+      this.setState(
+        {
+          currentPage: 1,
+          realCurrentPage: 1,
+        },
+        () => {
+          this.getListbyPagingSparePart(this.state.currentPage);
+        },
+      );
+    }
   };
 
   render() {
@@ -214,12 +254,31 @@ class showTransactionSparePartDetail extends React.Component {
               <CardBody>
                 <Table responsive striped id="tableUtama">
                   <thead>
-                    <tr>
-                      <th>Nama Suku Cadang</th>
-                      <th>Kode Produk</th>
-                      <th>Nomor Part</th>
-                      <th>Hapus</th>
-                    </tr>
+                    {
+                      <tr>
+                        <td
+                          colSpan="10"
+                          className="text-right"
+                          style={{ border: 'none' }}
+                        >
+                          <Label style={{ width: '50%', textAlign: 'right' }}>
+                            {' '}
+                            {'Halaman : ' +
+                              this.state.realCurrentPage +
+                              ' / ' +
+                              this.state.maxPage}
+                          </Label>
+                        </td>
+                      </tr>
+                    }
+                    {
+                      <tr>
+                        <th>Nama Suku Cadang</th>
+                        <th>Kode Produk</th>
+                        <th>Nomor Part</th>
+                        <th>Hapus</th>
+                      </tr>
+                    }
                   </thead>
 
                   <tbody>
@@ -247,6 +306,69 @@ class showTransactionSparePartDetail extends React.Component {
                     )}
                   </tbody>
                 </Table>
+              </CardBody>
+              <CardBody>
+                <Row>
+                  <Col md="9" sm="12" xs="12"></Col>
+                  <Col md="3" sm="12" xs="12">
+                    <Card className="mb-3s">
+                      <ButtonGroup>
+                        <Button
+                          name="FirstButton"
+                          value={1}
+                          onClick={e =>
+                            this.paginationButton(e, 0, this.state.maxPage)
+                          }
+                        >
+                          &#10092;&#10092;
+                        </Button>
+                        <Button
+                          name="PrevButton"
+                          value={this.state.currentPage}
+                          onClick={e =>
+                            this.paginationButton(e, -1, this.state.maxPage)
+                          }
+                        >
+                          &#10092;
+                        </Button>
+                        <input
+                          type="text"
+                          placeholder="Page"
+                          disabled={true}
+                          outline="none"
+                          value={this.state.currentPage}
+                          onChange={e =>
+                            this.setState({ currentPage: e.target.value })
+                          }
+                          onKeyPress={e => this.enterPressedPage(e)}
+                          style={{
+                            height: '38px',
+                            width: '75px',
+                            textAlign: 'center',
+                          }}
+                        />
+                        <Button
+                          name="NextButton"
+                          value={this.state.currentPage}
+                          onClick={e =>
+                            this.paginationButton(e, 1, this.state.maxPage)
+                          }
+                        >
+                          &#10093;
+                        </Button>
+                        <Button
+                          name="LastButton"
+                          value={this.state.maxPage}
+                          onClick={e =>
+                            this.paginationButton(e, 0, this.state.maxPage)
+                          }
+                        >
+                          &#10093;&#10093;
+                        </Button>
+                      </ButtonGroup>
+                    </Card>
+                  </Col>
+                </Row>
               </CardBody>
             </Card>
           </Col>

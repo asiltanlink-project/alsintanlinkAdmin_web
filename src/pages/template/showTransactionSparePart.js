@@ -49,6 +49,9 @@ class showTransactionSparePart extends React.Component {
       resultTransactionSparePart: [],
       loadingPage: false,
       typeDisabled: false,
+      currentPage: 1,
+      realCurrentPage: 1,
+      maxPage: 1,
     };
   }
 
@@ -70,7 +73,7 @@ class showTransactionSparePart extends React.Component {
     var offset = (currPage - 1) * currLimit;
     var keyword = this.state.keywordList;
     var pilihAlsin = this.state.pilihAlsin;
-    const urlA = myUrl.url_showSparePartType + pilihAlsin;
+    const urlA = myUrl.url_showSparePartType + pilihAlsin + '&page=' + currPage;
     console.log('jalan', urlA);
     var token = window.localStorage.getItem('tokenCookies');
     this.setState({ loadingPage: true });
@@ -94,8 +97,8 @@ class showTransactionSparePart extends React.Component {
           this.showNotification('Data tidak ditemukan!', 'error');
         } else {
           this.setState({
-            resultTransactionSparePart: data.result.spare_part_types,
-            // maxPages: data.metadata.pages ? data.metadata.pages : 1,
+            resultTransactionSparePart: data.result.spare_part_types.data,
+            maxPage: data.result.max_page,
             loading: false,
             loadingPage: false,
           });
@@ -170,7 +173,7 @@ class showTransactionSparePart extends React.Component {
   getAllAlsinType() {
     const url = myUrl.url_allAlsinType;
     var token = window.localStorage.getItem('tokenCookies');
-    // console.log('URL GET LIST', url);
+    console.log('URL GET LIST', url);
 
     this.setState({ loadingAlsin: true });
     // console.log("offset", offset, "currLimit", currLimit);
@@ -235,7 +238,6 @@ class showTransactionSparePart extends React.Component {
     if (token === '' || token === null || token === undefined) {
       window.location.replace('/login');
     }
-    // this.getSparePart(this.state.currentPages, this.state.todosPerPages);
     var alsinID = window.localStorage.getItem('alsinID');
     console.log('ALSIN ID', alsinID);
     if (alsinID !== null) {
@@ -310,7 +312,7 @@ class showTransactionSparePart extends React.Component {
           {
             namaAlsin: '',
           },
-          () => this.getSparePart(),
+          () => this.getSparePart(this.state.currentPage),
         ),
     );
   }
@@ -331,6 +333,39 @@ class showTransactionSparePart extends React.Component {
     window.localStorage.removeItem('alsinID');
     window.history.back();
   }
+
+  //set Current Page
+  paginationButton(event, flag, maxPage = 0) {
+    var currPage = Number(event.target.value);
+    if (currPage + flag > 0 && currPage + flag <= maxPage) {
+      this.setState(
+        {
+          currentPage: currPage + flag,
+          realCurrentPage: currPage + flag,
+        },
+        () => {
+          this.getSparePart(this.state.currentPage);
+        },
+      );
+    }
+  }
+
+  enterPressedSearch = event => {
+    var code = event.keyCode || event.which;
+    if (code === 13) {
+      // this.showNotification('Sedang Mencari data', 'info');
+      event.preventDefault();
+      this.setState(
+        {
+          currentPage: 1,
+          realCurrentPage: 1,
+        },
+        () => {
+          this.getSparePart(this.state.currentPage);
+        },
+      );
+    }
+  };
 
   render() {
     const { loading, loadingPage } = this.state;
@@ -360,7 +395,7 @@ class showTransactionSparePart extends React.Component {
                       textDecoration: 'underline',
                       color: '#009688',
                     }}
-                    onClick={()=>window.localStorage.removeItem('alsinID')}
+                    onClick={() => window.localStorage.removeItem('alsinID')}
                   >
                     {todo.spare_part_type_name}
                   </Label>
@@ -484,10 +519,29 @@ class showTransactionSparePart extends React.Component {
               <CardBody>
                 <Table responsive striped id="tableUtama">
                   <thead>
-                    <tr>
-                      <th>Suku Cadang</th>
-                      <th>Edit</th>
-                    </tr>
+                    {
+                      <tr>
+                        <td
+                          colSpan="10"
+                          className="text-right"
+                          style={{ border: 'none' }}
+                        >
+                          <Label style={{ width: '50%', textAlign: 'right' }}>
+                            {' '}
+                            {'Halaman : ' +
+                              this.state.realCurrentPage +
+                              ' / ' +
+                              this.state.maxPage}
+                          </Label>
+                        </td>
+                      </tr>
+                    }
+                    {
+                      <tr>
+                        <th>Suku Cadang</th>
+                        <th>Edit</th>
+                      </tr>
+                    }
                   </thead>
                   <tbody>
                     {TransactionAllSparePart.length === 0 &&
@@ -514,6 +568,69 @@ class showTransactionSparePart extends React.Component {
                     )}
                   </tbody>
                 </Table>
+              </CardBody>
+              <CardBody>
+                <Row>
+                  <Col md="9" sm="12" xs="12"></Col>
+                  <Col md="3" sm="12" xs="12">
+                    <Card className="mb-3s">
+                      <ButtonGroup>
+                        <Button
+                          name="FirstButton"
+                          value={1}
+                          onClick={e =>
+                            this.paginationButton(e, 0, this.state.maxPage)
+                          }
+                        >
+                          &#10092;&#10092;
+                        </Button>
+                        <Button
+                          name="PrevButton"
+                          value={this.state.currentPage}
+                          onClick={e =>
+                            this.paginationButton(e, -1, this.state.maxPage)
+                          }
+                        >
+                          &#10092;
+                        </Button>
+                        <input
+                          type="text"
+                          placeholder="Page"
+                          disabled={true}
+                          outline="none"
+                          value={this.state.currentPage}
+                          onChange={e =>
+                            this.setState({ currentPage: e.target.value })
+                          }
+                          onKeyPress={e => this.enterPressedPage(e)}
+                          style={{
+                            height: '38px',
+                            width: '75px',
+                            textAlign: 'center',
+                          }}
+                        />
+                        <Button
+                          name="NextButton"
+                          value={this.state.currentPage}
+                          onClick={e =>
+                            this.paginationButton(e, 1, this.state.maxPage)
+                          }
+                        >
+                          &#10093;
+                        </Button>
+                        <Button
+                          name="LastButton"
+                          value={this.state.maxPage}
+                          onClick={e =>
+                            this.paginationButton(e, 0, this.state.maxPage)
+                          }
+                        >
+                          &#10093;&#10093;
+                        </Button>
+                      </ButtonGroup>
+                    </Card>
+                  </Col>
+                </Row>
               </CardBody>
             </Card>
           </Col>
