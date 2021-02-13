@@ -18,23 +18,12 @@ import {
   InputGroup,
   InputGroupAddon,
 } from 'reactstrap';
-import {
-  MdSearch,
-  MdAutorenew,
-  MdEdit,
-  MdDelete,
-  MdList,
-  MdAdd,
-  MdAddAlert,
-} from 'react-icons/md';
-import { MdLoyalty, MdRefresh } from 'react-icons/md';
+import { MdSearch, MdAutorenew, MdList, MdAddAlert } from 'react-icons/md';
+import { MdLoyalty } from 'react-icons/md';
 import NotificationSystem from 'react-notification-system';
 import { NOTIFICATION_SYSTEM_STYLE } from 'utils/constants';
 import * as myUrl from 'pages/urlLink.js';
-import * as firebase from 'firebase/app';
-import { Scrollbar } from 'react-scrollbars-custom';
 import LoadingSpinner from 'pages/LoadingSpinner.js';
-import { BrowserRouter as Router, Route, Link } from 'react-router-dom';
 class showTransaction extends React.Component {
   constructor(props) {
     super(props);
@@ -69,7 +58,6 @@ class showTransaction extends React.Component {
   enterPressedSearch = event => {
     var code = event.keyCode || event.which;
     if (code === 13) {
-      // this.showNotification('Sedang Mencari data', 'info');
       event.preventDefault();
       this.setState(
         {
@@ -97,8 +85,7 @@ class showTransaction extends React.Component {
   };
 
   // get data Transaksi
-  getListbyPagingTransaksi(currPage, currLimit) {
-    // const trace = perf.trace('getBundling');
+  getListbyPagingTransaksi(currPage) {
     var province_id = this.state.pilihProvinsi;
     const url =
       myUrl.url_getAllUpjaTransaction +
@@ -110,7 +97,6 @@ class showTransaction extends React.Component {
     // console.log('URL GET LIST', url);
 
     this.setState({ loading: true });
-    // console.log("offset", offset, "currLimit", currLimit);
 
     const option = {
       method: 'GET',
@@ -120,10 +106,8 @@ class showTransaction extends React.Component {
         Authorization: `${'Bearer'} ${token}`,
       },
     };
-    // console.log('option', option);
     fetch(url, option)
       .then(response => {
-        // trace.stop();
         if (response.ok) {
           return response.json();
         } else {
@@ -141,7 +125,6 @@ class showTransaction extends React.Component {
       })
       .then(data => {
         var status = data.status;
-        // var resultTransaction = data.result.transactions;
         var resultTransactionAll = data.result.transactions_all;
         var message = data.result.message;
         console.log('data jalan GetlistByPaging', data);
@@ -159,7 +142,6 @@ class showTransaction extends React.Component {
           } else {
             this.showNotification('Data ditemukan!', 'info');
             this.setState({
-              // resultTransaction: resultTransaction,
               resultTransactionAll: resultTransactionAll.data,
               maxPage: data.result.max_page,
               loading: false,
@@ -177,9 +159,7 @@ class showTransaction extends React.Component {
   }
 
   // Get Provinsi
-  getProvinsi(currPage, currLimit) {
-    var offset = (currPage - 1) * currLimit;
-    var keyword = this.state.keywordList;
+  getProvinsi() {
     const urlA = myUrl.url_getProvince;
     // console.log('jalan', urlA);
     this.setState({ loadingPage: true });
@@ -198,13 +178,11 @@ class showTransaction extends React.Component {
         }
       })
       .then(data => {
-        // console.log('data Provinsi', data.result);
         if (data.status === 0) {
           this.showNotification('Data tidak ditemukan!', 'error');
         } else {
           this.setState({
             resultProvinsi: data.result.provinces,
-            // maxPages: data.metadata.pages ? data.metadata.pages : 1,
             loading: false,
             loadingPage: false,
           });
@@ -216,7 +194,7 @@ class showTransaction extends React.Component {
   sendAlert() {
     const urlA = myUrl.url_sendUpjaAlert;
     var token = window.localStorage.getItem('tokenCookies');
-    // console.log('jalan kecamatan', urlA);
+    // console.log('alert link', urlA);
     this.setState({ loadingPage: true });
     var payload = {};
     const option = {
@@ -235,7 +213,6 @@ class showTransaction extends React.Component {
         }
       })
       .then(data => {
-        // console.log('data Alert', data);
         if (data.status === 0) {
           this.showNotification(data.result.message, 'error');
           this.setState({
@@ -276,8 +253,6 @@ class showTransaction extends React.Component {
       pilihProvinsi: event.target.value,
       namaProvinsi: nama.name,
       modal_nested_parent_list_provinsi: false,
-      keywordList: '',
-      domisiliDisabled: false,
     });
   };
   // untuk pilih Provinsi
@@ -286,17 +261,14 @@ class showTransaction extends React.Component {
     if (!modalType) {
       return this.setState({
         modal: !this.state.modal,
-        keywordList: '',
         realCurrentPages: 1,
         maxPages: 1,
         currentPages: 1,
-        ecommerceIDtemp: this.state.ecommerceID,
       });
     }
 
     this.setState({
       [`modal_${modalType}`]: !this.state[`modal_${modalType}`],
-      keywordList: '',
       realCurrentPages: 1,
       maxPages: 1,
       currentPages: 1,
@@ -319,13 +291,11 @@ class showTransaction extends React.Component {
   }
 
   findData() {
-    // console.log('KLIK FIND DATA');
     var buttonSearch = document.getElementById('buttonSearch');
     buttonSearch.disabled = true;
     this.setState(
       {
         namaProvinsiSave: this.state.namaProvinsi,
-        resultUpja: [],
       },
       () =>
         this.setState(
@@ -428,7 +398,6 @@ class showTransaction extends React.Component {
                       style={{ fontWeight: 'bold' }}
                       value={this.state.namaProvinsi}
                     />
-                    {/* {console.log('ISINYA:', this.state.namaProvinsi)} */}
                     <InputGroupAddon addonType="append">
                       <Button onClick={() => this.setModalProvinsi()}>
                         <MdList />

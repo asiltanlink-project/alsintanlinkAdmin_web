@@ -17,26 +17,14 @@ import {
   ButtonGroup,
   InputGroup,
   InputGroupAddon,
-  Form,
   FormGroup,
-  Badge,
   Tooltip,
 } from 'reactstrap';
-import {
-  MdSearch,
-  MdAutorenew,
-  MdEdit,
-  MdDelete,
-  MdList,
-  MdAdd,
-  MdAddAlert,
-} from 'react-icons/md';
-import { MdLoyalty, MdRefresh, MdFileUpload } from 'react-icons/md';
+import { MdSearch, MdAutorenew, MdEdit, MdList } from 'react-icons/md';
+import { MdLoyalty, MdFileUpload } from 'react-icons/md';
 import NotificationSystem from 'react-notification-system';
 import { NOTIFICATION_SYSTEM_STYLE } from 'utils/constants';
 import * as myUrl from 'pages/urlLink.js';
-import * as firebase from 'firebase/app';
-import { Scrollbar } from 'react-scrollbars-custom';
 import LoadingSpinner from 'pages/LoadingSpinner.js';
 import axios from 'axios';
 import { BrowserRouter as Router, Route, Link } from 'react-router-dom';
@@ -69,9 +57,7 @@ class showTransactionSparePart extends React.Component {
   };
 
   // Get getSparePart
-  getSparePart(currPage, currLimit) {
-    var offset = (currPage - 1) * currLimit;
-    var keyword = this.state.keywordList;
+  getSparePart(currPage) {
     var pilihAlsin = this.state.pilihAlsin;
     const urlA = myUrl.url_showSparePartType + pilihAlsin + '&page=' + currPage;
     console.log('jalan', urlA);
@@ -176,7 +162,6 @@ class showTransactionSparePart extends React.Component {
     console.log('URL GET LIST', url);
 
     this.setState({ loadingAlsin: true });
-    // console.log("offset", offset, "currLimit", currLimit);
 
     const option = {
       method: 'GET',
@@ -186,10 +171,8 @@ class showTransactionSparePart extends React.Component {
         Authorization: `${'Bearer'} ${token}`,
       },
     };
-    // console.log('option', option);
     fetch(url, option)
       .then(response => {
-        // trace.stop();
         if (response.ok) {
           return response.json();
         } else {
@@ -209,19 +192,14 @@ class showTransactionSparePart extends React.Component {
         var status = data.status;
         var result = data.result.alsins;
         var message = data.result.message;
-        // console.log('ALSIN TYPE DATA', data);
         if (status === 0) {
           this.showNotification(message, 'error');
         } else {
           this.showNotification('Data ditemukan!', 'info');
-          this.setState(
-            {
-              resultAllAlsinType: result,
-              loadingAlsin: false,
-            },
-            // () =>
-            //   console.log('RESULT ALSIN ITEM', this.state.resultAllAlsinType),
-          );
+          this.setState({
+            resultAllAlsinType: result,
+            loadingAlsin: false,
+          });
         }
       })
       .catch(err => {
@@ -269,8 +247,6 @@ class showTransactionSparePart extends React.Component {
     );
   };
 
-  // KHUSUS STATE MODAL
-
   toggle = (modalType, todo) => () => {
     if (!modalType) {
       return this.setState({
@@ -300,7 +276,6 @@ class showTransactionSparePart extends React.Component {
   }
 
   findData() {
-    // console.log('KLIK FIND DATA');
     var buttonSearch = document.getElementById('buttonSearch');
     buttonSearch.disabled = true;
     this.setState(
@@ -382,7 +357,6 @@ class showTransactionSparePart extends React.Component {
       TransactionAllSparePart.map((todo, i) => {
         return (
           <tr key={i}>
-            {/* {console.log("TODOS ISINYA", todo)} */}
             <td style={{ textAlign: 'left' }}>
               <Link
                 to={`/showTransactionSparePart/spare_part_type_id=${todo.spare_part_type_id}`}
@@ -473,7 +447,6 @@ class showTransactionSparePart extends React.Component {
                       style={{ fontWeight: 'bold' }}
                       value={this.state.namaAlsin}
                     />
-                    {/* {console.log('ISINYA:', this.state.namaProvinsi)} */}
                     <InputGroupAddon addonType="append">
                       <Button onClick={() => this.setModalProvinsi()}>
                         <MdList />
@@ -696,9 +669,6 @@ class showTransactionSparePart extends React.Component {
             </FormGroup>
           </ModalBody>
           <ModalFooter>
-            {/* <Button color="primary" onClick={() => this.uploadExcel()}>
-              Simpan Excel
-            </Button> */}
             <Button color="primary" onClick={this.onFileUpload}>
               Simpan Excel
             </Button>
@@ -716,7 +686,6 @@ class showTransactionSparePart extends React.Component {
         >
           <ModalHeader>Edit Spare Part</ModalHeader>
           <ModalBody>
-            {/* {console.log("EDIT ALSIN", this.state.editSparePart)} */}
             <Label>Suku Cadang</Label>
             <Input
               autoComplete="off"
@@ -744,7 +713,6 @@ class showTransactionSparePart extends React.Component {
               Simpan Edit Spare Part
             </Button>
             <Modal
-              // onExit={this.handleClose}
               isOpen={this.state.modal_nested_editSparePart}
               toggle={this.toggle('nested_editSparePart')}
             >
@@ -865,11 +833,7 @@ class showTransactionSparePart extends React.Component {
   updateInputValue(value, field, fill) {
     let input = this.state[fill];
     input[field] = value;
-    this.setState(
-      { input },
-      // () =>
-      // console.log('EDIT ALSIN ', this.state.editSparePart),
-    );
+    this.setState({ input });
   }
 }
 export default showTransactionSparePart;
