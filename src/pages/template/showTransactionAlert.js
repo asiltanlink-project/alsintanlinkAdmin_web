@@ -17,10 +17,6 @@ import {
   ButtonGroup,
   InputGroup,
   InputGroupAddon,
-  Form,
-  FormGroup,
-  Badge,
-  Tooltip,
 } from 'reactstrap';
 import {
   MdSearch,
@@ -43,64 +39,14 @@ class showTransaction extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      resultFarmer: [],
-      resultUpja: [],
       currentPage: 1,
-      currentPages: 1,
       realCurrentPage: 1,
-      realCurrentPages: 1,
-      todosPerPage: 5,
-      todosPerPages: 5,
       maxPage: 1,
-      maxPages: 1,
-      flag: 0,
-      keyword: '',
-      keywordList: '',
-      procod: '',
       loading: false,
-      checked: false,
-      barcode: '',
-      newProductDesc: '',
-      newProcode: '',
-      enterButton: false,
       resultProvinsi: [],
-      resultKotaKab: [],
-      resultKecamatan: [],
-      resultTransaction: [],
       resultTransactionAll: [],
       loadingPage: false,
-      pilihType: '',
       pilihProvinsi: '',
-      pilihKotaKab: '',
-      pilihKecamatan: '',
-      lastID: 0,
-      namaPeriode: '',
-      ecommerceID: '',
-      action: '',
-      typeDisabled: false,
-      domisiliDisabled: true,
-      periodeDisabled: true,
-      dataAvailable: false,
-      startDate: '',
-      endDate: '',
-      resetInfo: false,
-      resultType: [
-        {
-          type_id: 'show_farmer',
-          type_name: 'Farmer',
-        },
-        {
-          type_id: 'show_upja',
-          type_name: 'UPJA',
-        },
-      ],
-
-      namaProvinsi2: [],
-      idPelapak: [],
-      pelapakDetail: [],
-      ecommerceDetail: [],
-      dynamicHeightEcommerce: '0px',
-      dynamicHeightPelapak: '0px',
     };
   }
 
@@ -149,155 +95,6 @@ class showTransaction extends React.Component {
       });
     }, 300);
   };
-
-  saveDomisili() {
-    this.setState({
-      pilihProvinsi: this.state.pilihProvinsi,
-      pilihKotaKab: this.state.pilihKotaKab,
-      pilihKecamatan: this.state.pilihKecamatan,
-      domisiliDisabled: true,
-      typeDisabled: true,
-      modal_nested_parent_list_domisili: false,
-    });
-  }
-
-  getListbyPaging(currPage, currLimit) {
-    // const trace = perf.trace('getBundling');
-    var namaKecamatan = this.state.namaKecamatanSave;
-    var showType = this.state.pilihType;
-    var kecamatanID = this.state.pilihKecamatan;
-    const url = myUrl.url_getAllData + showType + '?district_id=' + kecamatanID;
-    var token = window.localStorage.getItem('tokenCookies');
-    // console.log('URL GET LIST', url);
-
-    this.setState({ loading: true });
-    // console.log("offset", offset, "currLimit", currLimit);
-
-    const option = {
-      method: 'GET',
-      json: true,
-      headers: {
-        'Content-Type': 'application/json;charset=UTF-8',
-        Authorization: `${'Bearer'} ${token}`,
-      },
-    };
-    // console.log('option', option);
-    fetch(url, option)
-      .then(response => {
-        // trace.stop();
-        if (response.ok) {
-          return response.json();
-        } else {
-          if (response.status === 401) {
-            this.showNotification('Username/Password salah!', 'error');
-          } else if (response.status === 500) {
-            this.showNotification('Internal Server Error', 'error');
-          } else {
-            this.showNotification('Response ke server gagal!', 'error');
-          }
-          this.setState({
-            loading: false,
-          });
-        }
-      })
-      .then(data => {
-        var status = data.status;
-        var result = data.result.farmers;
-        var message = data.result.message;
-        // console.log('data jalan GetlistByPaging', data);
-        if (status === 0) {
-          this.showNotification(message, 'error');
-        } else {
-          this.showNotification('Data ditemukan!', 'info');
-          this.setState({
-            result: result,
-            loading: false,
-          });
-        }
-      })
-      .catch(err => {
-        // console.log('ERRORNYA', err);
-        this.showNotification('Error ke server!', 'error');
-        this.setState({
-          loading: false,
-        });
-      });
-  }
-
-  // get data farmer
-  getListbyPagingFarmer(currPage, currLimit) {
-    var kecamatanID = this.state.pilihKecamatan;
-    const url = myUrl.url_getAllData + 'show_farmer?district_id=' + kecamatanID;
-    var token = window.localStorage.getItem('tokenCookies');
-    // console.log('URL GET LIST', url);
-
-    this.setState({ loading: true });
-    // console.log("offset", offset, "currLimit", currLimit);
-
-    const option = {
-      method: 'GET',
-      json: true,
-      headers: {
-        'Content-Type': 'application/json;charset=UTF-8',
-        Authorization: `${'Bearer'} ${token}`,
-      },
-    };
-    // console.log('option', option);
-    fetch(url, option)
-      .then(response => {
-        // trace.stop();
-        if (response.ok) {
-          return response.json();
-        } else {
-          if (response.status === 401) {
-            this.showNotification('Username/Password salah!', 'error');
-          } else if (response.status === 500) {
-            this.showNotification('Internal Server Error', 'error');
-          } else {
-            this.showNotification('Response ke server gagal!', 'error');
-          }
-          this.setState({
-            loading: false,
-          });
-        }
-      })
-      .then(data => {
-        var status = data.status;
-        var result = data.result.farmers;
-        var message = data.result.message;
-        // console.log('data jalan GetlistByPaging', data);
-        // console.log('message GetlistByPaging', message);
-        if (status === 0) {
-          this.showNotification(message, 'error');
-        } else {
-          if (result.length === 0) {
-            this.showNotification(
-              `${'Data'} ${
-                this.state.namaTypeSave
-              } ${', '} ${this.state.namaProvinsiSave.toLowerCase()} ${'-'} ${this.state.namaKotaKabSave.toLowerCase()} ${'-'} ${this.state.namaKecamatanSave.toLowerCase()} ${', tidak ditemukan!'} `,
-              'error',
-            );
-            this.setState({
-              // resultFarmer: [{}],
-              loading: false,
-            });
-          } else {
-            this.showNotification('Data ditemukan!', 'info');
-            this.setState({
-              resultFarmer: result,
-              loading: false,
-            });
-          }
-        }
-      })
-      .catch(err => {
-        // console.log('ERRORNYA', err);
-        this.showNotification('Error ke server!', 'error');
-        this.setState({
-          loading: false,
-        });
-      });
-  }
 
   // get data Transaksi
   getListbyPagingTransaksi(currPage, currLimit) {
@@ -357,7 +154,6 @@ class showTransaction extends React.Component {
               'error',
             );
             this.setState({
-              // resultUpja: [{}],
               loading: false,
             });
           } else {
@@ -408,41 +204,6 @@ class showTransaction extends React.Component {
         } else {
           this.setState({
             resultProvinsi: data.result.provinces,
-            // maxPages: data.metadata.pages ? data.metadata.pages : 1,
-            loading: false,
-            loadingPage: false,
-          });
-        }
-      });
-  }
-  // Get KotaKab
-  getKotaKab(currPage, currLimit) {
-    var offset = (currPage - 1) * currLimit;
-    var keyword = this.state.keywordList;
-    const urlA = myUrl.url_getCity + '?province_id=' + this.state.pilihProvinsi;
-    // console.log('jalan kota', urlA);
-    this.setState({ loadingPage: true });
-    const option = {
-      method: 'GET',
-      json: true,
-      headers: {
-        'Content-Type': 'application/json;charset=UTF-8',
-        Authorization: window.localStorage.getItem('tokenCookies'),
-      },
-    };
-    fetch(urlA, option)
-      .then(response => {
-        if (response.ok) {
-          return response.json();
-        }
-      })
-      .then(data => {
-        // console.log('data Kota/Kabupaten', data.result);
-        if (data.status === 0) {
-          this.showNotification('Data tidak ditemukan!', 'error');
-        } else {
-          this.setState({
-            resultKotaKab: data.result.citys,
             // maxPages: data.metadata.pages ? data.metadata.pages : 1,
             loading: false,
             loadingPage: false,
@@ -502,7 +263,7 @@ class showTransaction extends React.Component {
     if (token === '' || token === null || token === undefined) {
       window.location.replace('/login');
     }
-    this.getProvinsi(this.state.currentPages, this.state.todosPerPages);
+    this.getProvinsi(this.state.currentPages);
   }
 
   // untuk pilih Provinsi
@@ -511,200 +272,41 @@ class showTransaction extends React.Component {
       return element.id === parseInt(event.target.value);
     });
 
-    this.setState(
-      {
-        pilihProvinsi: event.target.value,
-        namaProvinsi: nama.name,
-        modal_nested_parent_list_provinsi: false,
-        keywordList: '',
-        domisiliDisabled: false,
-      },
-      // () => console.log('PILIH PROVINSI', this.state.pilihProvinsi),
-      () => this.getKotaKab(this.state.currentPages, this.state.todosPerPages),
-    );
+    this.setState({
+      pilihProvinsi: event.target.value,
+      namaProvinsi: nama.name,
+      modal_nested_parent_list_provinsi: false,
+      keywordList: '',
+      domisiliDisabled: false,
+    });
   };
   // untuk pilih Provinsi
 
-  // untuk pilih Kota/Kabupaten
-  setKotakab = event => {
-    var nama = this.state.resultKotaKab.find(function (element) {
-      return element.id === parseInt(event.target.value);
-    });
-
-    this.setState(
-      {
-        pilihKotaKab: event.target.value,
-        namaKotaKab: nama.name,
-        modal_nested_parent_list_kotakab: false,
-        keywordList: '',
-        domisiliDisabled: false,
-      },
-      () =>
-        this.getKecamatan(this.state.currentPages, this.state.todosPerPages),
-    );
-  };
-  // untuk pilih Kota/Kabupaten
-
-  // untuk pilih Kecamatan
-  setKecamatan = event => {
-    var nama = this.state.resultKecamatan.find(function (element) {
-      return element.id === parseInt(event.target.value);
-    });
-
-    this.setState(
-      {
-        pilihKecamatan: event.target.value,
-        namaKecamatan: nama.name,
-        modal_nested_parent_list_kecamatan: false,
-        keywordList: '',
-        domisiliDisabled: false,
-      },
-      () => this.getProvinsi(this.state.currentPages, this.state.todosPerPages),
-    );
-  };
-  // untuk pilih Kecamatan
-
-  // untuk pilih Type
-  setType = event => {
-    var nama = this.state.resultType.find(function (element) {
-      return element.type_id === event.target.value;
-    });
-    this.setState(
-      {
-        pilihType: event.target.value,
-        namaType: nama.type_name,
-        namaTypeTemp: nama.type_name,
-        modal_nested_parent_list: false,
-        domisiliDisabled: false,
-        pilihProvinsi: '',
-        pilihKotaKab: '',
-        pilihKecamatan: '',
-      },
-      // () => console.log('CEK CEK CEK', this.state.pilihType),
-      // () =>
-      // this.getListbyPaging(),
-    );
-  };
-
-  //modal batas standar
-  state = {
-    modal: false,
-    modal_backdrop: false,
-    modal_nested_parent: false,
-    modal_nested: false,
-    backdrop: true,
-  };
-
-  //modal batas per pelapak
-  state = {
-    modal_batasPerPelapak: false,
-    modal_backdrop_batasPerPelapak: false,
-    modal_nested_parent_batasPerPelapak: false,
-    modal_nested_batasPerPelapak: false,
-    backdrop_batasPerPelapak: true,
-  };
-
-  //modal Edit Batas per Pelapak
-  state = {
-    modal_editBatasPerPelapak: false,
-    modal_backdrop_editBatasPerPelapak: false,
-    modal_nested_parent_editBatasPerPelapak: false,
-    modal_nested_editBatasPerPelapak: false,
-    editBatasPerPelapak: {},
-    tempEditBatasPerPelapak: {},
-  };
-
-  //modal Edit Massal
-  state = {
-    modal_editMassal: false,
-    modal_backdrop_editMassal: false,
-    modal_nested_parent_editMassal: false,
-    modal_nested_editMassal: false,
-    editDimen: {},
-  };
-
-  //modal Edit - edit Massal
-  state = {
-    modal_editMassal_edit: false,
-    modal_backdrop_editMassal_edit: false,
-    modal_nested_parent_editMassal_edit: false,
-    modal_nested_editMassal_edit: false,
-    editBatasBawah: {},
-  };
-
-  //modal Edit
-  state = {
-    modal_edit: false,
-    modal_backdrop: false,
-    modal_nested_parent_edit: false,
-    modal_nested_edit: false,
-    editDimen: {},
-  };
-
-  //modal delete
-  state = {
-    modal_delete: false,
-    modal_backdrop: false,
-    modal_nested_parent_delete: false,
-    delete_data: {},
-    modal_nested_delete: false,
-  };
-
-  //modal nonaktif
-  state = {
-    modal_nonaktif: false,
-    modal_backdrop: false,
-    modal_nested_parent_nonaktif: false,
-    nonaktif_data: {},
-    modal_nested_nonaktif: false,
-  };
-
-  //modal tambah Produk
-  state = {
-    modal_tambahProduk: false,
-    modal_backdrop_tambahProduk: false,
-    modal_nested_parent_tambahProduk: false,
-    modal_nested_tambahProduk: false,
-    backdrop_tambahProduk: true,
-  };
-
-  // KHUSUS STATE MODAL
-
   toggle = modalType => () => {
     if (!modalType) {
-      return this.setState(
-        {
-          modal: !this.state.modal,
-          keywordList: '',
-          realCurrentPages: 1,
-          maxPages: 1,
-          currentPages: 1,
-          ecommerceIDtemp: this.state.ecommerceID,
-        },
-        // () => this.getProvinsi(1, this.state.todosPerPages),
-      );
-    }
-
-    this.setState(
-      {
-        [`modal_${modalType}`]: !this.state[`modal_${modalType}`],
+      return this.setState({
+        modal: !this.state.modal,
         keywordList: '',
         realCurrentPages: 1,
         maxPages: 1,
         currentPages: 1,
-      },
-      // () => this.getProvinsi(1, this.state.todosPerPages),
-    );
+        ecommerceIDtemp: this.state.ecommerceID,
+      });
+    }
+
+    this.setState({
+      [`modal_${modalType}`]: !this.state[`modal_${modalType}`],
+      keywordList: '',
+      realCurrentPages: 1,
+      maxPages: 1,
+      currentPages: 1,
+    });
   };
 
   handleCloseDomisili = () => {
     this.setState({
       namaProvinsi: '',
-      namaKotaKab: '',
-      namaKecamatan: '',
       pilihProvinsi: '',
-      pilihKotaKab: '',
-      pilihKecamatan: '',
       modal_nested_parent_list_domisili: false,
     });
   };
@@ -735,27 +337,6 @@ class showTransaction extends React.Component {
     );
   }
 
-  setModalType() {
-    this.setState(
-      {
-        domisiliDisabled: true,
-        // namaEcommerce: '',
-      },
-      this.toggle('nested_parent_list'),
-    );
-  }
-
-  setModalDomisili() {
-    this.setState(
-      {
-        periodeDisabled: false,
-        typeDisabled: true,
-        // namaEcommerce: '',
-      },
-      this.toggle('nested_parent_list_domisili'),
-    );
-  }
-
   setModalProvinsi() {
     var buttonSearch = document.getElementById('buttonSearch');
     buttonSearch.disabled = false;
@@ -763,149 +344,16 @@ class showTransaction extends React.Component {
       {
         periodeDisabled: false,
         typeDisabled: true,
-        // domisiliDisabled: true,
-        // namaEcommerce: '',
       },
       this.toggle('nested_parent_list_provinsi'),
     );
   }
 
-  setModalKotaKab() {
-    var buttonSearch = document.getElementById('buttonSearch');
-    buttonSearch.disabled = false;
-    this.setState(
-      {
-        periodeDisabled: false,
-        typeDisabled: true,
-        domisiliDisabled: true,
-        // namaEcommerce: '',
-      },
-      this.toggle('nested_parent_list_kotakab'),
-    );
-  }
-
-  setModalKecamatan() {
-    var buttonSearch = document.getElementById('buttonSearch');
-    buttonSearch.disabled = false;
-    this.setState(
-      {
-        periodeDisabled: false,
-        typeDisabled: true,
-        domisiliDisabled: true,
-        // namaEcommerce: '',
-      },
-      this.toggle('nested_parent_list_kecamatan'),
-    );
-  }
-
-  firstPage() {
-    this.setState(
-      {
-        lastID: 0,
-      },
-      () => this.getListbyPaging(),
-    );
-  }
-
-  actionPage(param) {
-    var nextPage = document.getElementById('nextPageHeader');
-    var prevPage = document.getElementById('prevPageHeader');
-    var firstPage = document.getElementById('firstPageHeader');
-
-    // console.log('PARAM', param, 'TEST', param === nextPage);
-
-    if (param === 'nextPageHeader') {
-      // console.log('A');
-      // this.setState(
-      //   {
-      //     action: 'next',
-      //   },
-      //   () => this.getListbyPaging(),
-      // );
-    }
-    if (param === 'prevPageHeader') {
-      // console.log('B');
-      this.setState(
-        {
-          action: 'prev',
-          lastID: this.state.lastIDprev,
-        },
-        () => this.getListbyPaging(),
-      );
-    }
-    if (param === 'firstPageHeader') {
-      // console.log('C');
-      this.setState(
-        {
-          lastID: 0,
-          action: '',
-        },
-        () => this.getListbyPaging(),
-      );
-    }
-  }
-
   render() {
     const { loading, loadingPage } = this.state;
-    const currentTodosFarmer = this.state.resultFarmer;
-    const currentTodosUpja = this.state.resultUpja;
     const provinsiTodos = this.state.resultProvinsi;
-    const kotakabTodos = this.state.resultKotaKab;
-    const kecamatanTodos = this.state.resultKecamatan;
-    const typeTodos = this.state.resultType;
-    const TransactionTodos = this.state.resultTransaction;
     const TransactionAllTodos = this.state.resultTransactionAll;
-    const isEnabledSaveDomisili = this.canBeSubmittedDomisili();
     const isSearch = this.SearchAllList();
-
-    var formatter = new Intl.NumberFormat('id-ID', {
-      currency: 'IDR',
-    });
-
-    const renderTransaction =
-      TransactionTodos &&
-      TransactionTodos.map((todo, i) => {
-        return (
-          <tr key={i}>
-            <th scope="row">{todo.upja_id}</th>
-            <td>{todo.village}</td>
-            <td>{todo.leader_name}</td>
-            {todo.upja_name !== '' && (
-              <td style={{ width: '10%', textAlign: 'left' }}>
-                <Link to={`/showTransaction/upja/${todo.upja_id}`}>
-                  {
-                    <Label
-                      style={{
-                        fontWeight: 'bold',
-                        cursor: 'pointer',
-                        textDecoration: 'underline',
-                        color: '#009688',
-                      }}
-                    >
-                      {todo.upja_name}
-                    </Label>
-                  }
-                </Link>
-              </td>
-            )}
-            {(todo.class === 'Pemula' || todo.class === '1') && (
-              <td>
-                <Badge color="success">Pemula </Badge>
-              </td>
-            )}
-            {(todo.class === 'Berkembang' || todo.class === '2') && (
-              <td>
-                <Badge color="warning">Berkembang </Badge>
-              </td>
-            )}
-            {(todo.class === 'Profesional' || todo.class === '3') && (
-              <td>
-                <Badge color="danger">Profesional </Badge>
-              </td>
-            )}
-          </tr>
-        );
-      });
 
     const renderTransactionAll =
       TransactionAllTodos &&
@@ -1168,7 +616,7 @@ class showTransaction extends React.Component {
         </Row>
 
         {/* KHUSUS MODAL */}
-        {/* Modal List Type */}
+        {/* Modal Send Alert */}
         <Modal
           onExit={this.handleClose}
           isOpen={this.state.modal_nested_parent_list}
@@ -1195,122 +643,7 @@ class showTransaction extends React.Component {
             <Button onClick={this.toggle('nested_parent_list')}>Tidak</Button>
           </ModalFooter>
         </Modal>
-        {/* Modal List Type */}
-
-        {/* Modal List Domisili */}
-        <Modal
-          onExit={this.handleCloseDomisili}
-          isOpen={this.state.modal_nested_parent_list_domisili}
-          toggle={this.toggle('nested_parent_list_domisili')}
-          className={this.props.className}
-        >
-          <ModalHeader>List Domisili</ModalHeader>
-          <ModalBody>
-            <Row>
-              <Col>
-                <Label style={{ fontSize: '0.6em' }}>
-                  *NB: Harap isi sesuai alur Provinsi - Kota/Kab - Kecamatan
-                  untuk mendapatkan Data
-                </Label>
-              </Col>
-            </Row>
-            <Row>
-              <Col sm={3}>
-                <Label
-                  style={{
-                    fontWeight: 'bold',
-                    marginTop: '8px',
-                  }}
-                >
-                  Provinsi:&nbsp;
-                </Label>
-              </Col>
-              <Col sm={9}>
-                <InputGroup style={{ float: 'right' }}>
-                  <Input
-                    disabled
-                    placeholder="Pilih Provinsi"
-                    style={{ fontWeight: 'bold' }}
-                    value={this.state.namaProvinsi}
-                  />
-                  {/* {console.log('ISINYA:', this.state.namaProvinsi)} */}
-                  <InputGroupAddon addonType="append">
-                    <Button onClick={() => this.setModalProvinsi()}>
-                      <MdList />
-                    </Button>
-                  </InputGroupAddon>
-                </InputGroup>
-              </Col>
-            </Row>
-            <Row>
-              <Col sm={3}>
-                <Label
-                  style={{
-                    fontWeight: 'bold',
-                    marginTop: '8px',
-                  }}
-                >
-                  Kota/Kab:&nbsp;
-                </Label>
-              </Col>
-              <Col sm={9}>
-                <InputGroup style={{ float: 'right' }}>
-                  <Input
-                    disabled
-                    placeholder="Pilih Kota/Kab"
-                    style={{ fontWeight: 'bold' }}
-                    value={this.state.namaKotaKab}
-                  />
-                  <InputGroupAddon addonType="append">
-                    <Button onClick={() => this.setModalKotaKab()}>
-                      <MdList />
-                    </Button>
-                  </InputGroupAddon>
-                </InputGroup>
-              </Col>
-            </Row>
-            <Row>
-              <Col sm={3}>
-                <Label
-                  style={{
-                    fontWeight: 'bold',
-                    marginTop: '8px',
-                  }}
-                >
-                  Kecamatan:&nbsp;
-                </Label>
-              </Col>
-              <Col sm={9}>
-                <InputGroup style={{ float: 'right' }}>
-                  <Input
-                    disabled
-                    placeholder="Pilih Kecamatan"
-                    style={{ fontWeight: 'bold' }}
-                    value={this.state.namaKecamatan}
-                  />
-                  <InputGroupAddon addonType="append">
-                    <Button onClick={() => this.setModalKecamatan()}>
-                      <MdList />
-                    </Button>
-                  </InputGroupAddon>
-                </InputGroup>
-              </Col>
-            </Row>
-          </ModalBody>
-          <ModalFooter>
-            <Button
-              color="primary"
-              onClick={() => this.saveDomisili()}
-              disabled={!isEnabledSaveDomisili}
-            >
-              Simpan Domisili
-            </Button>
-            <Button color="danger" onClick={this.handleCloseDomisili}>
-              Batal
-            </Button>
-          </ModalFooter>
-        </Modal>
-        {/* Modal List Domisili */}
+        {/* Modal Send Alert */}
 
         {/* Modal List Provinsi */}
         <Modal
@@ -1350,97 +683,9 @@ class showTransaction extends React.Component {
         </Modal>
         {/* Modal List Provinsi */}
 
-        {/* Modal List Kota/kabupaten */}
-        <Modal
-          onExit={this.handleCloseDomisili}
-          isOpen={this.state.modal_nested_parent_list_kotakab}
-          toggle={this.toggle('nested_parent_list_kotakab')}
-          className={this.props.className}
-        >
-          <ModalHeader toggle={this.toggle('nested_parent_list_kotakab')}>
-            List Kota/Kabupaten
-          </ModalHeader>
-          <ModalBody>
-            <Table responsive striped>
-              <tbody>
-                {kotakabTodos.length === 0 && loadingPage === true ? (
-                  <LoadingSpinner status={4} />
-                ) : loadingPage === false && kotakabTodos.length === 0 ? (
-                  (
-                    <tr>
-                      <td
-                        style={{ backgroundColor: 'white' }}
-                        colSpan="17"
-                        className="text-center"
-                      >
-                        TIDAK ADA DATA
-                      </td>
-                    </tr>
-                  ) || <LoadingSpinner status={4} />
-                ) : loadingPage === true && kotakabTodos.length !== 0 ? (
-                  <LoadingSpinner status={4} />
-                ) : (
-                  // renderKotakab
-                  <Label>-</Label>
-                )}
-              </tbody>
-            </Table>
-          </ModalBody>
-        </Modal>
-        {/* Modal List Kota/kabupaten */}
-
-        {/* Modal List Kecamatan */}
-        <Modal
-          onExit={this.handleCloseDomisili}
-          isOpen={this.state.modal_nested_parent_list_kecamatan}
-          toggle={this.toggle('nested_parent_list_kecamatan')}
-          className={this.props.className}
-        >
-          <ModalHeader toggle={this.toggle('nested_parent_list_kecamatan')}>
-            List Kecamatan
-          </ModalHeader>
-          <ModalBody>
-            <Table responsive striped>
-              <tbody>
-                {kecamatanTodos.length === 0 && loadingPage === true ? (
-                  <LoadingSpinner status={4} />
-                ) : loadingPage === false && kecamatanTodos.length === 0 ? (
-                  (
-                    <tr>
-                      <td
-                        style={{ backgroundColor: 'white' }}
-                        colSpan="17"
-                        className="text-center"
-                      >
-                        TIDAK ADA DATA
-                      </td>
-                    </tr>
-                  ) || <LoadingSpinner status={4} />
-                ) : loadingPage === true && kecamatanTodos.length !== 0 ? (
-                  <LoadingSpinner status={4} />
-                ) : (
-                  // renderKecamatan
-                  <Label>-</Label>
-                )}
-              </tbody>
-            </Table>
-          </ModalBody>
-        </Modal>
-        {/* Modal List Kecamatan */}
         {/* KHUSUS MODAL */}
       </Page>
     );
-  }
-
-  canBeSubmittedDomisili() {
-    const { pilihProvinsi, pilihKotaKab, pilihKecamatan } = this.state;
-    return pilihProvinsi !== '' && pilihKotaKab !== '' && pilihKecamatan !== '';
-  }
-
-  updateSearchValue(evt) {
-    this.setState({
-      keyword: evt.target.value,
-    });
   }
 }
 export default showTransaction;
