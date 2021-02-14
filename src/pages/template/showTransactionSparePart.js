@@ -99,8 +99,31 @@ class showTransactionSparePart extends React.Component {
   };
 
   // On file upload (click the upload button)
+  // onFileUpload = () => {
+  //   // Create an object of formData
+  //   const formData = new FormData();
+
+  //   // Update the formData object
+  //   formData.append(
+  //     'myFile',
+  //     this.state.selectedFile,
+  //     this.state.selectedFile.name,
+  //   );
+
+  //   // Details of the uploaded file
+  //   console.log('FILE YANG DIUPLOAD', this.state.selectedFile);
+  //   // console.log("FILE YANG DIUPLOAD Detail ",formData);
+
+  //   // Request made to the backend api
+  //   // Send formData object
+  //   axios({ method: 'POST', url: myUrl.url_uploadExcel, headers: formData.name });
+  // };
+
+  // Send Alert
   onFileUpload = () => {
-    // Create an object of formData
+    const urlA = myUrl.url_uploadExcel;
+    var token = window.localStorage.getItem('tokenCookies');
+    //  Create an object of formData
     const formData = new FormData();
 
     // Update the formData object
@@ -109,14 +132,48 @@ class showTransactionSparePart extends React.Component {
       this.state.selectedFile,
       this.state.selectedFile.name,
     );
-
-    // Details of the uploaded file
-    console.log('FILE YANG DIUPLOAD', this.state.selectedFile);
-    // console.log("FILE YANG DIUPLOAD Detail ",formData);
-
-    // Request made to the backend api
-    // Send formData object
-    axios.post('api/uploadfile', formData);
+    // console.log('alert link', urlA);
+    this.setState({ loadingPage: true });
+    var payload = {
+      name: this.state.selectedFile,
+    };
+    const option = {
+      method: 'POST',
+      json: true,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+        Authorization: `${'Bearer'} ${token}`,
+      },
+      body: JSON.stringify(payload),
+    };
+    console.log('PAYLOAD SAVE EXCEL', payload);
+    fetch(urlA, option)
+      .then(response => {
+        if (response.ok) {
+          return response.json();
+        }
+      })
+      .then(data => {
+        if (data.status === 0) {
+          this.showNotification(data.result.message, 'error');
+          this.setState({
+            loadingPage: false,
+          });
+        } else {
+          this.showNotification(data.result.message, 'info');
+          this.setState({
+            loadingPage: false,
+            modal_nested_parent_list: false,
+          });
+        }
+      })
+      .catch(err => {
+        // console.log('ERRORNYA', err);
+        this.showNotification('Koneksi ke Server gagal!', 'error');
+        this.setState({
+          loadingPage: false,
+        });
+      });
   };
 
   // File content to be displayed after

@@ -25,13 +25,17 @@ var url_sendUpjaAlert = 'http://alsintanlink.com/api/admin/send_upja_alert';
 var url_showAllTransaction =
   'https://alsintanlink.com/api/admin/show_all_transaction';
 var url_getVillage = 'https://alsintanlink.com/api/location/village';
-
 var url_allAlsinType = 'https://alsintanlink.com/api/upja/show_all_alsin_type';
+var url_showSparePartType =
+  'https://alsintanlink.com/api/admin/show_spare_part_type?alsin_type_id=';
+var url_showSparePart =
+  'https://alsintanlink.com/api/admin/show_spare_part?spare_part_type_id=';
+var url_deleteSparePart =
+  'https://alsintanlink.com/api/admin/delete_spare_part';
+var url_updateSparePart =
+  'https://alsintanlink.com/api/admin/update_spare_part_type';
 
-var url_showSparePartType ='https://alsintanlink.com/api/admin/show_spare_part_type?alsin_type_id='
-var url_showSparePart ='https://alsintanlink.com/api/admin/show_spare_part?spare_part_type_id='
-var url_deleteSparePart = "https://alsintanlink.com/api/admin/delete_spare_part"
-var url_updateSparePart = "https://alsintanlink.com/api/admin/update_spare_part_type"
+var url_uploadExcel = 'https://alsintanlink.com/api/admin/import_spare_part';
 
 export {
   url_login,
@@ -53,5 +57,6 @@ export {
   url_showSparePartType,
   url_showSparePart,
   url_deleteSparePart,
-  url_updateSparePart
+  url_updateSparePart,
+  url_uploadExcel,
 };
