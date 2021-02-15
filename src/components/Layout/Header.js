@@ -53,15 +53,16 @@ class Header extends React.Component {
   signOut = () => {
     window.localStorage.removeItem('tokenCookies');
     window.localStorage.removeItem('profile');
+    window.localStorage.removeItem('desaID');
+    window.localStorage.removeItem('kecamatanID');
+    window.localStorage.removeItem('namaKotaKab');
+    window.localStorage.removeItem('namaProvinsi');
+    window.localStorage.removeItem('namaKecamatan');
+    window.localStorage.removeItem('namaDesa');
+    window.localStorage.removeItem('namaType');
+    window.localStorage.removeItem('type');
     this.setState({
       redirect: true,
-    });
-  };
-
-  keluarGudang = () => {
-    this.setState({
-      redirectGudang: true,
-      title: '',
     });
   };
 
