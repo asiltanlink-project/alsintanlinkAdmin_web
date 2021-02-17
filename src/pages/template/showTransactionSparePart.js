@@ -95,7 +95,9 @@ class showTransactionSparePart extends React.Component {
   // On file select (from the pop up)
   onFileChange = event => {
     // Update the state
-    this.setState({ selectedFile: event.target.files[0] });
+    this.setState({ selectedFile: event.target.files[0] }, () =>
+      console.log('SELECTED FILE', this.state.selectedFile.name !== ''),
+    );
   };
 
   // On file upload (click the upload button)
@@ -128,23 +130,26 @@ class showTransactionSparePart extends React.Component {
 
     // Update the formData object
     formData.append(
-      'myFile',
+      'name',
       this.state.selectedFile,
       this.state.selectedFile.name,
     );
     // console.log('alert link', urlA);
+    console.log('ISI FILE', formData);
     this.setState({ loadingPage: true });
     var payload = {
       name: this.state.selectedFile,
     };
+    console.log('palyoad type data', typeof this.state.selectedFile);
     const option = {
       method: 'POST',
       json: true,
       headers: {
-        'Content-Type': 'application/json;charset=UTF-8',
+        // 'Content-Type': 'application/json;charset=UTF-8',
+        Accept: 'application/json',
         Authorization: `${'Bearer'} ${token}`,
       },
-      body: JSON.stringify(payload),
+      body: formData,
     };
     console.log('PAYLOAD SAVE EXCEL', payload);
     fetch(urlA, option)
@@ -163,7 +168,7 @@ class showTransactionSparePart extends React.Component {
           this.showNotification(data.result.message, 'info');
           this.setState({
             loadingPage: false,
-            modal_nested_parent_list: false,
+            modal_nested_parent_list_uploadExcel: false,
           });
         }
       })
