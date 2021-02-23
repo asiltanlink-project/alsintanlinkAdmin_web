@@ -455,6 +455,7 @@ class showTransaction extends React.Component {
   };
 
   toggle = modalType => () => {
+    console.log('MODAL TYPE: ', modalType);
     if (!modalType) {
       return this.setState({
         modal: !this.state.modal,
@@ -462,14 +463,22 @@ class showTransaction extends React.Component {
         maxPage: 1,
         currentPage: 1,
       });
+    } else if (
+      modalType === 'nested_parent_list_transaksi' ||
+      modalType === 'nested_parent_list_transaksi_alsinItem' ||
+      modalType === 'nested_parent_list_transaksi_alsinItemOtherService'
+    ) {
+      this.setState({
+        [`modal_${modalType}`]: !this.state[`modal_${modalType}`],
+      });
+    } else {
+      this.setState({
+        [`modal_${modalType}`]: !this.state[`modal_${modalType}`],
+        realCurrentPage: 1,
+        maxPage: 1,
+        currentPage: 1,
+      });
     }
-
-    this.setState({
-      [`modal_${modalType}`]: !this.state[`modal_${modalType}`],
-      realCurrentPage: 1,
-      maxPage: 1,
-      currentPage: 1,
-    });
   };
 
   handleCloseStatus = () => {

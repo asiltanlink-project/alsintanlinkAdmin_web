@@ -134,6 +134,10 @@ class showTransactionDetail extends React.Component {
       currentPageTransactionAlsinItem: 1,
       realCurrentPageTransactionAlsinItem: 1,
       maxPageTransactionAlsinItem: 1,
+
+      currentPageItem: 1,
+      realCurrentPageItem: 1,
+      maxPageItem: 1,
     };
   }
 
@@ -167,6 +171,21 @@ class showTransactionDetail extends React.Component {
         },
         () => {
           this.getDetailAlsinPagination(this.state.currentPageAlsinItem);
+        },
+      );
+    }
+  }
+
+  paginationButtonItem(event, flag, maxPageItem = 0) {
+    var currPage = Number(event.target.value);
+    if (currPage + flag > 0 && currPage + flag <= maxPageItem) {
+      this.setState(
+        {
+          currentPageItem: currPage + flag,
+          realCurrentPageItem: currPage + flag,
+        },
+        () => {
+          this.getDetailTransactionAlsinPagination(this.state.currentPageItem);
         },
       );
     }
@@ -302,7 +321,7 @@ class showTransactionDetail extends React.Component {
         var resultFarmer = data.result.farmer;
         var resultTransaction = data.result.transactions.data;
         var message = data.result.message;
-        console.log('data jalan GetlistByPaging farmer', data);
+        // console.log('data jalan GetlistByPaging farmer', data);
         if (status === 0) {
           this.showNotification(message, 'error');
           this.setState({
@@ -373,7 +392,7 @@ class showTransactionDetail extends React.Component {
         }
       })
       .then(data => {
-        console.log('DATA UPJA', data);
+        // console.log('DATA UPJA', data);
         var status = data.status;
         var resultUpja = data.result.upja;
         var resultTransaction = data.result.transactions.data;
@@ -575,7 +594,7 @@ class showTransactionDetail extends React.Component {
       '&page=' +
       currPage;
     var token = window.localStorage.getItem('tokenCookies');
-    console.log('URL GET LIST OTHER SERVICE', url);
+    // console.log('URL GET LIST OTHER SERVICE', url);
 
     this.setState(
       { loadingPageAlsin: true },
@@ -658,7 +677,7 @@ class showTransactionDetail extends React.Component {
       '&page=' +
       currPage;
     var token = window.localStorage.getItem('tokenCookies');
-    console.log('URL GET LIST OTHER SERVICE', url);
+    // console.log('URL GET LIST OTHER SERVICE', url);
 
     this.setState({ loadingPageAlsin: true });
     // this.setState(
@@ -882,7 +901,7 @@ class showTransactionDetail extends React.Component {
       '?transaction_order_id=' +
       transaction_order_id;
     var token = window.localStorage.getItem('tokenCookies');
-    console.log('URL GET LIST TRANSACTION', url);
+    // console.log('URL GET LIST TRANSACTION', url);
 
     this.setState(
       { loadingPageTransaction: true },
@@ -918,14 +937,14 @@ class showTransactionDetail extends React.Component {
         }
       })
       .then(data => {
-        console.log('DATA TRANSAKSI', data.result);
+        // console.log('DATA TRANSAKSI', data.result);
         var status = data.status;
         var resultTransaction = data.result.transaction;
         var resultTransactionAlsin = data.result.alsins;
         var resultTransactionAlsinOtherService = data.result.other_service;
         // var resultOtherService = data.result.other_service;
         var message = data.result.message;
-        console.log('data jalan GetlistByPaging upja', data);
+        // console.log('data jalan GetlistByPaging upja', data);
         if (status === 0) {
           this.showNotification(message, 'error');
           this.setState({
@@ -947,7 +966,8 @@ class showTransactionDetail extends React.Component {
 
               loadingPageTransaction: false,
             },
-            // () => console.log('DATA TRANSAKSI', this.state.resultReparation),
+            // () =>
+            //   console.log('DATA TRANSAKSI', this.state.resultTransactionAlsin),
           );
         }
       })
@@ -961,12 +981,12 @@ class showTransactionDetail extends React.Component {
   }
 
   getDetailTransactionAlsin(currPage, currLimit) {
-    console.log(
-      'this.state.detailTransactionAlsinItem',
-      this.state.detailTransactionAlsinItem,
-      '2',
-      this.state.detailTransaction,
-    );
+    // console.log(
+    //   'this.state.detailTransactionAlsinItem',
+    //   this.state.detailTransactionAlsinItem,
+    //   '2',
+    //   this.state.detailTransaction,
+    // );
     var transaction_order_type_id = this.state.detailTransactionAlsinItem
       .transaction_order_type_id;
     var alsin_type_id = this.state.detailTransactionAlsinItem.alsin_type_id;
@@ -978,9 +998,11 @@ class showTransactionDetail extends React.Component {
       '&alsin_type_id=' +
       alsin_type_id +
       '&alsin_other=' +
-      alsin_other;
+      alsin_other +
+      '&page=' +
+      currPage;
     var token = window.localStorage.getItem('tokenCookies');
-    console.log('URL GET LIST TRANSACTION ALSIN ITEM', url);
+    // console.log('URL GET LIST TRANSACTION ALSIN ITEM', url);
 
     this.setState(
       { loadingPageTransactionAlsinItem: true },
@@ -1016,7 +1038,7 @@ class showTransactionDetail extends React.Component {
         }
       })
       .then(data => {
-        console.log('DATA TRANSAKSI ALSIN ITEM', data);
+        // console.log('DATA TRANSAKSI ALSIN ITEM', data);
         var status = data.status;
         var resultTransactionAlsinItem = data.result.alsin_items;
         var message = data.result.message;
@@ -1030,10 +1052,105 @@ class showTransactionDetail extends React.Component {
           this.showNotification('Data ditemukan!', 'info');
           this.setState(
             {
-              resultTransactionAlsinItem: resultTransactionAlsinItem,
+              resultTransactionAlsinItem: resultTransactionAlsinItem.data,
               loadingPageTransactionAlsinItem: false,
+              maxPageItem: data.result.max_page,
             },
-            // () => console.log('DATA TRANSAKSI', data),
+            // () =>
+            //   console.log(
+            //     'DATA TRANSAKSI ALSIN ITEM',
+            //     this.state.resultTransactionAlsinItem,
+            //   ),
+          );
+        }
+      })
+      .catch(err => {
+        // console.log('ERRORNYA', err);
+        this.showNotification('Error ke server!', 'error');
+        this.setState({
+          loadingPageTransactionAlsinItem: false,
+        });
+      });
+  }
+
+  getDetailTransactionAlsinPagination(currPage, currLimit) {
+    console.log(
+      'this.state.detailTransactionAlsinItem',
+      this.state.detailTransactionAlsinItem,
+      '2',
+      this.state.detailTransaction,
+    );
+    var transaction_order_type_id = this.state.detailTransactionAlsinItem
+      .transaction_order_type_id;
+    var alsin_type_id = this.state.detailTransactionAlsinItem.alsin_type_id;
+    var alsin_other = this.state.detailTransactionAlsinItem.alsin_other;
+    const url =
+      myUrl.url_getDetailTransactionItem +
+      '?transaction_order_type_id=' +
+      transaction_order_type_id +
+      '&alsin_type_id=' +
+      alsin_type_id +
+      '&alsin_other=' +
+      alsin_other +
+      '&page=' +
+      currPage;
+    var token = window.localStorage.getItem('tokenCookies');
+    // console.log('URL GET LIST TRANSACTION ALSIN ITEM', url);
+
+    this.setState({ loadingPageTransactionAlsinItem: true });
+    // console.log("offset", offset, "currLimit", currLimit);
+
+    const option = {
+      method: 'GET',
+      json: true,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+        Authorization: `${'Bearer'} ${token}`,
+      },
+    };
+    // console.log('option', option);
+    fetch(url, option)
+      .then(response => {
+        // trace.stop();
+        if (response.ok) {
+          return response.json();
+        } else {
+          if (response.status === 401) {
+            this.showNotification('Username/Password salah!', 'error');
+          } else if (response.status === 500) {
+            this.showNotification('Internal Server Error', 'error');
+          } else {
+            this.showNotification('Response ke server gagal!', 'error');
+          }
+          this.setState({
+            loadingPageTransactionAlsinItem: false,
+          });
+        }
+      })
+      .then(data => {
+        // console.log('DATA TRANSAKSI ALSIN ITEM', data);
+        var status = data.status;
+        var resultTransactionAlsinItem = data.result.alsin_items;
+        var message = data.result.message;
+        // console.log('data jalan GetlistByPaging upja', data);
+        if (status === 0) {
+          this.showNotification(message, 'error');
+          this.setState({
+            loadingPageTransactionAlsinItem: false,
+          });
+        } else {
+          this.showNotification('Data ditemukan!', 'info');
+          this.setState(
+            {
+              resultTransactionAlsinItem: resultTransactionAlsinItem.data,
+              loadingPageTransactionAlsinItem: false,
+              maxPageItem: data.result.max_page,
+            },
+            // () =>
+            //   console.log(
+            //     'DATA TRANSAKSI ALSIN ITEM',
+            //     this.state.resultTransactionAlsinItem,
+            //   ),
           );
         }
       })
@@ -1066,7 +1183,7 @@ class showTransactionDetail extends React.Component {
       '&alsin_other=' +
       alsin_other;
     var token = window.localStorage.getItem('tokenCookies');
-    console.log('URL GET LIST TRANSACTION ALSIN ITEM', url);
+    // console.log('URL GET LIST TRANSACTION ALSIN ITEM', url);
 
     this.setState(
       { loadingPageTransactionAlsinItem: true },
@@ -1102,7 +1219,7 @@ class showTransactionDetail extends React.Component {
         }
       })
       .then(data => {
-        console.log('DATA TRANSAKSI ALSIN ITEM', data);
+        // console.log('DATA TRANSAKSI ALSIN ITEM', data);
         var status = data.status;
         var resultTransactionAlsinItem = data.result.alsin_items;
         var message = data.result.message;
@@ -1244,6 +1361,9 @@ class showTransactionDetail extends React.Component {
           realCurrentPageAlsinItem: 1,
           currentPageAlsinItem: 1,
           maxPageAlsinItem: 1,
+          realCurrentPageItem: 1,
+          currentPageItem: 1,
+          maxPageItem: 1,
           realCurrentPageSukuCadang: 1,
           currentPageSukuCadang: 1,
           maxPageSukuCadang: 1,
@@ -1265,6 +1385,9 @@ class showTransactionDetail extends React.Component {
         realCurrentPageAlsinItem: 1,
         currentPageAlsinItem: 1,
         maxPageAlsinItem: 1,
+        realCurrentPageItem: 1,
+        currentPageItem: 1,
+        maxPageItem: 1,
         realCurrentPageSukuCadang: 1,
         currentPageSukuCadang: 1,
         maxPageSukuCadang: 1,
@@ -1369,7 +1492,7 @@ class showTransactionDetail extends React.Component {
         detailTransactionAlsinItem: todo,
         // namaEcommerce: '',
       },
-      () => this.getDetailTransactionAlsin(),
+      () => this.getDetailTransactionAlsin(this.state.currentPageItem),
     );
   }
 
@@ -1578,7 +1701,7 @@ class showTransactionDetail extends React.Component {
       currentTodosTransaction.map((todo, i) => {
         return (
           <tr key={i}>
-            {console.log('TOTAL ALSIN', todo)}
+            {/* {console.log('TOTAL ALSIN', todo)} */}
             {todo.alsin_type_name !== '' && (
               <td style={{ textAlign: 'left' }}>
                 {
@@ -1616,9 +1739,9 @@ class showTransactionDetail extends React.Component {
         );
       });
 
-    {
-      console.log('TOTAL REPARATION', this.state.resultReparation);
-    }
+    // {
+    //   console.log('TOTAL REPARATION', this.state.resultReparation);
+    // }
     const renderTodosTransactionOtherService =
       this.state.resultTransactionAlsinOtherService &&
       this.state.resultTransactionAlsinOtherService.map((todo, i) => {
@@ -3373,11 +3496,30 @@ class showTransactionDetail extends React.Component {
           <ModalBody>
             <Table responsive striped>
               <thead>
-                <tr>
-                  <th>Kode Kendaraan</th>
-                  <th>Deskripsi</th>
-                  <th>Status</th>
-                </tr>
+                {
+                  <tr>
+                    <td
+                      colSpan="10"
+                      className="text-right"
+                      style={{ border: 'none' }}
+                    >
+                      <Label style={{ width: '50%', textAlign: 'right' }}>
+                        {' '}
+                        {'Halaman : ' +
+                          this.state.realCurrentPageItem +
+                          ' / ' +
+                          this.state.maxPageItem}
+                      </Label>
+                    </td>
+                  </tr>
+                }
+                {
+                  <tr>
+                    <th>Kode Kendaraan</th>
+                    <th>Deskripsi</th>
+                    <th>Status</th>
+                  </tr>
+                }
               </thead>
               <tbody>
                 {currentTodosTransactionAlsinItem.length === 0 &&
@@ -3404,6 +3546,86 @@ class showTransactionDetail extends React.Component {
                 )}
               </tbody>
             </Table>
+            <CardBody>
+              <Row>
+                <Col>
+                  <Card className="mb-3s">
+                    <ButtonGroup>
+                      <Button
+                        name="FirstButton"
+                        value={1}
+                        onClick={e =>
+                          this.paginationButtonItem(
+                            e,
+                            0,
+                            this.state.maxPageItem,
+                          )
+                        }
+                      >
+                        &#10092;&#10092;
+                      </Button>
+                      <Button
+                        name="PrevButton"
+                        value={this.state.currentPageItem}
+                        onClick={e =>
+                          this.paginationButtonItem(
+                            e,
+                            -1,
+                            this.state.maxPageItem,
+                          )
+                        }
+                      >
+                        &#10092;
+                      </Button>
+                      <input
+                        type="text"
+                        placeholder="Page"
+                        disabled={true}
+                        outline="none"
+                        value={this.state.currentPageItem}
+                        onChange={e =>
+                          this.setState({
+                            currentPageItem: e.target.value,
+                          })
+                        }
+                        onKeyPress={e => this.enterPressedPage(e)}
+                        style={{
+                          height: '38px',
+                          width: '75px',
+                          textAlign: 'center',
+                        }}
+                      />
+                      <Button
+                        name="NextButton"
+                        value={this.state.currentPageItem}
+                        onClick={e =>
+                          this.paginationButtonItem(
+                            e,
+                            1,
+                            this.state.maxPageItem,
+                          )
+                        }
+                      >
+                        &#10093;
+                      </Button>
+                      <Button
+                        name="LastButton"
+                        value={this.state.maxPageItem}
+                        onClick={e =>
+                          this.paginationButtonItem(
+                            e,
+                            0,
+                            this.state.maxPageItem,
+                          )
+                        }
+                      >
+                        &#10093;&#10093;
+                      </Button>
+                    </ButtonGroup>
+                  </Card>
+                </Col>
+              </Row>
+            </CardBody>
           </ModalBody>
         </Modal>
         {/* Modal Transaction Alsin Item*/}
