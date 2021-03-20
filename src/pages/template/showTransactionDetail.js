@@ -1609,7 +1609,7 @@ class showTransactionDetail extends React.Component {
                     }}
                     onClick={() => this.setModalDetailTransaction({ ...todo })}
                   >
-                    {todo.upja_id}
+                    {i + 1}
                   </Label>
                 }
               </td>
@@ -1663,7 +1663,7 @@ class showTransactionDetail extends React.Component {
                     }}
                     onClick={() => this.setModalDetailTransaction({ ...todo })}
                   >
-                    {todo.farmer_id}
+                    {i + 1}
                   </Label>
                 }
               </td>
@@ -2273,7 +2273,7 @@ class showTransactionDetail extends React.Component {
                       }
                       {
                         <tr>
-                          <th>Alsin ID</th>
+                          <th>No</th>
                           <th>Biaya Transport</th>
                           <th>Total Biaya</th>
                           <th>UPJA</th>
@@ -2305,7 +2305,7 @@ class showTransactionDetail extends React.Component {
                       }
                       {
                         <tr>
-                          <th>Alsin ID</th>
+                          <th>No</th>
                           <th>Biaya Transport</th>
                           <th>Total Biaya</th>
                           <th>Farmer</th>

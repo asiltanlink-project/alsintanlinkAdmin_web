@@ -1286,7 +1286,7 @@ class showTransaction extends React.Component {
       currentTodosFarmer.map((todo, i) => {
         return (
           <tr key={i}>
-            <th scope="row">{todo.farmer_id}</th>
+            <th scope="row">{i+1}</th>
             {todo.farmer_name !== '' && (
               <td style={{ width: '10%', textAlign: 'left' }}>
                 <Link to={`/showTransaction/farmer/${todo.farmer_id}`}>
@@ -1325,7 +1325,7 @@ class showTransaction extends React.Component {
       currentTodosUpja.map((todo, i) => {
         return (
           <tr key={i}>
-            <th scope="row">{todo.upja_id}</th>
+            <th scope="row">{i+1}</th>
             {todo.upja_name !== '' && (
               <td style={{ width: '10%', textAlign: 'left' }}>
                 <Link to={`/showTransaction/upja/${todo.upja_id}`}>
@@ -1697,7 +1697,7 @@ class showTransaction extends React.Component {
                       }
                       {
                         <tr>
-                          <th>ID</th>
+                          <th>No</th>
                           <th>Nama Petani</th>
                           <th>No. Telepon</th>
                           <th>Status</th>
@@ -1726,7 +1726,7 @@ class showTransaction extends React.Component {
                       }
                       {
                         <tr>
-                          <th>ID</th>
+                          <th>No</th>
                           <th>UPJA</th>
                           <th>Desa</th>
                           <th>Kepala UPJA</th>
