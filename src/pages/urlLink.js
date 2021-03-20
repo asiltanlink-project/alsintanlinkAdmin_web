@@ -36,6 +36,7 @@ var url_updateSparePart =
   'https://alsintanlink.com/api/admin/update_spare_part_type';
 
 var url_uploadExcel = 'https://alsintanlink.com/api/admin/import_spare_part';
+var url_manual_book = "http://alsintanlink.com/api/manual_book/admin"
 
 export {
   url_login,
@@ -59,4 +60,5 @@ export {
   url_deleteSparePart,
   url_updateSparePart,
   url_uploadExcel,
+  url_manual_book
 };

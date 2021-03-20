@@ -1011,7 +1011,7 @@ class showTransaction extends React.Component {
             namaProvinsi: '',
             namaKotaKab: '',
             namaKecamatan: '',
-            namaDesa:'',
+            namaDesa: '',
             namaType: '',
           },
           () => this.findUpjaFarmer(),
@@ -1286,7 +1286,7 @@ class showTransaction extends React.Component {
       currentTodosFarmer.map((todo, i) => {
         return (
           <tr key={i}>
-            <th scope="row">{i+1}</th>
+            <th scope="row">{i + 1}</th>
             {todo.farmer_name !== '' && (
               <td style={{ width: '10%', textAlign: 'left' }}>
                 <Link to={`/showTransaction/farmer/${todo.farmer_id}`}>
@@ -1325,7 +1325,7 @@ class showTransaction extends React.Component {
       currentTodosUpja.map((todo, i) => {
         return (
           <tr key={i}>
-            <th scope="row">{i+1}</th>
+            <th scope="row">{i + 1}</th>
             {todo.upja_name !== '' && (
               <td style={{ width: '10%', textAlign: 'left' }}>
                 <Link to={`/showTransaction/upja/${todo.upja_id}`}>
@@ -1528,6 +1528,14 @@ class showTransaction extends React.Component {
                     >
                       <MdSearch />
                       Cari
+                    </Button>
+                    <Button
+                      color="danger"
+                      onClick={() => {
+                        window.open(myUrl.url_manual_book);
+                      }}
+                    >
+                      Manual Book
                     </Button>
                   </ButtonGroup>
                 </Col>
