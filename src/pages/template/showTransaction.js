@@ -1000,8 +1000,8 @@ class showTransaction extends React.Component {
 
   findData() {
     // console.log('KLIK FIND DATA');
-    var buttonSearch = document.getElementById('buttonSearch');
-    buttonSearch.disabled = true;
+    // var buttonSearch = document.getElementById('buttonSearch');
+    // buttonSearch.disabled = true;
 
     this.setState(
       {
@@ -1043,8 +1043,8 @@ class showTransaction extends React.Component {
   }
 
   resetSearch() {
-    var buttonSearch = document.getElementById('buttonSearch');
-    buttonSearch.disabled = true;
+    // var buttonSearch = document.getElementById('buttonSearch');
+    // buttonSearch.disabled = true;
     this.setState({
       namaType: '',
       namaKotaKab: '',
@@ -1078,8 +1078,8 @@ class showTransaction extends React.Component {
   }
 
   setModalProvinsi() {
-    var buttonSearch = document.getElementById('buttonSearch');
-    buttonSearch.disabled = false;
+    // var buttonSearch = document.getElementById('buttonSearch');
+    // buttonSearch.disabled = false;
     this.setState(
       {
         periodeDisabled: false,
@@ -1092,8 +1092,8 @@ class showTransaction extends React.Component {
   }
 
   setModalKotaKab() {
-    var buttonSearch = document.getElementById('buttonSearch');
-    buttonSearch.disabled = false;
+    // var buttonSearch = document.getElementById('buttonSearch');
+    // buttonSearch.disabled = false;
     this.setState(
       {
         periodeDisabled: false,
@@ -1106,8 +1106,8 @@ class showTransaction extends React.Component {
   }
 
   setModalKecamatan() {
-    var buttonSearch = document.getElementById('buttonSearch');
-    buttonSearch.disabled = false;
+    // var buttonSearch = document.getElementById('buttonSearch');
+    // buttonSearch.disabled = false;
     this.setState(
       {
         periodeDisabled: false,
@@ -1120,8 +1120,8 @@ class showTransaction extends React.Component {
   }
 
   setModalDesa() {
-    var buttonSearch = document.getElementById('buttonSearch');
-    buttonSearch.disabled = false;
+    // var buttonSearch = document.getElementById('buttonSearch');
+    // buttonSearch.disabled = false;
     this.setState(
       {
         periodeDisabled: false,
@@ -1632,12 +1632,9 @@ class showTransaction extends React.Component {
                           sm={10}
                           style={{ paddingBottom: 0, marginBottom: 0 }}
                         >
-                          :&nbsp;
-                          {this.state.namaProvinsiSave === undefined &&
-                          window.localStorage.getItem('namaProvinsi') ===
-                            undefined ? (
-                            <Label style={{ fontWeight: 'bold' }}>-</Label>
-                          ) : (
+                          :&nbsp;{(this.state.namaProvinsiSave === undefined && this.state.namaKecamatanSave === undefined && this.state.namaKotaKabSave === undefined && this.state.namaDesaSave === undefined) || (window.localStorage.getItem('namaProvinsi') === undefined && window.localStorage.getItem('namaKecamatan') === undefined && window.localStorage.getItem('namaKotaKab') === undefined && window.localStorage.getItem('namaDesa') === undefined)?
+                          <Label style={{ fontWeight: 'bold' }}>-,-,-,-</Label>
+                          :
                             <Label style={{ fontWeight: 'bold' }}>
                               {(this.state.namaProvinsiSave ||
                                 window.localStorage.getItem('namaProvinsi')) !== '' ? (this.state.namaProvinsiSave ||
@@ -1655,7 +1652,7 @@ class showTransaction extends React.Component {
                                 window.localStorage.getItem('namaDesa')) !=='' ? this.state.namaDesaSave ||
                                 window.localStorage.getItem('namaDesa') : '-'}
                             </Label>
-                          )}
+                          }
                         </Col>
                       )}
                     </Row>
