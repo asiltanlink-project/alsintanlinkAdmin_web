@@ -4,7 +4,7 @@
 // url local efath
 var url_alsintanlinkLocal = 'https://alsintanlink.com';
 var url_alsintanlinkProduction =
-  'http://alsintanlink-api.litbang.pertanian.go.id/';
+  'http://alsintanlink-api.litbang.pertanian.go.id';
 
 //URL LOGIN
 var url_login = url_alsintanlinkProduction + '/api/admin/login';
