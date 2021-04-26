@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-expressions */
 import Page from 'components/Page';
 import React from 'react';
 import {
@@ -343,11 +344,17 @@ class showTransaction extends React.Component {
     const url =
       myUrl.url_getAllData +
       'show_farmer?village_id=' +
-      villageID +  "&province_id=" + provinceID + "&city_id=" + cityID + "&district_id=" + districtID +
+      villageID +
+      '&province_id=' +
+      provinceID +
+      '&city_id=' +
+      cityID +
+      '&district_id=' +
+      districtID +
       '&page=' +
       currPage;
 
-      // province_id=31&city_id=3172&district_id=3172080&village_id=25502&page=1
+    // province_id=31&city_id=3172&district_id=3172080&village_id=25502&page=1
     var token = window.localStorage.getItem('tokenCookies');
     // console.log('URL GET LIST', url);
     console.log('MASUK FARMER', url);
@@ -431,7 +438,13 @@ class showTransaction extends React.Component {
     const url =
       myUrl.url_getAllData +
       'show_upja?village_id=' +
-      villageID +  "&province_id=" + provinceID + "&city_id=" + cityID + "&district_id=" + districtID +
+      villageID +
+      '&province_id=' +
+      provinceID +
+      '&city_id=' +
+      cityID +
+      '&district_id=' +
+      districtID +
       '&page=' +
       currPage;
     var token = window.localStorage.getItem('tokenCookies');
@@ -728,7 +741,13 @@ class showTransaction extends React.Component {
     if (token === '' || token === null || token === undefined) {
       window.location.replace('/login');
     } else {
-      if (type !== null && (desaID !== null || kotakabID !== null || provinsiID !== null || kecamatanID !== null)) {
+      if (
+        type !== null &&
+        (desaID !== null ||
+          kotakabID !== null ||
+          provinsiID !== null ||
+          kecamatanID !== null)
+      ) {
         console.log('MASUK');
         this.setState(
           {
@@ -832,6 +851,7 @@ class showTransaction extends React.Component {
     var nama = this.state.resultType.find(function (element) {
       return element.type_id === event.target.value;
     });
+    var buttonSearch = document.getElementById('buttonSearch');
     this.setState(
       {
         pilihType: event.target.value,
@@ -842,6 +862,26 @@ class showTransaction extends React.Component {
         pilihProvinsi: '',
         pilihKotaKab: '',
         pilihKecamatan: '',
+        pilihDesa: '',
+        namaDesaSave: '',
+        namaDesa: '',
+        namaKecamatan: '',
+        namaKecamatanSave: '',
+        namaKotaKab: '',
+        namaKotaKabSave: '',
+        namaProvinsi: '',
+        namaProvinsiSave: '',
+      },
+      () => {
+        window.localStorage.removeItem('namaProvinsi'),
+          window.localStorage.removeItem('namaKotaKab'),
+          window.localStorage.removeItem('namaKecamatan'),
+          window.localStorage.removeItem('namaDesa'),
+          window.localStorage.removeItem('provinsiID'),
+          window.localStorage.removeItem('kecamatanID'),
+          window.localStorage.removeItem('kotakabID'),
+          window.localStorage.removeItem('desaID'),
+          buttonSearch.disabled = false;
       },
       // () => console.log('CEK CEK CEK', this.state.pilihType),
       // () =>
@@ -1000,8 +1040,8 @@ class showTransaction extends React.Component {
 
   findData() {
     // console.log('KLIK FIND DATA');
-    // var buttonSearch = document.getElementById('buttonSearch');
-    // buttonSearch.disabled = true;
+    var buttonSearch = document.getElementById('buttonSearch');
+    buttonSearch.disabled = true;
 
     this.setState(
       {
@@ -1539,6 +1579,7 @@ class showTransaction extends React.Component {
                       style={{ float: 'right' }}
                       onClick={() => this.findData()}
                       // disabled={!isSearch}
+                      disabled={this.state.pilihType === ''}
                       id="buttonSearch"
                     >
                       <MdSearch />
@@ -1632,27 +1673,41 @@ class showTransaction extends React.Component {
                           sm={10}
                           style={{ paddingBottom: 0, marginBottom: 0 }}
                         >
-                          :&nbsp;{(this.state.namaProvinsiSave === undefined && this.state.namaKecamatanSave === undefined && this.state.namaKotaKabSave === undefined && this.state.namaDesaSave === undefined) || (window.localStorage.getItem('namaProvinsi') === undefined && window.localStorage.getItem('namaKecamatan') === undefined && window.localStorage.getItem('namaKotaKab') === undefined && window.localStorage.getItem('namaDesa') === undefined)?
-                          <Label style={{ fontWeight: 'bold' }}>-,-,-,-</Label>
-                          :
+                          :&nbsp;
+                          {(this.state.namaProvinsiSave === undefined &&
+                            this.state.namaKecamatanSave === undefined &&
+                            this.state.namaKotaKabSave === undefined &&
+                            this.state.namaDesaSave === undefined) ||
+                          (window.localStorage.getItem('namaProvinsi') ===
+                            undefined &&
+                            window.localStorage.getItem('namaKecamatan') ===
+                              undefined &&
+                            window.localStorage.getItem('namaKotaKab') ===
+                              undefined &&
+                            window.localStorage.getItem('namaDesa') ===
+                              undefined) ? (
                             <Label style={{ fontWeight: 'bold' }}>
-                              {(this.state.namaProvinsiSave ||
-                                window.localStorage.getItem('namaProvinsi')) !== '' ? (this.state.namaProvinsiSave ||
-                                window.localStorage.getItem('namaProvinsi')) : '-' }
-                              ,&nbsp;
-                              {(this.state.namaKotaKabSave ||
-                                window.localStorage.getItem('namaKotaKab')) !== '' ? (this.state.namaKotaKabSave ||
-                                  window.localStorage.getItem('namaKotaKab')) : '-'}
-                              ,&nbsp;
-                              {(this.state.namaKecamatanSave ||
-                                window.localStorage.getItem('namaKecamatan')) !== '' ? (this.state.namaKecamatanSave ||
-                                  window.localStorage.getItem('namaKecamatan')) : '-'}
-                              ,&nbsp;
-                              {(this.state.namaDesaSave ||
-                                window.localStorage.getItem('namaDesa')) !=='' ? this.state.namaDesaSave ||
-                                window.localStorage.getItem('namaDesa') : '-'}
+                              -,-,-,-
                             </Label>
-                          }
+                          ) : (
+                            <Label style={{ fontWeight: 'bold' }}>
+                              {this.state.namaProvinsiSave !== ''
+                                ? this.state.namaProvinsiSave
+                                : '-'}
+                              ,&nbsp;
+                              {this.state.namaKotaKabSave !== ''
+                                ? this.state.namaKotaKabSave
+                                : '-'}
+                              ,&nbsp;
+                              {this.state.namaKecamatanSave !== ''
+                                ? this.state.namaKecamatanSave
+                                : '-'}
+                              ,&nbsp;
+                              {this.state.namaDesaSave !== ''
+                                ? this.state.namaDesaSave
+                                : '-'}
+                            </Label>
+                          )}
                         </Col>
                       )}
                     </Row>
