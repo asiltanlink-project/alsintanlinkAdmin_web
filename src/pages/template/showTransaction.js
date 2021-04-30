@@ -1516,7 +1516,7 @@ class showTransaction extends React.Component {
                       Halaman untuk melihat transaksi secara keseluruhan
                       berdasarkan Status
                     </Tooltip>
-                    <Button
+                    {/* <Button
                       id="excelInfo"
                       color="primary"
                       style={{ float: 'right' }}
@@ -1536,7 +1536,7 @@ class showTransaction extends React.Component {
                       }
                     >
                       Halaman untuk Mengecek SparePart
-                    </Tooltip>
+                    </Tooltip> */}
                     <Button
                       id="alertInfo"
                       color="warning"
