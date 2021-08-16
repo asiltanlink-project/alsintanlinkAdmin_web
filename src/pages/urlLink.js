@@ -47,6 +47,8 @@ var url_uploadExcel =
   url_alsintanlinkProduction + '/api/admin/import_spare_part';
 var url_manual_book = 'http://alsintanlink.com/api/manual_book/admin';
 
+var url_add_location = url_alsintanlinkProduction + '/api/admin/add_new_location'
+
 export {
   url_login,
   url_showDetailFarmer,
@@ -70,4 +72,5 @@ export {
   url_updateSparePart,
   url_uploadExcel,
   url_manual_book,
+  url_add_location
 };

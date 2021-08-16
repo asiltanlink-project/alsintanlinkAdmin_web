@@ -42,6 +42,9 @@ const showTransactionSparePart = React.lazy(() =>
 const showTransactionSparePartDetail = React.lazy(() =>
   import('pages/template/showTransactionSparePartDetail'),
 );
+const addNewLocation = React.lazy(() =>
+import('pages/template/addNewLocation'),
+);
 
 const getBasename = () => {
   return `/${process.env.PUBLIC_URL.split('/').pop()}`;
@@ -134,6 +137,12 @@ class App extends React.Component {
                   setTitle={this.setTitle}
                   path="/showtransaction/upja/:upja_id"
                   component={showTransactionDetail}
+                />
+                 <Route
+                  exact
+                  setTitle={this.setTitle}
+                  path="/addnewlocation"
+                  component={addNewLocation}
                 />
               </React.Suspense>
             </MainLayout>

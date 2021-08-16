@@ -91,6 +91,7 @@ class showTransaction extends React.Component {
       statusInfo: false,
       excelInfo: false,
       alertInfo: false,
+      tambahLokasi: false,
       resultType: [
         {
           type_id: 'show_farmer',
@@ -520,11 +521,8 @@ class showTransaction extends React.Component {
   }
 
   // Get Provinsi
-  getProvinsi(currPage, currLimit) {
-    var offset = (currPage - 1) * currLimit;
-    var keyword = this.state.keywordList;
-    const urlA = myUrl.url_getProvince;
-    // console.log('jalan', urlA);
+  getProvinsi() {
+    const urlA = myUrl.url_getProvince
     this.setState({ loadingPage: true });
     const option = {
       method: 'GET',
@@ -1574,6 +1572,25 @@ class showTransaction extends React.Component {
                       }
                     >
                       Reset Farmer/UPJA dan Domisili yang telah dipilih
+                    </Tooltip>
+                    <Button
+                      style={{ float: 'right' }}
+                      onClick={() =>
+                        this.props.history.push('/addnewlocation')
+                      }
+                      id="tambahLokasi"
+                    >
+                      <MdAdd />
+                    </Button>
+                    <Tooltip
+                      placement="right"
+                      isOpen={this.state.tambahLokasi}
+                      target="tambahLokasi"
+                      toggle={() =>
+                        this.setState({ tambahLokasi: !this.state.tambahLokasi })
+                      }
+                    >
+                      Tambah Data Lokasi UPJA
                     </Tooltip>
                     <Button
                       style={{ float: 'right' }}
